@@ -1,0 +1,18 @@
+{
+  "name": "zedge",
+  "version": "1.0.0",
+  "description": "Self-hosted Cloudflare control panel: domains, DNS, security, rules, Workers, R2, Zero Trust, email, analytics, multi-user roles",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "node --test \"test/*.test.js\"",
+    "deploy": "node scripts/deploy.mjs"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

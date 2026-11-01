@@ -1,0 +1,43 @@
+# Zedge behind a Cloudflare Tunnel. Nothing is published on the host:
+# the only way in is the tunnel (and Cloudflare Access, if you set it up).
+# Run `npm run deploy -- --hostname console.example.com` to create the tunnel, DNS record and .env.
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      CF_API_TOKEN: ${CF_API_TOKEN:?run npm run deploy first}
+      EDGE_ADMIN_PASSWORD: ${EDGE_ADMIN_PASSWORD:?run npm run deploy first}
+      SESSION_SECRET: ${SESSION_SECRET:-}
+      CF_ACCOUNT_ID: ${CF_ACCOUNT_ID:-}
+      CF_ACCOUNT_IDS: ${CF_ACCOUNT_IDS:-}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-}
+      R2_ENDPOINT: ${R2_ENDPOINT:-}
+      HOST: 0.0.0.0
+      DATA_DIR: /data
+      COOKIE_SECURE: "1"
+      TRUST_CF_CONNECTING_IP: "1"
+    volumes:
+      - zedge-data:/data
+    expose:
+      - "8787"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?run npm run deploy first}
+    depends_on:
+      - app
+
+volumes:
+  zedge-data:

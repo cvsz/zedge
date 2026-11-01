@@ -2,6 +2,11 @@
 
 A self-hosted control panel for Cloudflare. Add domains and subdomains in one click, edit DNS inline, manage WAF, rate limits, redirects and cache rules, deploy Workers, browse R2, run Zero Trust, route email, see traffic charts, and give your team their own logins with per-action permissions. Node 20+, one dependency (Express), no build step.
 
+Cloudflare_Docs=https://developers.cloudflare.com/llms-full.txt
+Cloudflare_Fundamentals=https://developers.cloudflare.com/fundamentals/llms-full.txt
+Cloudflare_CLI=https://developers.cloudflare.com/cf/llms-full.txt
+Cloudflare_Skills=https://github.com/cloudflare/skills
+
 ## Quick start
 
 **Local**

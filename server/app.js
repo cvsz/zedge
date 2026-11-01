@@ -6,6 +6,8 @@ import { createAuth } from './auth.js';
 import { createStore } from './store.js';
 import { can } from './rbac.js';
 import { HttpError } from './errors.js';
+import { recordMetric, getMetrics } from './metrics.js';
+import { openApiSpec } from './openapi.js';
 import { registerCore } from './routes/core.js';
 import { registerRules } from './routes/rules.js';
 import { registerWorkers } from './routes/workers.js';
@@ -28,6 +30,14 @@ export function createApp(config, { fetchImpl } = {}) {
   const app = express();
   app.disable('x-powered-by');
   app.set('trust proxy', false);
+  
+  app.use((req, res, next) => {
+    res.on('finish', () => recordMetric(res.statusCode));
+    next();
+  });
+
+  app.get('/metrics', (req, res) => res.type('text/plain').send(getMetrics(store)));
+  app.get('/openapi.json', (req, res) => res.json(openApiSpec));
   // Behind a Cloudflare Tunnel every request arrives from cloudflared. Cloudflare sets CF-Connecting-IP to the real
   // client, so the login rate limit and audit log can use it. Only enable when the tunnel is the sole way in.
   if (config.trustCfIp) {

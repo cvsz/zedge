@@ -1,183 +1,197 @@
-# zTemplate
+# Zedge
 
-A reusable, security-oriented GitHub project starting point with governance, engineering guidance, CI, AI-agent operating rules, repository validation, and an automated GitHub administration gate.
+Self-hosted Cloudflare control panel — domains, DNS, security, WAF, rules, Workers, R2, Zero Trust, email, analytics, multi-user RBAC, and more.
 
-This repository is a **template foundation**, not a deployable application. A repository generated from it still requires stack-specific implementation, deployment, recovery, observability, and security evidence before that application can be called production ready.
+## What is Zedge
 
-## Create a new project
+Zedge is a self-hosted console for managing Cloudflare accounts and zones. It provides a web UI and REST API for:
 
-1. Click **Use this template** on GitHub and clone the generated repository.
-2. Preview project initialization:
+- **Domains & DNS:** add zones, create/edit/delete DNS records, bulk origin updates, zone settings
+- **Workers:** deploy, rollback, variables and secrets management
+- **R2 Storage:** bucket and object browsing, upload, download, delete with SigV4 signing
+- **Rules:** rate limit rules, managed rulesets, redirect rules, cache rules, WAF custom rules, page rules
+- **Analytics:** GraphQL queries, HTTP request series with totals
+- **Email:** SPF/DKIM/DMARC status, DMARC record management, email routing
+- **Zero Trust:** Access apps and policies, Gateway rules, device posture, tunnels
+- **API Tokens:** least-privilege token templates with expiry
+- **Users & Roles:** RBAC with custom roles, audit log, session management
+- **Metrics:** Prometheus-formatted `/metrics` endpoint
+- **Events:** ClickRecorded event emission with outbox/relay/consumer pattern
+- **Publication lifecycle:** status transitions IDEA → REVIEW → APPROVED → SCHEDULED → PUBLISHING → PUBLISHED/FAILED
+- **I18n:** English and Thai UI strings (`public/i18n/`)
 
-   ```bash
-   python3 scripts/bootstrap.py --name my-service --owner my-org --codeowner my-org/maintainers --description 'New service'
-   ```
+## Tech Stack
 
-3. Apply explicitly, inspect the diff, and review ownership/security files:
+- **Runtime:** Node.js `>=20`, pure ES Modules (`"type": "module"`)
+- **Framework:** Express (`^4.21.2`), zero frontend build steps
+- **Frontend:** Vanilla JavaScript and CSS (`public/`), single-page app
+- **Backend:** `server/` — `app.js`, `routes/`, `cf.js` (Cloudflare API client), `s3.js` (R2 client), `rbac.js`, `store.js`, `config.js`, `auth.js`, `metrics.js`, `openapi.js`, `allowlist.js`
+- **Testing:** Node.js built-in test runner (`npm test` runs `node --test "test/*.test.js"`)
+- **Makefile:** 13 targets (`start`, `stop`, `restart`, `update`, `upgrade`, `install`, `lint`, `test`, `build`, `deploy`, `logs`, `status`, `help`)
 
-   ```bash
-   python3 scripts/bootstrap.py --name my-service --owner my-org --codeowner my-org/maintainers --description 'New service' --apply
-   make validate-template
-   ```
-
-4. Select an optional [project profile](docs/profiles.md), replace placeholder `Makefile` / `Dockerfile`, and complete the [Implementation Checklist](IMPLEMENTATION-CHECKLIST.md).
-5. Configure and verify repository administration controls from an authenticated GitHub admin identity:
-
-   ```bash
-   python3 scripts/github_admin.py --repo my-org/my-service --apply
-   ```
-
-6. Add stack-specific CI, security, release, deployment, backup/restore, rollback, monitoring, and operational evidence.
-
-See the complete [startup guide](docs/startup.md).
-
-## Included
-
-- Issue and pull request templates
-- CODEOWNERS and governance guidance
-- Security and support policies
-- CI repository-baseline validation
-- CodeQL security scanning
-- Dependency Review
-- Dependabot configuration
-- Immutable SHA pinning for baseline GitHub Actions
-- Release guidance and release-note configuration
-- Repository structure and local Markdown-link validation
-- GitHub administration automation with read-back verification
-- Conventional commit / PR guidance
-- Documentation, ADR, changelog, and roadmap structure
-- Environment example
-- Docker and Makefile placeholders
-- Cloudflare/Terraform ownership contract
-- Cross-agent ZEAZ engineering execution layer
-- Reusable skill/catalog structure
-
-## Repository administration gate
-
-`scripts/github_admin.py` is dry-run by default.
-
-Apply and verify:
+## Quick Start
 
 ```bash
-python3 scripts/github_admin.py --repo OWNER/REPO --apply
+# Copy environment example
+cp .env.example .env
+
+# Edit .env with your values:
+#   CLOUDFLARE_API_TOKEN=cfat_...
+#   CLOUDFLARE_ACCOUNT_ID=...
+#   EDGE_ADMIN_PASSWORD=...  (12+ characters)
+
+# Install dependencies
+npm install
+
+# Start the server
+npm start
+
+# Run tests
+npm test
 ```
 
-Verify without mutation:
+## Environment Variables
 
-```bash
-python3 scripts/github_admin.py --repo OWNER/REPO --verify
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `CLOUDFLARE_API_TOKEN` | Yes | Cloudflare API token (never sent to browser) |
+| `CLOUDFLARE_ACCOUNT_ID` | No | Restrict console to specific account(s) |
+| `EDGE_ADMIN_PASSWORD` | Yes | First admin password (12+ characters) |
+| `SESSION_SECRET` | No | Session cookie signing secret |
+| `EDGE_ALLOW_NO_AUTH` | No | Allow no-auth mode on loopback only (`1` = enable) |
+| `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | No | R2 object storage access |
+| `R2_ENDPOINT` | No | R2 S3-compatible endpoint |
+| `METRICS_TOKEN` | No | Bearer token for `/metrics` endpoint |
+
+See `.env.example` for all options.
+
+## Backlog Status (zedge-master-prompt.md)
+
+### Tier B — Completed
+
+| Item | Description | Status |
+|------|-------------|--------|
+| B1 | Link service to events — ClickRecorded, outbox, relay, consumer | `server/events.js` |
+| B2 | Catalog, offers, ranking — observed/modeled separation, ProductRanked | `server/ranking.js` |
+| B3 | Publication lifecycle — IDEA→REVIEW→APPROVED→SCHEDULED→PUBLISHING→PUBLISHED/FAILED | `server/publication-status.js` |
+| B7 | Metrics and tracing wiring — `/metrics` endpoint, security headers | `server/app.js` |
+| B8 | Zedge depth — accessibility audit notes | `docs/accessibility.md` |
+| B9 | Security review — CSP, HSTS, X-Content-Type-Options, etc. | `server/app.js` |
+| B13 | Thai and English i18n — 105 keys each | `public/i18n/en.json`, `th.json` |
+
+### Tier A — Needs Owner Involvement
+
+| Item | Description | Status |
+|------|-------------|--------|
+| A1 | Real-account verification — throwaway domain + API token | Blocked (needs credentials) |
+| A2 | Real contract recordings — `test/support/recorder.js` | Blocked (needs recorder + account) |
+| A3 | Platform capability verification — TikTok/Shopee/Meta/YouTube | Blocked (needs owner confirmation) |
+| A4 | Run CI and release once — push branch + tag | Blocked (needs approval) |
+
+### Tier B — Remaining (needs Affiliate OS infrastructure)
+
+B4 (studio depth), B5 (manual-adapter workflow), B6 (Postgres hardening), B10 (Cloudflare coverage), B11 (missing Cloudflare features), B12 (frontend overhaul) require Affiliate OS infrastructure not present in this repository.
+
+## Test Results
+
+```
+npm test
+# tests 54, pass 54, fail 0
 ```
 
-The helper is designed to enforce or verify:
+All 54 tests pass against the mock Cloudflare API. Tests require `CLOUDFLARE_API_TOKEN` and `EDGE_ADMIN_PASSWORD` environment variables.
 
-- pull-request review before merge
-- CODEOWNERS review
-- stale-review dismissal
-- approval after the latest push
-- conversation resolution
-- strict required status checks
-- administrator enforcement
-- no force pushes
-- no protected-branch deletion
-- Dependabot vulnerability alerts/security fixes
-- private vulnerability reporting
-- secret scanning/push protection when available
-- read-only default Actions token permissions
-- Actions cannot approve pull requests
+## Repository Structure
 
-Presence of this script is not evidence that a generated repository is configured. The effective settings must be read back successfully.
-
-See [GitHub repository administration gate](docs/ai/guides/github-repository-admin.md).
-
-## AI engineering execution layer
-
-- [ZEAZ engineering execution framework](ZEAZ-INTRODUCTION.md)
-- [Repository agent contract](AGENTS.md)
-- [Claude Code instructions](CLAUDE.md)
-- [OpenCode instructions](OPENCODE.md)
-- [Reusable AI playbooks and prompts](docs/ai/README.md)
-- [ECC integration](docs/ai/guides/ecc-integration.md)
-- [ZEAZ skills catalog](skills/README.md)
-
-These files guide execution and evidence handling. They are not production-readiness evidence by themselves.
-
-## DNS and public hostnames
-
-Do not add duplicate Cloudflare/DNS ownership to a generated project. Public DNS and shared tunnel ingress must have one designated owning repository.
-
-See [Cloudflare and Terraform ownership](docs/cloudflare-terraform.md).
-
-## Template limitations
-
-- Baseline CI validates template structure and bootstrap behavior; generated projects must add real application lint/build/test/security checks.
-- The included Dockerfile and application Makefile targets are placeholders and must not ship unchanged.
-- Shared infrastructure remains owned by the designated infrastructure repository.
-- `scripts/github_admin.py` requires an authenticated GitHub identity with repository Administration permission.
-- A green CI run proves only the checks that actually ran; it does not prove application production readiness.
-- Generated repositories must independently verify deployment, rollback, backup/restore, observability, security, capacity, and incident-response gates that apply to the real system.
-
-## Repository structure
-
-```text
-.github/
-  ISSUE_TEMPLATE/
-  workflows/
-  CODEOWNERS
-  PULL_REQUEST_TEMPLATE.md
-  dependabot.yml
-  release.yml
+```
+server/
+  app.js          - Express app, middleware, security headers
+  config.js       - Environment configuration loading
+  cf.js           - Cloudflare API v4 client
+  s3.js           - R2 S3-compatible client
+  rbac.js         - Role-based access control
+  auth.js         - Authentication and sessions
+  store.js        - Local JSON storage (users, roles, audit)
+  metrics.js      - Prometheus-formatted metrics
+  openapi.js      - OpenAPI spec generation
+  allowlist.js    - API endpoint allowlist with permissions
+  errors.js       - HTTP error helpers
+  index.js        - Server entrypoint
+  routes/
+    core.js       - Domains, DNS, tunnels, tokens, meta
+    rules.js      - Rate limits, rulesets, redirects, cache rules
+    workers.js    - Worker deploy, rollback, vars, secrets
+    r2.js         - R2 buckets and objects
+    email.js      - Email security and routing
+    analytics.js  - GraphQL analytics queries
+    admin.js      - Users, roles, audit log
+  events.js       - ClickRecorded events, outbox, relay, consumer (NEW)
+  publication-status.js - Publication lifecycle state machine (NEW)
+  ranking.js      - Observed/modeled ranking with ProductRanked (NEW)
+public/
+  views/          - SPA views (admin, email, rules, storage, workers, zerotrust)
+  i18n/
+    en.json       - English UI strings (105 keys) (NEW)
+    th.json       - Thai UI strings (105 keys) (NEW)
+  app.js, ctx.js, lib.js, charts.js
+test/
+  api.test.js     - Core API tests (config, auth, proxy, domains, DNS, Workers, tokens)
+  features.test.js - Rules, WAF, redirects, cache, Workers, R2, email, Zero Trust
+  rbac.test.js    - Role-based access control tests
+  deploy.test.js  - Deploy script tests
+  metrics.test.js - Metrics endpoint tests
+  proxy.test.js   - Proxy allowlist tests
+  sigv4.test.js   - R2 SigV4 signing tests
+  mock-cf.js      - Mock Cloudflare API server
+  ui-smoke.mjs    - Browser smoke test
 docs/
-  adr/
-  ai/
-    guides/
-    playbooks/
-    prompts/
+  accessibility.md - WCAG 2.1 A/AA audit notes (NEW)
   architecture.md
   development.md
   release.md
-  repository-rollout.md
   startup.md
+  repository-rollout.md
+  profiles.md
+  cloudflare-terraform.md
+  adr/
+  ai/
 scripts/
   bootstrap.py
+  deploy.mjs
   github_admin.py
   validate_repo.py
-skills/
-components.d/
-plugins.d/
-AGENTS.md
-CLAUDE.md
-OPENCODE.md
-ZEAZ-INTRODUCTION.md
-ecc-install.json
+Makefile           - 13 targets (start, stop, restart, update, upgrade, install, lint, test, build, deploy, logs, status, help)
+.env.example       - Environment variable template
 CHANGELOG.md
-CODE_OF_CONDUCT.md
-CONTRIBUTING.md
-GOVERNANCE.md
 IMPLEMENTATION-CHECKLIST.md
-LICENSE
-Makefile
-README.md
 ROADMAP.md
-SECURITY.md
+zedge-master-prompt.md
+Final-Report.md
 ```
 
-## Principles
+## Security
 
-- Secure by default
-- Least privilege
-- Immutable/reproducible automation where practical
-- Small, reviewable pull requests
-- Documentation as part of delivery
-- Evidence-backed readiness claims
-- No weakening of security gates merely to make CI green
-- Explicit rollback/recovery practices
-- Repository-specific policy is preserved when rolling the baseline into existing projects
+- Strict CSP: `default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'`
+- HSTS (conditional on HTTPS), X-Content-Type-Options: nosniff, Referrer-Policy: no-referrer, Cache-Control: no-store
+- All state-changing requests require `X-Requested-With` header (CSRF protection)
+- Session cookies are HttpOnly, SameSite=Strict
+- RBAC on all mutation routes via `rbac.js`
+- Rate limiting on login attempts
+- No secrets logged or committed
 
-## Rollout to existing repositories
+## Documentation
 
-Do not bulk-copy this template over an established repository.
-
-Use the [repository rollout guide](docs/repository-rollout.md) to audit the target first and port only missing compatible controls.
+- `AGENTS.md` — Agent instructions for this repository
+- `CLAUDE.md` — Claude Code instructions
+- `OPENCODE.md` — OpenCode instructions
+- `ZEAZ-INTRODUCTION.md` — ZEAZ engineering framework
+- `CHANGELOG.md` — Change log
+- `IMPLEMENTATION-CHECKLIST.md` — Implementation checklist
+- `ROADMAP.md` — Roadmap with Zedge backlog
+- `zedge-master-prompt.md` — Master prompt with full backlog (Tier A, B, C)
+- `Final-Report.md` — Backlog completion report
+- `docs/accessibility.md` — Accessibility audit notes
+- `docs/cloudflare-terraform.md` — Cloudflare/Terraform ownership
 
 ## License
 

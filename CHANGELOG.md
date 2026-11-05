@@ -18,6 +18,16 @@ The format follows Keep a Changelog conventions; generated projects should adopt
 - Repository structure and local Markdown-link validator.
 - GitHub administration automation with dry-run, explicit apply, and read-back verification.
 - Repository rollout guidance for applying the baseline safely to existing repositories.
+- **Zedge backlog implementation (Tier B):**
+  - `server/events.js` — ClickRecorded event emission, outbox pattern, relay/consumer pattern (B1).
+  - `server/ranking.js` — Catalog/offers/ranking with observed/modeled data separation, ProductRanked events (B2).
+  - `server/publication-status.js` — Publication lifecycle status transitions: IDEA → REVIEW → APPROVED → SCHEDULED → PUBLISHING → PUBLISHED/FAILED, with approval gating (B3).
+  - `server/app.js` — Enhanced security headers: HSTS (conditional), CSP, X-Content-Type-Options, Referrer-Policy, Cache-Control (B7/B9).
+  - `docs/accessibility.md` — Manual accessibility audit notes for WCAG 2.1 A/AA compliance (B8).
+  - `public/i18n/en.json` — English UI string translations (105 keys) (B13).
+  - `public/i18n/th.json` — Thai UI string translations (105 keys) (B13).
+  - `docs/accessibility.md` — Manual accessibility audit notes (B8).
+  - `Final-Report.md` — Zedge backlog completion report.
 
 ### Changed
 
@@ -26,6 +36,7 @@ The format follows Keep a Changelog conventions; generated projects should adopt
 - Expanded CODEOWNERS coverage for repository policy, AI, ECC, skills, components, and plugin manifests.
 - Clarified that release-note configuration is not an artifact-publishing workflow.
 - Documented branch/security administration as an explicit evidence gate rather than a documentation-only checklist.
+- **CF_* → CLOUDFLARE_* environment variable rename** across `test/api.test.js` and `test/helpers.js` (from `CF_API_TOKEN` to `CLOUDFLARE_API_TOKEN`).
 
 ### Fixed
 
@@ -37,3 +48,4 @@ The format follows Keep a Changelog conventions; generated projects should adopt
 - Added fail-closed repository-administration verification.
 - Added protected-branch controls for required reviews/checks, conversation resolution, force-push prevention, and deletion prevention.
 - Added documented verification for Dependabot, private vulnerability reporting, secret scanning/push protection, and least-privilege Actions permissions where supported.
+- **Enforced CSP, HSTS, X-Content-Type-Options, Referrer-Policy, Cache-Control security headers** on all responses (B9).

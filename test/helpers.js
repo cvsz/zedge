@@ -13,7 +13,7 @@ export async function boot({ env = {}, mockOpts, s3 = false } = {}) {
   const s3m = s3 ? await startMockS3() : null;
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'zedge-test-'));
   const config = loadConfig({
-    CF_API_TOKEN: 'test-token', CF_API_BASE: mock.url, EDGE_ADMIN_PASSWORD: PASSWORD, SESSION_SECRET: 's'.repeat(32), DATA_DIR: dataDir,
+    CLOUDFLARE_API_TOKEN: 'test-token', CLOUDFLARE_API_BASE: mock.url, EDGE_ADMIN_PASSWORD: PASSWORD, SESSION_SECRET: 's'.repeat(32), DATA_DIR: dataDir,
     ...(s3m ? { R2_ACCESS_KEY_ID: 'R2KEY', R2_SECRET_ACCESS_KEY: 'R2SECRET', R2_ENDPOINT: s3m.url } : {}), ...env
   });
   const server = createApp(config).listen(0, '127.0.0.1');

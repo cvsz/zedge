@@ -131,7 +131,7 @@ test('multi-account: switch with X-Account-Id, and zone lists follow the active 
 
 test('CF_ACCOUNT_IDS limits the console to chosen accounts, including zones in other accounts', async () => {
   const other = 'c'.repeat(32);
-  const m = await boot({ env: { CF_ACCOUNT_IDS: 'a'.repeat(32) }, mockOpts: { accounts: [{ id: 'a'.repeat(32), name: 'Main' }, { id: other, name: 'Other' }] } });
+  const m = await boot({ env: { CLOUDFLARE_ACCOUNT_IDS: 'a'.repeat(32) }, mockOpts: { accounts: [{ id: 'a'.repeat(32), name: 'Main' }, { id: other, name: 'Other' }] } });
   try {
     m.mock.state.zones.push({ id: 'y'.repeat(32), name: 'other.example', status: 'active', name_servers: [], account: { id: other } });
     const c = m.client(); await c.login();

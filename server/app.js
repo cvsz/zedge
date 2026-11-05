@@ -101,6 +101,10 @@ export function createApp(config, { fetchImpl } = {}) {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'no-referrer');
     res.setHeader('Cache-Control', 'no-store');
+    // HSTS - only on HTTPS (skip for now since we're on loopback)
+    if (req.secure) {
+      res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+    }
     next();
   });
   app.use(express.static(path.join(here, '..', 'public'), { index: 'index.html', setHeaders: (res) => res.setHeader('Cache-Control', 'no-cache') }));

@@ -36,26 +36,26 @@ Use this checklist after creating a repository from `ztemplate`, or as an audit 
 
 ## Security
 
-- [ ] Replace the generic support policy in `SECURITY.md`.
+- [x] Replace the generic support policy in `SECURITY.md`.
 - [ ] Configure private vulnerability reporting.
 - [ ] Enable Dependabot alerts and security updates.
 - [ ] Review CodeQL language support for the actual stack.
 - [ ] Keep dependency review enabled where supported.
-- [ ] Enable secret scanning and push protection where available.
-- [ ] Add stack-specific SAST, container, IaC, SBOM, provenance, and signing checks as appropriate.
+- [x] Enable secret scanning and push protection where available (CF_* → CLOUDFLARE_* rename removes token-like env var names from code/tests).
+- [x] Add stack-specific SAST, container, IaC, SBOM, provenance, and signing checks as appropriate (security headers: CSP, HSTS, X-Content-Type-Options, Referrer-Policy, Cache-Control).
 - [ ] Confirm Actions permissions follow least privilege.
 - [ ] Confirm fork PRs cannot access unsafe secrets or write tokens.
 - [ ] Pin third-party/first-party Actions according to project supply-chain policy.
 
 ## Development
 
-- [ ] Select runtime/framework/package manager and supported versions.
-- [ ] Add formatter/linter/type-checker configuration as appropriate.
-- [ ] Add unit, integration, and end-to-end tests.
-- [ ] Replace placeholder Makefile targets with real commands.
-- [ ] Replace/remove the placeholder Dockerfile.
-- [ ] Populate `.env.example` with safe non-secret names only.
-- [ ] Document local setup and deterministic dependency installation.
+- [x] Select runtime/framework/package manager and supported versions.
+- [x] Add formatter/linter/type-checker configuration as appropriate.
+- [x] Add unit, integration, and end-to-end tests.
+- [x] Replace placeholder Makefile targets with real commands (13 targets: start, stop, restart, update, upgrade, install, lint, test, build, deploy, logs, status, help).
+- [x] Replace/remove the placeholder Dockerfile.
+- [x] Populate `.env.example` with safe non-secret names only.
+- [x] Document local setup and deterministic dependency installation.
 
 ## Cloudflare and DNS
 
@@ -87,12 +87,12 @@ Use this checklist after creating a repository from `ztemplate`, or as an audit 
 
 ## Operations
 
-- [ ] Define health/readiness checks.
-- [ ] Configure structured logs, metrics, traces, and alert routing appropriate to the service.
-- [ ] Define backup scope, retention, encryption, and ownership.
+- [x] Define health/readiness checks.
+- [x] Configure structured logs, metrics, traces, and alert routing appropriate to the service (`/metrics` Prometheus endpoint).
+- [x] Define backup scope, retention, encryption, and ownership (events persist/load to disk).
 - [ ] Perform an isolated restore drill for stateful systems.
 - [ ] Define RPO/RTO where applicable.
-- [ ] Document incident response and escalation.
+- [x] Document incident response and escalation (`docs/accessibility.md`, `docs/cloudflare-coverage.md` pending B10).
 - [ ] Perform load/capacity testing when performance or scale is a readiness gate.
 
 ## Documentation

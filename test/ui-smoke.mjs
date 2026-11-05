@@ -10,7 +10,7 @@ const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
 
 const mock = await startMock();
-const config = loadConfig({ CF_API_TOKEN: 'test-token', CF_API_BASE: mock.url, EDGE_ADMIN_PASSWORD: 'correct horse battery', SESSION_SECRET: 's'.repeat(32) });
+const config = loadConfig({ CLOUDFLARE_API_TOKEN: 'test-token', CLOUDFLARE_API_BASE: mock.url, EDGE_ADMIN_PASSWORD: 'correct horse battery', SESSION_SECRET: 's'.repeat(32) });
 const server = createApp(config).listen(0, '127.0.0.1');
 await new Promise((r) => server.once('listening', r));
 const base = `http://127.0.0.1:${server.address().port}`;

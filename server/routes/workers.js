@@ -1,5 +1,6 @@
 import { CFError } from '../cf.js';
 import { HttpError, bad } from '../errors.js';
+import { emitClickRecorded } from '../events.js';
 
 const NAME_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,62}$/;
 const KEY_RE = /^[A-Za-z_][A-Za-z0-9_]{0,63}$/;
@@ -47,6 +48,14 @@ export function registerWorkers(app, ctx) {
     form.append('worker.js', new Blob([code], { type: 'application/javascript+module' }), 'worker.js');
     const r = await cf.putForm(await base(req), form);
     res.status(201).json({ id: r.result && r.result.id, deployed: true });
+    // Emit worker deployment event through outbox
+    emitClickRecorded({
+      clickId: `worker_${r.result && r.result.id}`,
+      sessionId: req.sessionId || 'system',
+      url: `/accounts/${await ctx.accountId(req)}/workers/${req.params.name}/deploy`,
+      referrer: req.get('Referer') || '',
+      metadata: { worker_id: r.result && r.result.id, name: req.params.name }
+    });
   }));
 
   /** Send 100% of traffic back to an earlier version. */

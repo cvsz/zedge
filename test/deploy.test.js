@@ -10,8 +10,8 @@ async function setup(t) {
   const mock = await startMock();
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'zedge-deploy-'));
   const envFile = path.join(dir, '.env');
-  process.env.CF_API_TOKEN = 'test-token';
-  t.after(async () => { delete process.env.CF_API_TOKEN; await mock.close(); fs.rmSync(dir, { recursive: true, force: true }); });
+  process.env.CLOUDFLARE_API_TOKEN = 'test-token';
+  t.after(async () => { delete process.env.CLOUDFLARE_API_TOKEN; await mock.close(); fs.rmSync(dir, { recursive: true, force: true }); });
   const run = (extra = {}) => deploy({ name: 'zedge', start: false, allow: [], envFile, hostname: 'console.zeaz.dev', ...extra }, { api: mock.url, log: () => {} });
   return { mock, envFile, run };
 }

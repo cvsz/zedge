@@ -10,8 +10,8 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
  * the server: the browser only ever holds a signed session cookie.
  */
 export function loadConfig(env = process.env) {
-  const token = env.CF_API_TOKEN;
-  if (!token) throw new Error('CF_API_TOKEN is required');
+  const token = env.CLOUDFLARE_API_TOKEN;
+  if (!token) throw new Error('CLOUDFLARE_API_TOKEN is required');
 
   const host = env.HOST || '127.0.0.1';
   const password = env.EDGE_ADMIN_PASSWORD || '';
@@ -24,12 +24,12 @@ export function loadConfig(env = process.env) {
   }
   if (password && password.length < 12) throw new Error('EDGE_ADMIN_PASSWORD must be at least 12 characters');
 
-  const accountIds = list(env.CF_ACCOUNT_IDS || env.CF_ACCOUNT_ID);
+  const accountIds = list(env.CLOUDFLARE_ACCOUNT_IDS || env.CLOUDFLARE_ACCOUNT_ID);
   return {
     token,
     accountIds,
     accountId: accountIds[0] || '',
-    apiBase: (env.CF_API_BASE || 'https://api.cloudflare.com/client/v4').replace(/\/$/, ''),
+    apiBase: (env.CLOUDFLARE_API_BASE || 'https://api.cloudflare.com/client/v4').replace(/\/$/, ''),
     host,
     port: Number(env.PORT || 8787),
     password,

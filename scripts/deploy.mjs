@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // One-command deploy: Cloudflare Tunnel + proxied DNS record (+ optional Access policy) + .env, then docker compose up.
-//   CF_API_TOKEN=... npm run deploy -- --hostname console.example.com [--allow you@example.com,team@example.com]
+// CLOUDFLARE_API_TOKEN=... npm run deploy -- --hostname console.example.com [--allow you@example.com,team@example.com]
 // The token needs: Zone:Read, DNS:Edit, Account > Cloudflare Tunnel:Edit, and Access: Apps and Policies:Edit if you use --allow.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -54,8 +54,8 @@ export async function deploy(opts, { fetchImpl = fetch, fs: fsx = fs, log = cons
   const envPath = opts.envFile || path.join(process.cwd(), '.env');
   const existingText = fsx.existsSync(envPath) ? fsx.readFileSync(envPath, 'utf8') : '';
   const existing = parseEnv(existingText);
-  const token = process.env.CF_API_TOKEN || existing.CF_API_TOKEN;
-  if (!token) throw new DeployError('Set CF_API_TOKEN (environment or .env) to a token that can edit Tunnels and DNS.');
+  const token = process.env.CLOUDFLARE_API_TOKEN || existing.CLOUDFLARE_API_TOKEN;
+  if (!token) throw new DeployError('Set CLOUDFLARE_API_TOKEN (environment or .env) to a token that can edit Tunnels and DNS.');
   if (!opts.hostname || !/^([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/.test(opts.hostname)) throw new DeployError('Give the public hostname with --hostname, for example console.example.com');
   if (opts.allow.some((e) => !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e))) throw new DeployError('--allow takes a comma-separated list of email addresses');
 
@@ -70,7 +70,7 @@ export async function deploy(opts, { fetchImpl = fetch, fs: fsx = fs, log = cons
   const zones = await cf('GET', '/zones?per_page=50');
   const zone = zones.filter((z) => opts.hostname === z.name || opts.hostname.endsWith(`.${z.name}`)).sort((a, b) => b.name.length - a.name.length)[0];
   if (!zone) throw new DeployError(`No zone this token can see contains ${opts.hostname}. Add the domain to Cloudflare first.`);
-  const accountId = opts.account || existing.CF_ACCOUNT_ID || (zone.account && zone.account.id);
+  const accountId = opts.account || existing.CLOUDFLARE_ACCOUNT_ID || (zone.account && zone.account.id);
   if (!accountId) throw new DeployError('Could not work out the account id. Pass --account.');
   log(`Zone ${zone.name} (account ${accountId})`);
 
@@ -112,8 +112,8 @@ export async function deploy(opts, { fetchImpl = fetch, fs: fsx = fs, log = cons
   // 6. .env (never overwrites values you already set)
   const tunnelToken = await cf('GET', `/accounts/${accountId}/cfd_tunnel/${tunnel.id}/token`);
   const values = {
-    CF_API_TOKEN: existing.CF_API_TOKEN || token,
-    CF_ACCOUNT_ID: existing.CF_ACCOUNT_ID || accountId,
+    CLOUDFLARE_API_TOKEN: existing.CLOUDFLARE_API_TOKEN || token,
+    CLOUDFLARE_ACCOUNT_ID: existing.CLOUDFLARE_ACCOUNT_ID || accountId,
     EDGE_ADMIN_PASSWORD: existing.EDGE_ADMIN_PASSWORD || crypto.randomBytes(18).toString('base64url'),
     SESSION_SECRET: existing.SESSION_SECRET || crypto.randomBytes(32).toString('hex'),
     TUNNEL_TOKEN: tunnelToken
@@ -133,7 +133,7 @@ const HELP = `Usage: npm run deploy -- --hostname console.example.com [options]
   --env-file F     where to write settings (default ./.env)
   --no-start       write everything but do not run docker compose
 
-CF_API_TOKEN must be set in the environment or in .env.`;
+CLOUDFLARE_API_TOKEN must be set in the environment or in .env.`;
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {

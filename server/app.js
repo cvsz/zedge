@@ -67,7 +67,7 @@ export function createApp(config, { fetchImpl } = {}) {
   }
   async function accountId(req) {
     const list = await accounts();
-    if (!list.length) throw new HttpError(409, 'This token cannot see any account. Set CF_ACCOUNT_ID.');
+    if (!list.length) throw new HttpError(409, 'This token cannot see any account. Set CLOUDFLARE_ACCOUNT_ID.');
     const want = req && req.get && req.get('x-account-id');
     if (want) {
       if (!list.some((a) => a.id === want)) throw new HttpError(403, 'That account is not available to this console');
@@ -76,7 +76,7 @@ export function createApp(config, { fetchImpl } = {}) {
     return list[0].id;
   }
 
-  // When CF_ACCOUNT_IDS limits the console to some accounts, zone ids must belong to one of them.
+  // When CLOUDFLARE_ACCOUNT_IDS limits the console to some accounts, zone ids must belong to one of them.
   const zoneCache = new Map();
   async function assertZone(zid) {
     if (!config.accountIds.length) return;

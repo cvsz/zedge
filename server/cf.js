@@ -9,7 +9,9 @@ export class CFError extends Error {
   }
 }
 
+/** @param {{ token: string, apiBase: string, fetchImpl?: typeof fetch }} options */
 export function createCF({ token, apiBase, fetchImpl = fetch }) {
+  /** @param {string} method @param {string} path @param {{ body?: any, query?: any, form?: any }} [opts] */
   async function raw(method, path, { body, query, form } = {}) {
     const url = new URL(apiBase + path);
     for (const [k, v] of Object.entries(query || {})) if (v !== undefined && v !== '') url.searchParams.set(k, v);

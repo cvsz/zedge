@@ -17,6 +17,7 @@ const outbox = [];
  * @param {string} options.referrer - The referrer URL
  * @param {Object} options.metadata - Additional metadata
  */
+/** @param {{ clickId?: string, sessionId?: string, url?: string, referrer?: string, metadata?: Object }} options */
 export function emitClickRecorded({ clickId, sessionId, url, referrer, metadata } = {}) {
   const event = {
     id: `click_${Date.now()}_${Math.random().toString(36).slice(2)}`,
@@ -100,6 +101,7 @@ export function loadEvents(dataDir) {
  * @param {Function} options.deliver - Function to deliver events to consumer
  * @returns {Array} Array of remaining outbox events (not yet delivered)
  */
+/** @param {{ deliver?: Function }} options */
 export function relay({ deliver } = {}) {
   const remaining = [];
   for (const event of outbox) {
@@ -126,6 +128,7 @@ export function relay({ deliver } = {}) {
  * @param {Function} options.consume - Function to consume processed events
  * @returns {Array} Array of still-processed events
  */
+/** @param {{ consume?: Function }} options */
 export function consume({ consume: consumeFn } = {}) {
   const remaining = [];
   for (const event of outbox) {

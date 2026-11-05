@@ -20,7 +20,9 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 
 export { TOKEN_TEMPLATES } from './routes/core.js';
 
-export function createApp(config, { fetchImpl } = {}) {
+/** @param {{ fetchImpl?: typeof fetch }} opts */
+export function createApp(config, opts = {}) {
+  const { fetchImpl } = opts;
   const store = createStore(config.dataDir);
   if (store.isEmpty() && config.password) {
     store.createUser({ name: 'admin', password: config.password, role: 'admin' });

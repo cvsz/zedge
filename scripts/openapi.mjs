@@ -62,9 +62,9 @@ export function build() {
 
   // 2. the Cloudflare pass-through: only the allowlisted calls exist
   for (const r of ALLOWED) {
-    const t = `/api/cf${template(r.pattern)}`;
+    const t = `/api/cf${template(r.re.source)}`;
     add(t, r.method, {
-      summary: `Cloudflare ${r.method} ${template(r.pattern)}`,
+      summary: `Cloudflare ${r.method} ${template(r.re.source)}`,
       tags: ['cloudflare'],
       ...(params(t).length ? { parameters: params(t) } : {}),
       'x-permission': r.perm,

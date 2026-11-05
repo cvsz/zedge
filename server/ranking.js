@@ -29,6 +29,7 @@ let modeledData = [];
  * @param {number} options.score - Ranking score
  * @param {Object} options.metadata - Additional metadata (platform, timestamp, etc)
  */
+/** @param {{ productId?: string, position?: number, score?: number, metadata?: Object }} options */
 export function recordObserved({ productId, position, score, metadata } = {}) {
   observedData.push({
     id: `obs_${Date.now()}_${Math.random().toString(36).slice(2)}`,
@@ -51,6 +52,7 @@ export function recordObserved({ productId, position, score, metadata } = {}) {
  * @param {number} options.factor - Ranking factor used
  * @param {Object} options.metadata - Additional metadata
  */
+/** @param {{ productId?: string, rank?: number, factor?: number, metadata?: Object }} options */
 export function recordModeled({ productId, rank, factor, metadata } = {}) {
   modeledData.push({
     id: `model_${Date.now()}_${Math.random().toString(36).slice(2)}`,

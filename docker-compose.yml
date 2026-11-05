@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     environment:
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN:?run npm run deploy first}
-      EDGE_ADMIN_PASSWORD: ${EDGE_ADMIN_PASSWORD:?run npm run deploy first}
+      ZEDGE_ADMIN_PASSWORD: ${ZEDGE_ADMIN_PASSWORD:?run npm run deploy first}
       SESSION_SECRET: ${SESSION_SECRET:-}
       CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID:-}
       CLOUDFLARE_ACCOUNT_IDS: ${CLOUDFLARE_ACCOUNT_IDS:-}
@@ -19,7 +19,7 @@ services:
       COOKIE_SECURE: "1"
       TRUST_CF_CONNECTING_IP: "1"
     volumes:
-      - zedge-data:/data
+      - edge-data:/data
     expose:
       - "8787"
     read_only: true
@@ -40,4 +40,4 @@ services:
       - app
 
 volumes:
-  zedge-data:
+  edge-data:

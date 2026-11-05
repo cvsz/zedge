@@ -1,117 +1,42 @@
-# Implementation Checklist
+# Implementation checklist
 
-Use this checklist after creating a repository from `ztemplate`, or as an audit checklist when porting the baseline into an existing repository.
+`[x]` means a passing automated test (or the smoke test) covers it. `[ ]` means not done or not verified.
 
-## Bootstrap
+## Foundation
+- [x] Sign-in with scrypt-hashed passwords, signed session cookie, CSRF header, login throttling
+- [x] Roles and permissions, custom roles, last-admin protection
+- [x] TOTP two-factor with one-time recovery codes; admin reset
+- [x] Per-user domain allowlist
+- [x] Approval flow for risky actions (off by default)
+- [x] Hash-chained audit log with verify, export, retention
+- [x] Per-user API rate limiting
+- [x] Prometheus `/metrics` (token protected)
+- [x] Change and lockout alerts to a webhook
+- [x] Encrypted backups of the data directory
 
-- [ ] Create the new repository with **Use this template** when independent history is desired.
-- [ ] Preview and apply `scripts/bootstrap.py` with the actual name, owner, code owner, and description.
-- [ ] Review the changed identity/ownership files and commit `.ztemplate-initialized.json` as nonsecret setup evidence.
-- [ ] Run `make validate-template`.
-- [ ] Choose a project profile in `docs/profiles.md` and record non-goals.
-- [ ] Confirm README and ABOUT describe the real project.
+## Cloudflare coverage
+- [x] Domains, DNS (incl. zone file import/export), DNSSEC, zone settings, cache purge
+- [x] WAF custom rules, IP access rules, rate limits, managed rulesets, redirects, cache rules, transform rules, origin overrides, page rules
+- [x] Workers (deploy, versions, variables, secrets, routes, domains, cron), Snippets
+- [x] Pages, load balancing, health checks
+- [x] KV, D1 (SQL console), Queues, R2
+- [x] SSL (Universal, advanced, Origin CA, authenticated origin pulls), Turnstile, Bot Fight Mode, Logpush
+- [x] Zero Trust: tunnels, Access apps/groups/service tokens, WARP profiles, device posture, Gateway DNS rules
+- [x] Email routing, DMARC, analytics and top lists
+- [x] Snapshots, diff, restore, JSON/Terraform export, clone settings
 
-## Repository identity
+## Verification
+- [x] 112 automated tests against an in-memory mock of Cloudflare and R2
+- [x] Browser smoke test through every screen
+- [x] CSP guard test (no inline styles)
+- [ ] Run against a real Cloudflare account (EC-101)
+- [ ] Contract tests from recorded real responses (EC-102): harness built and tested on the mock; [ ] real recordings
+- [ ] Docker image built and started on a real daemon (EC-103)
 
-- [ ] Replace template identity/placeholders with the real project.
-- [ ] Confirm license choice and preserve required attribution.
-- [ ] Configure repository description, topics, homepage, visibility, and template status as applicable.
-
-## Ownership and governance
-
-- [ ] Update `.github/CODEOWNERS`.
-- [ ] Review `CONTRIBUTING.md`, `GOVERNANCE.md`, and `CODE_OF_CONDUCT.md`.
-- [ ] Run the GitHub administration helper in dry-run mode.
-- [ ] Apply repository administration controls with an authenticated admin identity.
-- [ ] Verify the effective controls:
-
-  ```bash
-  python3 scripts/github_admin.py --repo OWNER/REPO --verify
-  ```
-
-- [ ] Require pull-request review and CODEOWNERS approval.
-- [ ] Require passing status checks and conversation resolution.
-- [ ] Block force pushes and deletion of the protected default branch.
-- [ ] Document any break-glass role/process.
-
-## Security
-
-- [x] Replace the generic support policy in `SECURITY.md`.
-- [ ] Configure private vulnerability reporting.
-- [ ] Enable Dependabot alerts and security updates.
-- [ ] Review CodeQL language support for the actual stack.
-- [ ] Keep dependency review enabled where supported.
-- [x] Enable secret scanning and push protection where available (CF_* → CLOUDFLARE_* rename removes token-like env var names from code/tests).
-- [x] Add stack-specific SAST, container, IaC, SBOM, provenance, and signing checks as appropriate (security headers: CSP, HSTS, X-Content-Type-Options, Referrer-Policy, Cache-Control).
-- [ ] Confirm Actions permissions follow least privilege.
-- [ ] Confirm fork PRs cannot access unsafe secrets or write tokens.
-- [ ] Pin third-party/first-party Actions according to project supply-chain policy.
-
-## Development
-
-- [x] Select runtime/framework/package manager and supported versions.
-- [x] Add formatter/linter/type-checker configuration as appropriate.
-- [x] Add unit, integration, and end-to-end tests.
-- [x] Replace placeholder Makefile targets with real commands (13 targets: start, stop, restart, update, upgrade, install, lint, test, build, deploy, logs, status, help).
-- [x] Replace/remove the placeholder Dockerfile.
-- [x] Populate `.env.example` with safe non-secret names only.
-- [x] Document local setup and deterministic dependency installation.
-
-## Cloudflare and DNS
-
-- [ ] Read `docs/cloudflare-terraform.md`.
-- [ ] Keep public DNS/shared tunnel ownership in one designated infrastructure repository.
-- [ ] Confirm the service answers locally before requesting a public hostname.
-- [ ] Import existing records instead of recreating them.
-- [ ] Confirm infrastructure plans do not destroy unrelated resources.
-- [ ] Verify sibling/shared routes after changes.
-
-## CI/CD
-
-- [ ] Customize CI for the selected stack.
-- [ ] Pin runtime versions and define supported-version matrices.
-- [ ] Add real lint/test/build/package/security validation.
-- [ ] Configure artifact retention and provenance where needed.
-- [ ] Configure environments, approvals, and deployment protections.
-- [ ] Validate CI from both pull requests and the protected default branch.
-
-## Release
-
-- [ ] Choose an explicit versioning policy.
-- [ ] Maintain `CHANGELOG.md` and release notes.
-- [ ] Configure publishing only when required.
-- [ ] Publish from trusted workflows only.
-- [ ] Add artifact signing/attestation where appropriate.
-- [ ] Document known-good rollback.
-- [ ] Verify rollback on production-equivalent infrastructure when applicable.
-
-## Operations
-
-- [x] Define health/readiness checks.
-- [x] Configure structured logs, metrics, traces, and alert routing appropriate to the service (`/metrics` Prometheus endpoint).
-- [x] Define backup scope, retention, encryption, and ownership (events persist/load to disk).
-- [ ] Perform an isolated restore drill for stateful systems.
-- [ ] Define RPO/RTO where applicable.
-- [x] Document incident response and escalation (`docs/accessibility.md`, `docs/cloudflare-coverage.md` pending B10).
-- [ ] Perform load/capacity testing when performance or scale is a readiness gate.
-
-## Documentation
-
-- [ ] Complete `docs/architecture.md`.
-- [ ] Complete `docs/development.md`.
-- [ ] Complete `docs/release.md`.
-- [ ] Add ADRs for material decisions.
-- [ ] Document operational ownership and support expectations.
-
-## Final verification
-
-- [ ] Fresh clone works with documented setup.
-- [ ] Repository validator passes.
-- [ ] Required CI/security checks pass on the exact release head.
-- [ ] Protected-branch/admin verification succeeds.
-- [ ] No secrets/private data are committed.
-- [ ] Deployment is verified in the intended environment.
-- [ ] Backup/restore and rollback evidence exists where applicable.
-- [ ] Every applicable production-readiness gate is `VERIFIED`; any `NOT APPLICABLE` gate has an explicit reason.
-
-A green template CI run alone is never sufficient to claim application production readiness.
+## Not built
+- [x] OIDC / SSO (EC-104)
+- [x] Email alerts and failure/expiry/tamper alerts (EC-105)
+- [x] Limits for account-level resources (EC-106)
+- [x] Helm chart, Prometheus rules, Grafana dashboard (EC-107); [ ] signed images: workflow written, never run; [ ] helm lint run
+- [ ] Remaining Cloudflare features (EC-108, partly done)
+- [x] OpenAPI (generated, drift-tested) and automated accessibility scan; [x] type checks (tsc checkJs, non-strict); [ ] manual accessibility audit (EC-109)

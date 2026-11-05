@@ -5,7 +5,7 @@ const MANAGED = [
   ['cloudflare', 'efb7b8c949ac4650a09736fc376e9aee', 'Cloudflare Managed Ruleset', 'Blocks known exploits such as Log4j and common CVEs.'],
   ['owasp', '4814384a9e5d4991b9815dcfc25d2f1f', 'Cloudflare OWASP Core Ruleset', 'Scores requests against OWASP ModSecurity patterns.']
 ];
-const TABS = [['ratelimit', 'Rate limits'], ['managed', 'Managed rulesets'], ['redirect', 'Redirects'], ['cache', 'Cache rules'], ['pagerules', 'Page rules']];
+const TABS = [['ratelimit', 'Rate limits'], ['managed', 'Managed rulesets'], ['redirect', 'Redirects'], ['cache', 'Cache rules'], ['rewrite', 'URL rewrites'], ['headers', 'Header edits'], ['origin', 'Origin override'], ['pagerules', 'Page rules']];
 const ttlChoices = [[7200, '2 hours'], [86400, '1 day'], [604800, '7 days'], [2592000, '30 days'], [31536000, '1 year']];
 
 const matchFields = (prefix = '') => {
@@ -143,7 +143,52 @@ async function pageRulesTab(z) {
   ];
 }
 
-const BUILDERS = { ratelimit: rateLimitTab, managed: managedTab, redirect: redirectTab, cache: cacheTab, pagerules: pageRulesTab };
+
+async function rewriteTab(z) {
+  const list = ruleList(z, 'urlrewrite', (r) => `${r.expression}  →  ${JSON.stringify(r.action_parameters && r.action_parameters.uri)}`);
+  await list.load();
+  const m = matchFields();
+  const desc = input({ placeholder: 'Old blog path', 'aria-label': 'Description' });
+  const np = input({ placeholder: '/new-path (optional)', 'aria-label': 'New path' });
+  const nq = input({ placeholder: 'v=2 (optional)', 'aria-label': 'New query string' });
+  return [
+    card('URL rewrites', h('span', { class: 'small soft' }, 'Change the path or query string Cloudflare sends to your origin. Visitors still see the original URL.'), list.box),
+    card('Add a rewrite', field('Name', desc), h('div', { class: 'row end' }, m.nodes), h('div', { class: 'row end' }, field('Rewrite path to', np), field('Rewrite query to', nq),
+      btn('Add rewrite', async () => { await api('POST', `zones/${z.id}/rules/urlrewrite`, { ...m.values(), description: desc.value, newPath: np.value, newQuery: nq.value }); toast('Rewrite added'); m.clear(); np.value = ''; nq.value = ''; await list.load(); }, 'primary')))
+  ];
+}
+
+function headerEditor(z, kind, ops, title, help) {
+  return async () => {
+    const list = ruleList(z, kind, (r) => `${r.expression}  ·  ${Object.entries((r.action_parameters && r.action_parameters.headers) || {}).map(([k, v]) => `${v.operation} ${k}${v.value ? `: ${v.value}` : ''}`).join(', ')}`);
+    await list.load();
+    const m = matchFields();
+    const desc = input({ placeholder: 'Security headers', 'aria-label': 'Description' });
+    const name = input({ placeholder: 'X-Frame-Options', 'aria-label': 'Header name' });
+    const op = selectOf('Operation', ops.map((o) => [o, o]), 'set');
+    const value = input({ placeholder: 'DENY', 'aria-label': 'Header value' });
+    return [card(title, h('span', { class: 'small soft' }, help), list.box),
+      card('Add a header edit', field('Name', desc), h('div', { class: 'row end' }, m.nodes), h('div', { class: 'row end' }, field('Header', name), field('Operation', op), field('Value', value),
+        btn('Add', async () => { await api('POST', `zones/${z.id}/rules/${kind}`, { ...m.values(), description: desc.value, headers: [{ name: name.value, op: op.value, value: value.value }] }); toast('Header edit added'); m.clear(); name.value = ''; value.value = ''; await list.load(); }, 'primary')))];
+  };
+}
+
+async function originTab(z) {
+  const list = ruleList(z, 'origin', (r) => `${r.expression}  →  ${JSON.stringify(r.action_parameters)}`);
+  await list.load();
+  const m = matchFields();
+  const desc = input({ placeholder: 'Send /api to the API server', 'aria-label': 'Description' });
+  const host = input({ placeholder: 'origin.example.com', 'aria-label': 'Origin host' });
+  const port = input({ placeholder: '443 (optional)', 'aria-label': 'Origin port' });
+  const hh = input({ placeholder: 'Host header (optional)', 'aria-label': 'Host header' });
+  return [
+    card('Origin overrides', h('span', { class: 'small soft' }, 'Send matching requests to a different origin server, and optionally change the Host header.'), list.box),
+    card('Add an override', field('Name', desc), h('div', { class: 'row end' }, m.nodes), h('div', { class: 'row end' }, field('Origin host', host), field('Port', port), field('Host header', hh),
+      btn('Add override', async () => { await api('POST', `zones/${z.id}/rules/origin`, { ...m.values(), description: desc.value, originHost: host.value, originPort: port.value, hostHeader: hh.value }); toast('Override added'); m.clear(); host.value = ''; await list.load(); }, 'primary')))
+  ];
+}
+
+const BUILDERS = { ratelimit: rateLimitTab, managed: managedTab, redirect: redirectTab, cache: cacheTab, rewrite: rewriteTab, headers: async (z) => [...await headerEditor(z, 'reqheaders', ['set', 'remove'], 'Request header edits', 'Change headers on requests before they reach your origin.')(), ...await headerEditor(z, 'respheaders', ['set', 'add', 'remove'], 'Response header edits', 'Change headers on responses before visitors receive them.')()], origin: originTab, pagerules: pageRulesTab };
 
 export async function rulesView() {
   const z = zone();

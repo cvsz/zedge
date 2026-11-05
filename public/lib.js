@@ -26,7 +26,7 @@ export function fill(el, ...kids) {
 }
 
 export class ApiError extends Error {
-  constructor(status, message) { super(message); this.status = status; }
+  constructor(status, message, json) { super(message); this.status = status; this.json = json || null; }
 }
 
 let onUnauthorized = () => {};
@@ -58,7 +58,7 @@ export async function api(method, path, body) {
   let json = null;
   try { json = await res.json(); } catch { /* empty */ }
   if (res.status === 401 && path !== 'login') onUnauthorized();
-  if (!res.ok) throw new ApiError(res.status, (json && json.error) || `Request failed (${res.status})`);
+  if (!res.ok) throw new ApiError(res.status, (json && json.error) || `Request failed (${res.status})`, json);
   return json;
 }
 export const cf = (method, path, body) => api(method, `cf${path}`, body);
@@ -112,11 +112,14 @@ export function segmented(label, options, current, onPick) {
 export function toggle(on, label, onChange) {
   return h('button', {
     type: 'button', role: 'switch', class: 'switch', 'aria-checked': String(on), 'aria-label': label,
-    onclick: (e) => run(e.currentTarget, async () => {
-      const next = e.currentTarget.getAttribute('aria-checked') !== 'true';
-      await onChange(next);
-      e.currentTarget.setAttribute('aria-checked', String(next));
-    })
+    onclick: (e) => {
+      const self = e.currentTarget; // currentTarget is null once the handler has awaited
+      return run(self, async () => {
+        const next = self.getAttribute('aria-checked') !== 'true';
+        await onChange(next);
+        self.setAttribute('aria-checked', String(next));
+      });
+    }
   }, h('i'));
 }
 

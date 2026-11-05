@@ -1,0 +1,35 @@
+{
+  "$id": "events/CommissionRecorded.v1",
+  "x-version": 1,
+  "title": "CommissionRecorded",
+  "type": "object",
+  "properties": {
+    "commission_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "conversion_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "amount": {
+      "$ref": "common#/$defs/money"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "reversed",
+        "paid"
+      ]
+    }
+  },
+  "required": [
+    "commission_id",
+    "conversion_id",
+    "amount",
+    "status"
+  ],
+  "additionalProperties": false
+}

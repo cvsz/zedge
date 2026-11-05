@@ -1,0 +1,9 @@
+{
+  "name": "affiliate-link-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Affiliate link redirects with privacy-conscious click attribution (Cloudflare Worker + D1)",
+  "scripts": { "test": "node --no-warnings=ExperimentalWarning --test test/worker.test.js" },
+  "engines": { "node": ">=22.5" }
+}

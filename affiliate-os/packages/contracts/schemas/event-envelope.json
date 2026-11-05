@@ -1,0 +1,61 @@
+{
+  "$id": "event-envelope",
+  "x-version": 1,
+  "title": "Domain event envelope",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "ProductDiscovered",
+        "ProductRanked",
+        "CampaignCreated",
+        "CreativeRequested",
+        "CreativeGenerated",
+        "CreativeApproved",
+        "ContentScheduled",
+        "ContentPublished",
+        "ContentFailed",
+        "ClickRecorded",
+        "ConversionRecorded",
+        "CommissionRecorded",
+        "PerformanceWindowCompleted",
+        "OptimizationRequested"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "organization_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "correlation_id": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 128
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "id",
+    "type",
+    "version",
+    "organization_id",
+    "occurred_at",
+    "correlation_id",
+    "payload"
+  ],
+  "additionalProperties": false
+}

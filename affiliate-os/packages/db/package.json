@@ -1,0 +1,21 @@
+{
+  "name": "@affiliate-os/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Postgres migrations and the organization-scoped data-access layer",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "migrate": "node src/cli.js"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.14"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "optionalDependencies": {
+    "pg": "^8.13.0"
+  }
+}

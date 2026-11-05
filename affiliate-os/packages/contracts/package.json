@@ -1,0 +1,13 @@
+{
+  "name": "@affiliate-os/contracts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "JSON schemas and a dependency-free validator for events and core entities",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "lock": "node src/lock.js --write"
+  },
+  "engines": { "node": ">=22" }
+}

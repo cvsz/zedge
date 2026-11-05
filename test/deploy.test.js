@@ -32,7 +32,7 @@ test('deploy creates tunnel, ingress, proxied DNS and a private .env', async (t)
   assert.equal(rec.proxied, true);
   const env = parseEnv(fs.readFileSync(envFile, 'utf8'));
   assert.equal(env.TUNNEL_TOKEN, `tunnel-token-${tunnel.id}`);
-  assert.ok(env.EDGE_ADMIN_PASSWORD.length >= 12 && env.SESSION_SECRET.length >= 32);
+  assert.ok(env.ZEDGE_ADMIN_PASSWORD.length >= 12 && env.SESSION_SECRET.length >= 32);
   assert.equal(fs.statSync(envFile).mode & 0o777, 0o600);
 });
 
@@ -44,7 +44,7 @@ test('re-running reuses the tunnel and keeps existing secrets', async (t) => {
   const second = parseEnv(fs.readFileSync(envFile, 'utf8'));
   assert.equal(mock.state.tunnels.filter((x) => x.name === 'zedge').length, 1);
   assert.equal(mock.state.records.filter((x) => x.name === 'console.zeaz.dev').length, 1);
-  assert.equal(second.EDGE_ADMIN_PASSWORD, first.EDGE_ADMIN_PASSWORD);
+  assert.equal(second.ZEDGE_ADMIN_PASSWORD, first.ZEDGE_ADMIN_PASSWORD);
   assert.equal(second.SESSION_SECRET, first.SESSION_SECRET);
 });
 

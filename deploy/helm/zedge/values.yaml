@@ -1,0 +1,56 @@
+# Zedge keeps its state (users, audit log, snapshots, approvals) in files, so it runs as ONE replica
+# with a persistent volume. Do not raise replicaCount.
+replicaCount: 1
+
+image:
+  repository: ghcr.io/your-org/zedge   # build and push your own image from the Dockerfile
+  tag: ""                                      # defaults to the chart appVersion
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+
+# Secrets live in a Kubernetes Secret that YOU create (kubectl create secret generic zedge-secrets ...).
+# Required keys: CLOUDFLARE_API_TOKEN, ZEDGE_ADMIN_PASSWORD (or configure OIDC and leave it out), SESSION_SECRET (32+ chars).
+# Optional keys: CLOUDFLARE_ACCOUNT_IDS, OIDC_CLIENT_SECRET, METRICS_TOKEN, ALERT_WEBHOOK_URL, SMTP_URL, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, BACKUP_PASSPHRASE.
+existingSecret: zedge-secrets
+
+# Plain settings (anything from .env.example that is not a secret).
+env:
+  COOKIE_SECURE: "1"
+  RATE_LIMIT_PER_MIN: "600"
+  RATE_LIMIT_WRITES_PER_MIN: "120"
+  APPROVAL_REQUIRED: "0"
+  AUDIT_RETENTION_DAYS: "0"
+  # OIDC_ISSUER: https://idp.example.com
+  # OIDC_CLIENT_ID: zedge
+  # OIDC_REDIRECT_URL: https://console.example.com/api/oidc/callback
+  # OIDC_ROLE_MAP: '{"zedge-admins":"admin","zedge-ops":"operator"}'
+
+service:
+  type: ClusterIP
+  port: 8787
+
+# Put the console behind your ingress, ideally with Cloudflare Access or another login in front.
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: console.example.com
+      path: /
+  tls: []
+
+persistence:
+  size: 1Gi
+  storageClass: ""
+  existingClaim: ""
+
+resources:
+  requests: { cpu: 50m, memory: 96Mi }
+  limits: { memory: 256Mi }
+
+podAnnotations: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Scrape metrics with Prometheus: set METRICS_TOKEN in the secret, then annotate or add a ServiceMonitor yourself.

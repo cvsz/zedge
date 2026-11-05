@@ -1,0 +1,43 @@
+{
+  "$id": "events/ContentPublished.v1",
+  "x-version": 1,
+  "title": "ContentPublished",
+  "type": "object",
+  "properties": {
+    "content_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "channel_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "publication_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "platform_post_id": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "published_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "api",
+        "manual"
+      ]
+    }
+  },
+  "required": [
+    "content_id",
+    "channel_id",
+    "publication_id",
+    "published_at",
+    "mode"
+  ],
+  "additionalProperties": false
+}

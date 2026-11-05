@@ -13,10 +13,11 @@ export async function boot({ env = {}, mockOpts, s3 = false } = {}) {
   const s3m = s3 ? await startMockS3() : null;
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'zedge-test-'));
   const config = loadConfig({
-    CLOUDFLARE_API_TOKEN: 'test-token', CLOUDFLARE_API_BASE: mock.url, EDGE_ADMIN_PASSWORD: PASSWORD, SESSION_SECRET: 's'.repeat(32), DATA_DIR: dataDir,
+    CLOUDFLARE_API_TOKEN: 'test-token', CF_API_BASE: mock.url, ZEDGE_ADMIN_PASSWORD: PASSWORD, SESSION_SECRET: 's'.repeat(32), DATA_DIR: dataDir,
     ...(s3m ? { R2_ACCESS_KEY_ID: 'R2KEY', R2_SECRET_ACCESS_KEY: 'R2SECRET', R2_ENDPOINT: s3m.url } : {}), ...env
   });
-  const server = createApp(config).listen(0, '127.0.0.1');
+  const app = createApp(config);
+  const server = app.listen(0, '127.0.0.1');
   await new Promise((r) => server.once('listening', r));
   const base = `http://127.0.0.1:${server.address().port}`;
 
@@ -32,13 +33,13 @@ export async function boot({ env = {}, mockOpts, s3 = false } = {}) {
       call,
       get cookie() { return cookie; },
       set cookie(v) { cookie = v; },
-      async login(username = 'admin', password = PASSWORD) {
-        const r = await call('POST', '/api/login', { username, password });
+      async login(username = 'admin', password = PASSWORD, code) {
+        const r = await call('POST', '/api/login', { username, password, ...(code ? { code } : {}) });
         if (r.ok) cookie = r.headers.get('set-cookie').split(';')[0];
         return r;
       },
       async json(method, p, body, headers) { const r = await call(method, p, body, headers); return { status: r.status, body: await r.json().catch(() => null) }; }
     };
   };
-  return { mock, s3: s3m, base, config, dataDir, client, close: async () => { server.closeAllConnections(); server.close(); await mock.close(); if (s3m) await s3m.close(); } };
+  return { app, mock, s3: s3m, base, config, dataDir, client, close: async () => { server.closeAllConnections(); server.close(); await mock.close(); if (s3m) await s3m.close(); } };
 }

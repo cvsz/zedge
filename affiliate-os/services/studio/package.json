@@ -1,0 +1,20 @@
+{
+  "name": "@affiliate-os/studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Studio shell: Cloudflare Access sign-in, content calendar board and approval inbox",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/main.js",
+    "test": "node --test \"test/*.test.js\""
+  },
+  "dependencies": {
+    "@affiliate-os/auth": "*",
+    "@affiliate-os/db": "*",
+    "@affiliate-os/observability": "*"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

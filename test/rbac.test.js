@@ -17,7 +17,7 @@ async function userClient(name, role, extra = {}) {
   return c;
 }
 
-test('the first admin is created from EDGE_ADMIN_PASSWORD and passwords are stored hashed', () => {
+test('the first admin is created from ZEDGE_ADMIN_PASSWORD and passwords are stored hashed', () => {
   const file = fs.readFileSync(path.join(env.dataDir, 'users.json'), 'utf8');
   assert.ok(!file.includes(PASSWORD), 'no plaintext password on disk');
   assert.match(JSON.parse(file).users.admin.hash, /^scrypt\$/);
@@ -129,7 +129,7 @@ test('multi-account: switch with X-Account-Id, and zone lists follow the active 
   } finally { await m.close(); }
 });
 
-test('CF_ACCOUNT_IDS limits the console to chosen accounts, including zones in other accounts', async () => {
+test('CLOUDFLARE_ACCOUNT_IDS limits the console to chosen accounts, including zones in other accounts', async () => {
   const other = 'c'.repeat(32);
   const m = await boot({ env: { CLOUDFLARE_ACCOUNT_IDS: 'a'.repeat(32) }, mockOpts: { accounts: [{ id: 'a'.repeat(32), name: 'Main' }, { id: other, name: 'Other' }] } });
   try {
@@ -144,10 +144,24 @@ test('CF_ACCOUNT_IDS limits the console to chosen accounts, including zones in o
 });
 
 test('no-auth mode acts as a full admin on loopback only', async () => {
-  const m = await boot({ env: { EDGE_ADMIN_PASSWORD: '', EDGE_ALLOW_NO_AUTH: '1' } });
+  const m = await boot({ env: { ZEDGE_ADMIN_PASSWORD: '', ZEDGE_ALLOW_NO_AUTH: '1' } });
   const c = m.client();
   const s = (await c.json('GET', '/api/session')).body;
   assert.deepEqual([s.signedIn, s.noAuth, s.user.role], [true, true, 'admin']);
   assert.equal((await c.call('GET', '/api/admin/users')).status, 200);
   await m.close();
+});
+
+import { loadConfig } from '../server/config.js';
+test('config: CLOUDFLARE_* names are read; legacy CF_* names still work with a warning; new names win', () => {
+  const base = { ZEDGE_ADMIN_PASSWORD: 'correct horse battery', SESSION_SECRET: 's'.repeat(32), DATA_DIR: '/tmp/x' };
+  assert.equal(loadConfig({ ...base, CLOUDFLARE_API_TOKEN: 'new', CLOUDFLARE_ACCOUNT_ID: 'a'.repeat(32) }).token, 'new');
+  const warn = console.warn; const seen = []; console.warn = (m) => seen.push(m);
+  try {
+    const c = loadConfig({ ...base, CF_API_TOKEN: 'old', CF_ACCOUNT_IDS: 'b'.repeat(32) });
+    assert.equal(c.token, 'old'); assert.deepEqual(c.accountIds, ['b'.repeat(32)]);
+    assert.match(seen.join(' '), /Deprecated.*CF_API_TOKEN.*CLOUDFLARE_API_TOKEN/);
+    seen.length = 0; assert.equal(loadConfig({ ...base, CLOUDFLARE_API_TOKEN: 'new', CF_API_TOKEN: 'old' }).token, 'new'); assert.equal(seen.length, 0);
+  } finally { console.warn = warn; }
+  assert.throws(() => loadConfig({ ...base }), /CLOUDFLARE_API_TOKEN is required/);
 });

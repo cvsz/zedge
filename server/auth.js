@@ -1,9 +1,10 @@
 import crypto from 'node:crypto';
 import { verifyPassword, hashPassword, MIN_PASSWORD } from './store.js';
 import { HttpError, bad } from './errors.js';
+import { verifyTotp, hashRecovery } from './totp.js';
 
-const COOKIE = 'edge_session';
-const LOCAL_ADMIN = { name: 'local', role: 'admin', permissions: ['*'] };
+const COOKIE = 'zedge_session';
+const LOCAL_ADMIN = { name: 'local', role: 'admin', permissions: ['*'], zones: [], resources: {} };
 
 const sign = (secret, value) => crypto.createHmac('sha256', secret).update(value).digest('base64url');
 function safeEqual(a, b) {
@@ -20,7 +21,8 @@ function parseCookies(header = '') {
   return out;
 }
 
-export function createAuth(config, store) {
+/** @param {any} config @param {any} store @param {{ alert?: (message: string) => void }} [deps] */
+export function createAuth(config, store, { alert = (_message) => {} } = {}) {
   const attempts = new Map(); // ip -> { count, resetAt }
 
   function issue(res, username) {
@@ -28,7 +30,7 @@ export function createAuth(config, store) {
     const payload = `${exp}.${crypto.randomBytes(8).toString('hex')}.${Buffer.from(username).toString('base64url')}`;
     const flags = ['HttpOnly', 'SameSite=Strict', 'Path=/', `Max-Age=${config.sessionHours * 3600}`];
     if (config.secureCookie) flags.push('Secure');
-    res.setHeader('Set-Cookie', `${COOKIE}=${payload}.${sign(config.sessionSecret, payload)}; ${flags.join('; ')}`);
+    res.append('Set-Cookie', `${COOKIE}=${payload}.${sign(config.sessionSecret, payload)}; ${flags.join('; ')}`);
   }
 
   function sessionName(req) {
@@ -48,7 +50,7 @@ export function createAuth(config, store) {
     if (!name) return null;
     const u = store.getUser(name);
     if (!u || u.disabled) return null;
-    return { name: u.name, role: u.role, permissions: store.permissionsFor(u.role) };
+    return { name: u.name, role: u.role, permissions: store.permissionsFor(u.role), zones: u.zones || [], resources: u.resources || {} };
   }
 
   function login(req, res) {
@@ -59,6 +61,9 @@ export function createAuth(config, store) {
       return res.status(429).json({ error: 'Too many attempts. Try again in a few minutes.' });
     }
     const username = String((req.body && req.body.username) || 'admin').trim().toLowerCase();
+    if (config.oidc && config.oidc.disablePassword && !config.oidc.breakglass.includes(username)) {
+      return res.status(403).json({ error: 'Password sign-in is turned off. Use single sign-on.' });
+    }
     const u = config.noAuth ? null : store.getUser(username);
     const ok = !!u && !u.disabled && verifyPassword(req.body && req.body.password, u.hash);
     if (!u) verifyPassword(req.body && req.body.password, undefined); // keep timing similar for unknown users
@@ -66,8 +71,25 @@ export function createAuth(config, store) {
       const next = rec && rec.resetAt > now ? rec : { count: 0, resetAt: now + 15 * 60 * 1000 };
       next.count += 1;
       attempts.set(ip, next);
+      if (next.count === 5) alert(`Zedge: sign-in locked for ${ip} after repeated failures`);
       store.audit({ t: new Date().toISOString(), user: username, method: 'LOGIN', path: '/api/login', status: 401, ip });
       return res.status(401).json({ error: 'Incorrect username or password' });
+    }
+    // second factor: password first, then a code from the authenticator app (or a one-time recovery code)
+    if (u.totp && u.totp.enabled) {
+      const code = String((req.body && req.body.code) || '').trim();
+      if (!code) return res.status(401).json({ error: 'Enter the 6-digit code from your authenticator app', totpRequired: true });
+      const step = verifyTotp(u.totp.secret, code, { lastStep: u.totp.lastStep ?? -1 });
+      let good = false;
+      if (step !== null) { store.totpStep(u.name, step); good = true; } else if (/^[0-9a-f]{5}-[0-9a-f]{5}$/i.test(code)) good = store.totpUseRecovery(u.name, hashRecovery(code));
+      if (!good) {
+        const next = rec && rec.resetAt > now ? rec : { count: 0, resetAt: now + 15 * 60 * 1000 };
+        next.count += 1;
+        attempts.set(ip, next);
+        if (next.count === 5) alert(`Zedge: sign-in locked for ${ip} after repeated failures`);
+        store.audit({ t: new Date().toISOString(), user: u.name, method: 'LOGIN', path: '/api/login (2fa)', status: 401, ip });
+        return res.status(401).json({ error: 'That code is not valid, or was already used', totpRequired: true });
+      }
     }
     attempts.delete(ip);
     issue(res, u.name);
@@ -94,6 +116,7 @@ export function createAuth(config, store) {
 
   return {
     login,
+    issueSession: issue,
     logout: (req, res) => { res.setHeader('Set-Cookie', `${COOKIE}=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0`); res.json({ ok: true }); },
     resolve,
     require,

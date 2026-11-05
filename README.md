@@ -196,3 +196,95 @@ Final-Report.md
 ## License
 
 MIT. See `LICENSE`.
+---
+
+## OpenID Connect (SSO)
+
+OIDC identity-token verification (`server/oidc.js`):
+
+- Accepts RS256 and ES256 signed JWTs only; `"none"` and HS256 are refused
+- Validates issuer (`iss`), audience (`aud`), authorized party (`azp`), expiry (`exp`), not-before (`nbf`), issued-at (`iat`), nonce, and subject (`sub`)
+- Maps claims to console roles via `oidc.roleMap` config; derives a prefixed console username from email to prevent collision with local accounts
+- Configuration is under `oidc.*` in `.env.example` / server config
+
+## Two-Factor Authentication (TOTP)
+
+TOTP support (`server/totp.js`, `server/auth.js`):
+
+- RFC 4226 HOTP with HMAC-SHA1, base32-encoded secrets
+- 6-digit codes with time-step tracking and single-use enforcement
+- Recovery codes (5-5 hex format) for account lockout scenarios
+- Enforced at login when `u.totp.enabled` is set; admin can reset via `resetTotp`
+
+## Alerts (SMTP Email)
+
+Outbound email via SMTP (`server/alerts.js`):
+
+- Implicit TLS (`smtps://`) or STARTTLS; plain SMTP to remote hosts is blocked
+- Optional `AUTH PLAIN` credentials from the SMTP URL
+- Configurable timeout and certificate verification
+
+## Approvals (Risk-Aware Destructive Actions)
+
+Risk-aware approval workflow (`server/approvals.js`):
+
+- Fingerprints destructive requests (method + path + body) with SHA-256
+- Identifies high-risk operations: cache purge, DNSSEC disable, KV/D1/queue deletion, D1 writes, snapshot restore, certificate revocation
+- Pending state (24 hours) and approved state (30 minutes) before execution
+- Audit trail for all approval decisions
+
+## Limits (Per-User Resource Quotas)
+
+Per-user resource limits (`server/limits.js`, enforced in `server/store.js`):
+
+- Workers (script names), R2 buckets, KV namespaces, D1 databases, Pages projects
+- Max 200 entries per resource type; names/ids validated against `^[A-Za-z0-9._-]{1,64}$`
+- Empty list = all resources; specific list = restricted to listed IDs only
+- Enforced at account-level route access (`/accounts/*`)
+
+## Edge API Routes
+
+Direct zone-level operations (`server/routes/edge.js`):
+
+- **Workers snippets**: `PUT/DELETE /api/zones/:zid/snippets/:name` (32 KB max, `workers.write` required)
+- **KV values**: read/write/delete key-value pairs in zone KV namespaces
+- **D1 SQL**: read-only SQL queries (`SELECT/WITH/EXPLAIN/PRAGMA table_info` only)
+- **DNS zone files**: zone file import/export (1 MB max)
+
+## Snapshots (Configuration Diff)
+
+Zone configuration snapshots (`server/routes/snapshots.js`):
+
+- Diff DNS records and rules between snapshot and live state
+- Detect added, removed, and changed records (proxied, TTL, content)
+- Compare WAF/rate-limit/cache rules across zones
+- Cloneable zone settings: SSL, TLS, HSTS, Brotli, security level, and more
+- Max 50 snapshots retained; snapshot IDs use `YYYYMMDDThhmmssZ-xxxxxx` format
+
+---
+
+## CI Workflow
+
+GitHub Actions CI (`.github/workflows/ci.yml`):
+
+- **test**: Node.js 20 and 22 matrix; `npm ci`, `npm run typecheck`, `npm test`, `npm run openapi:check`
+- **affiliate-link-service**: tests in `affiliate-os/services/link-service`
+- **helm**: `helm lint` and `helm template` for `deploy/helm/zedge`; rejects `replicaCount=2`
+- **browser**: Playwright smoke test with Chromium (needs test job)
+- **docker**: `docker build` with buildx, `zedge:ci` tag (needs test job)
+
+---
+
+## Environment Variables (New)
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `OIDC_ISSUER` | No | OpenID Connect issuer URL |
+| `OIDC_CLIENT_ID` | No | OIDC client ID (audience) |
+| `OIDC_ROLE_CLAIM` | No | JWT claim used for role mapping (default: `role`) |
+| `OIDC_ROLE_MAP` | No | JSON mapping of claim values to console roles |
+| `OIDC_DISABLE_PASSWORD` | No | Set `1` to disable password login (breakglass users excepted) |
+| `OIDC_BREAKGLASS` | No | Comma-separated usernames exempt from OIDC-only mode |
+| `SMTP_URL` | No | SMTP connection URL for alerts (`smtps://` or `STARTTLS`) |
+| `SMTP_FROM` | No | Default sender address for alert emails |
+| `RESOURCE_LIMITS` | No | JSON object of per-user resource quotas |

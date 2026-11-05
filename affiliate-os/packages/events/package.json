@@ -1,0 +1,11 @@
+{
+  "name": "@affiliate-os/events",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Transactional outbox, idempotent consumers, dead-letter queue and replay",
+  "main": "src/index.js",
+  "scripts": { "test": "node --test \"test/*.test.js\"" },
+  "dependencies": { "@affiliate-os/contracts": "*", "@affiliate-os/db": "*" },
+  "engines": { "node": ">=22" }
+}

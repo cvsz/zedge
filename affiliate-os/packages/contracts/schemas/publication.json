@@ -1,0 +1,72 @@
+{
+  "$id": "publication",
+  "x-version": 1,
+  "title": "Publication (one content item on one channel)",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "organization_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "content_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "channel_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 128
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "SCHEDULED",
+        "PUBLISHING",
+        "PUBLISHED",
+        "FAILED",
+        "CANCELLED"
+      ]
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "api",
+        "manual"
+      ]
+    },
+    "scheduled_for": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "published_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "platform_post_id": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "error_code": {
+      "type": "string",
+      "maxLength": 80
+    }
+  },
+  "required": [
+    "id",
+    "organization_id",
+    "content_id",
+    "channel_id",
+    "idempotency_key",
+    "status",
+    "mode"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,11 @@
+{
+  "name": "@affiliate-os/auth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Per-organization sign-in (OIDC), roles, approvals and a hash-chained audit log",
+  "main": "src/index.js",
+  "scripts": { "test": "node --test \"test/*.test.js\"" },
+  "dependencies": { "@affiliate-os/db": "*" },
+  "engines": { "node": ">=22" }
+}

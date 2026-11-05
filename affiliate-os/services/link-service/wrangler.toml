@@ -1,0 +1,16 @@
+# Deploy with: npx wrangler deploy   (create the D1 database first: npx wrangler d1 create affiliate-links)
+# Then: npx wrangler d1 execute affiliate-links --file=schema.sql --remote
+# Secrets: npx wrangler secret put ADMIN_TOKEN   (32+ random characters)
+name = "affiliate-link-service"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "affiliate-links"
+database_id = "REPLACE_WITH_YOUR_D1_ID"
+
+[vars]
+# Only these hosts (and their subdomains) may be redirect targets. Required: an open redirect is a phishing tool.
+ALLOWED_DESTINATION_HOSTS = "shopee.co.th,shopee.com,tiktok.com,example.com"
+DEFAULT_DISCLOSURE = "Affiliate link: we may earn a commission at no extra cost to you."

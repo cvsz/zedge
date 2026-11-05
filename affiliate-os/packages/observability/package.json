@@ -1,0 +1,10 @@
+{
+  "name": "@affiliate-os/observability",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Dependency-free tracing (OTLP-JSON-shaped spans), Prometheus text metrics and a budgeted cost ledger",
+  "main": "src/index.js",
+  "scripts": { "test": "node --test \"test/*.test.js\"" },
+  "engines": { "node": ">=22" }
+}

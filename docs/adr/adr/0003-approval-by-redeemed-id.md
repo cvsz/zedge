@@ -1,0 +1,3 @@
+# ADR 0003: Approvals are redeemed by the requester, not replayed by the server
+
+**Status:** accepted. **Context:** risky actions need a second person. **Decision:** the first call is refused and recorded; an approver decides; the requester repeats the identical call with `X-Approval-Id`. The server checks owner, status, expiry (30 min), a fingerprint of method+path+body, and marks it used. **Consequences:** the action always runs under the requester's identity and permissions; no stored-request replay machinery; approval cannot be reused or redirected. If no other approver exists the check is skipped so the only admin is not locked out.

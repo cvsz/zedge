@@ -1,0 +1,96 @@
+{
+  "$id": "content",
+  "x-version": 1,
+  "title": "Content item",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "organization_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "campaign_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "creative_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "IDEA",
+        "GENERATING",
+        "REVIEW",
+        "APPROVED",
+        "SCHEDULED",
+        "PUBLISHING",
+        "PUBLISHED",
+        "FAILED",
+        "ARCHIVED"
+      ]
+    },
+    "language": {
+      "$ref": "common#/$defs/language"
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "image",
+        "video",
+        "text",
+        "carousel"
+      ]
+    },
+    "caption": {
+      "type": "string",
+      "maxLength": 5000
+    },
+    "disclosure": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 300
+    },
+    "claims": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "product_field": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          }
+        },
+        "required": [
+          "text",
+          "product_field"
+        ],
+        "additionalProperties": false,
+        "description": "Every claim names the product record field that supports it."
+      }
+    },
+    "autonomy_level": {
+      "$ref": "common#/$defs/autonomy_level"
+    }
+  },
+  "required": [
+    "id",
+    "organization_id",
+    "status",
+    "language",
+    "format",
+    "disclosure"
+  ],
+  "additionalProperties": false
+}

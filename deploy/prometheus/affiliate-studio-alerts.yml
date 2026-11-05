@@ -1,0 +1,24 @@
+# Prometheus alert rules for the Affiliate OS studio. Needs METRICS_TOKEN set and the target scraped.
+groups:
+  - name: affiliate-studio
+    rules:
+      - alert: StudioDown
+        expr: up{job="affiliate-studio"} == 0
+        for: 3m
+        labels: { severity: page }
+        annotations: { summary: 'Studio is not answering scrapes', runbook: 'affiliate-os/docs/runbooks/auth-outage.md' }
+      - alert: StudioServerErrors
+        expr: sum(rate(studio_requests_total{status=~"5.."}[5m])) / clamp_min(sum(rate(studio_requests_total[5m])), 1) > 0.05
+        for: 10m
+        labels: { severity: page }
+        annotations: { summary: 'More than 5% of studio requests fail' }
+      - alert: StudioRateLimited
+        expr: sum(rate(studio_requests_total{status="429"}[5m])) > 1
+        for: 10m
+        labels: { severity: ticket }
+        annotations: { summary: 'Sustained rate limiting: a client is flooding, or the limit is too low' }
+      - alert: StudioAuthRefusals
+        expr: sum(rate(studio_requests_total{route="api",status="403"}[10m])) > 2
+        for: 15m
+        labels: { severity: ticket }
+        annotations: { summary: 'Many refused API calls', runbook: 'affiliate-os/docs/runbooks/auth-outage.md' }

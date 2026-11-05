@@ -1,0 +1,27 @@
+{
+  "$id": "events/CreativeApproved.v1",
+  "x-version": 1,
+  "title": "CreativeApproved",
+  "type": "object",
+  "properties": {
+    "creative_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "approved_by": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "approval_request_id": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "required": [
+    "creative_id",
+    "approved_by",
+    "approval_request_id"
+  ],
+  "additionalProperties": false
+}

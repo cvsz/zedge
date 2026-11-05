@@ -1,0 +1,38 @@
+{
+  "$id": "events/OptimizationRequested.v1",
+  "x-version": 1,
+  "title": "OptimizationRequested",
+  "type": "object",
+  "properties": {
+    "target_type": {
+      "type": "string",
+      "enum": [
+        "campaign",
+        "content",
+        "creative",
+        "product"
+      ]
+    },
+    "target_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "requested_by": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    }
+  },
+  "required": [
+    "target_type",
+    "target_id",
+    "reason",
+    "requested_by"
+  ],
+  "additionalProperties": false
+}

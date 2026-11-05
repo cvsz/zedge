@@ -1,0 +1,228 @@
+[
+  {
+    "id": "00000000-0000-4000-8000-000000000100",
+    "type": "ProductDiscovered",
+    "version": 1,
+    "organization_id": "00000000-0000-4000-8000-000000000001",
+    "occurred_at": "2026-11-02T10:00:00Z",
+    "correlation_id": "corr-0001-abcd",
+    "payload": {
+      "product_id": "00000000-0000-4000-8000-000000000004",
+      "provider_id": "00000000-0000-4000-8000-000000000005",
+      "title": "Desk lamp",
+      "source": "manual",
+      "url": "https://merchant.example/lamp",
+      "price": {
+        "amount_minor": 12900,
+        "currency": "THB"
+      }
+    }
+  },
+  {
+    "id": "00000000-0000-4000-8000-000000000100",
+    "type": "ProductRanked",
+    "version": 1,
+    "organization_id": "00000000-0000-4000-8000-000000000001",
+    "occurred_at": "2026-11-02T10:00:00Z",
+    "correlation_id": "corr-0001-abcd",
+    "payload": {
+      "product_id": "00000000-0000-4000-8000-000000000004",
+      "score": 0.72,
+      "basis": "modeled",
+      "model_version": "v1"
+    }
+  },
+  {
+    "id": "00000000-0000-4000-8000-000000000100",
+    "type": "CampaignCreated",
+    "version": 1,
+    "organization_id": "00000000-0000-4000-8000-000000000001",
+    "occurred_at": "2026-11-02T10:00:00Z",
+    "correlation_id": "corr-0001-abcd",
+    "payload": {
+      "campaign_id": "00000000-0000-4000-8000-000000000003",
+      "brand_id": "00000000-0000-4000-8000-000000000002",
+      "name": "Autumn lamps",
+      "autonomy_level": "APPROVAL_REQUIRED"
+    }
+  },
+  {
+    "id": "00000000-0000-4000-8000-000000000100",
+    "type": "CreativeRequested",
+    "version": 1,
+    "organization_id": "00000000-0000-4000-8000-000000000001",
+    "occurred_at": "2026-11-02T10:00:00Z",
+    "correlation_id": "corr-0001-abcd",
+    "payload": {
+      "creative_id": "00000000-0000-4000-8000-000000000006",
+      "campaign_id": "00000000-0000-4000-8000-000000000003",
+      "product_id": "00000000-0000-4000-8000-000000000004",
+      "format": "video",
+      "language": "th",
+      "requested_by": "owner"
+    }
+  },
+  {
+    "id": "00000000-0000-4000-8000-000000000100",
+    "type": "CreativeGenerated",
+    "version": 1,
+    "organization_id": "00000000-0000-4000-8000-000000000001",
+    "occurred_at": "2026-11-02T10:00:00Z",
+    "correlation_id": "corr-0001-abcd",
+    "payload": {
+      "creative_id": "00000000-0000-4000-8000-000000000006",
+      "content_id": "00000000-0000-4000-8000-000000000007",
+      "asset_ids": [
+        "00000000-0000-4000-8000-000000000013"
+      ],
+      "model": "local-model",
+      "cost": {
+        "amount_minor": 40,
+        "currency": "THB"
+      }
+    }
+  },
+  {
+    "id": "00000000-0000-4000-8000-000000000100",
+    "type": "CreativeApproved",
+    "version": 1,
+    "organization_id": "00000000-0000-4000-8000-000000000001",
+    "occurred_at": "2026-11-02T10:00:00Z",
+    "correlation_id": "corr-0001-abcd",
+    "payload": {
+      "creative_id": "00000000-0000-4000-8000-000000000006",
+      "approved_by": "owner",
+      "approval_request_id": "00000000-0000-4000-8000-000000000010"
+    }
+  },
+  {
+    "id": "00000000-0000-4000-8000-000000000100",
+    "type": "ContentScheduled",
+    "version": 1,
+    "organization_id": "00000000-0000-4000-8000-000000000001",
+    "occurred_at": "2026-11-02T10:00:00Z",
+    "correlation_id": "corr-0001-abcd",
+    "payload": {
+      "content_id": "00000000-0000-4000-8000-000000000007",
+      "channel_id": "00000000-0000-4000-8000-000000000008",
+      "scheduled_for": "2026-11-02T10:00:00Z",
+      "idempotency_key": "sched-0001-abcd"
+    }
+  },
+  {
+    "id": "00000000-0000-4000-8000-000000000100",
+    "type": "ContentPublished",
+    "version": 1,
+    "organization_id": "00000000-0000-4000-8000-000000000001",
+    "occurred_at": "2026-11-02T10:00:00Z",
+    "correlation_id": "corr-0001-abcd",
+    "payload": {
+      "content_id": "00000000-0000-4000-8000-000000000007",
+      "channel_id": "00000000-0000-4000-8000-000000000008",
+      "publication_id": "00000000-0000-4000-8000-000000000009",
+      "published_at": "2026-11-02T10:00:00Z",
+      "mode": "manual"
+    }
+  },
+  {
+    "id": "00000000-0000-4000-8000-000000000100",
+    "type": "ContentFailed",
+    "version": 1,
+    "organization_id": "00000000-0000-4000-8000-000000000001",
+    "occurred_at": "2026-11-02T10:00:00Z",
+    "correlation_id": "corr-0001-abcd",
+    "payload": {
+      "content_id": "00000000-0000-4000-8000-000000000007",
+      "channel_id": "00000000-0000-4000-8000-000000000008",
+      "publication_id": "00000000-0000-4000-8000-000000000009",
+      "error_code": "RATE_LIMITED",
+      "retryable": true
+    }
+  },
+  {
+    "id": "00000000-0000-4000-8000-000000000100",
+    "type": "ClickRecorded",
+    "version": 1,
+    "organization_id": "00000000-0000-4000-8000-000000000001",
+    "occurred_at": "2026-11-02T10:00:00Z",
+    "correlation_id": "corr-0001-abcd",
+    "payload": {
+      "slug": "lamp-tt",
+      "day": "2026-11-02",
+      "platform": "tiktok",
+      "country": "TH",
+      "is_bot": false,
+      "basis": "observed"
+    }
+  },
+  {
+    "id": "00000000-0000-4000-8000-000000000100",
+    "type": "ConversionRecorded",
+    "version": 1,
+    "organization_id": "00000000-0000-4000-8000-000000000001",
+    "occurred_at": "2026-11-02T10:00:00Z",
+    "correlation_id": "corr-0001-abcd",
+    "payload": {
+      "conversion_id": "00000000-0000-4000-8000-000000000011",
+      "provider_id": "00000000-0000-4000-8000-000000000005",
+      "order_ref": "ORD-1001",
+      "link_slug": "lamp-tt",
+      "amount": {
+        "amount_minor": 12900,
+        "currency": "THB"
+      },
+      "basis": "observed",
+      "source": "provider-report"
+    }
+  },
+  {
+    "id": "00000000-0000-4000-8000-000000000100",
+    "type": "CommissionRecorded",
+    "version": 1,
+    "organization_id": "00000000-0000-4000-8000-000000000001",
+    "occurred_at": "2026-11-02T10:00:00Z",
+    "correlation_id": "corr-0001-abcd",
+    "payload": {
+      "commission_id": "00000000-0000-4000-8000-000000000012",
+      "conversion_id": "00000000-0000-4000-8000-000000000011",
+      "amount": {
+        "amount_minor": 900,
+        "currency": "THB"
+      },
+      "status": "pending"
+    }
+  },
+  {
+    "id": "00000000-0000-4000-8000-000000000100",
+    "type": "PerformanceWindowCompleted",
+    "version": 1,
+    "organization_id": "00000000-0000-4000-8000-000000000001",
+    "occurred_at": "2026-11-02T10:00:00Z",
+    "correlation_id": "corr-0001-abcd",
+    "payload": {
+      "subject_type": "campaign",
+      "subject_id": "00000000-0000-4000-8000-000000000003",
+      "window_start": "2026-11-01T00:00:00Z",
+      "window_end": "2026-11-02T10:00:00Z",
+      "metrics": {
+        "clicks": 120,
+        "ctr": 0.031
+      },
+      "basis": "observed"
+    }
+  },
+  {
+    "id": "00000000-0000-4000-8000-000000000100",
+    "type": "OptimizationRequested",
+    "version": 1,
+    "organization_id": "00000000-0000-4000-8000-000000000001",
+    "occurred_at": "2026-11-02T10:00:00Z",
+    "correlation_id": "corr-0001-abcd",
+    "payload": {
+      "target_type": "creative",
+      "target_id": "00000000-0000-4000-8000-000000000006",
+      "reason": "Low click rate after minimum sample",
+      "requested_by": "owner"
+    }
+  }
+]

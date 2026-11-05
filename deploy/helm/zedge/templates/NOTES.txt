@@ -1,0 +1,8 @@
+Zedge is installed as a single replica with a persistent volume.
+
+1. The pod reads its secrets from the Secret "{{ .Values.existingSecret }}". If you have not made it yet:
+     kubectl -n {{ .Release.Namespace }} create secret generic {{ .Values.existingSecret }} \
+       --from-literal=CLOUDFLARE_API_TOKEN=... --from-literal=ZEDGE_ADMIN_PASSWORD=... --from-literal=SESSION_SECRET=$(openssl rand -hex 32)
+2. Open it through your ingress, or locally:
+     kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "zedge.fullname" . }} 8787:{{ .Values.service.port }}
+3. Back up the volume (users, audit log, snapshots). The chart keeps the claim when you uninstall.

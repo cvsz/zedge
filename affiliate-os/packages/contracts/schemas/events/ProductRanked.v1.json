@@ -1,0 +1,30 @@
+{
+  "$id": "events/ProductRanked.v1",
+  "x-version": 1,
+  "title": "ProductRanked",
+  "type": "object",
+  "properties": {
+    "product_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "basis": {
+      "$ref": "common#/$defs/basis"
+    },
+    "model_version": {
+      "type": "string",
+      "maxLength": 64
+    }
+  },
+  "required": [
+    "product_id",
+    "score",
+    "basis"
+  ],
+  "additionalProperties": false
+}

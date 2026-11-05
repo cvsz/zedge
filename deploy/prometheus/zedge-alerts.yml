@@ -1,0 +1,30 @@
+# Prometheus alert rules for Zedge. Needs METRICS_TOKEN set and the target scraped (see prometheus.example.yml).
+groups:
+  - name: zedge
+    rules:
+      - alert: ZedgeDown
+        expr: up{job="zedge"} == 0
+        for: 3m
+        labels: { severity: critical }
+        annotations: { summary: "Zedge is not answering", description: "Prometheus could not scrape {{ $labels.instance }} for 3 minutes." }
+      - alert: ZedgeCloudflareErrors
+        expr: increase(zedge_cloudflare_errors_total[10m]) > 10
+        for: 5m
+        labels: { severity: warning }
+        annotations: { summary: "Many Cloudflare API errors", description: "More than 10 failed Cloudflare calls in 10 minutes. Check the API token and Cloudflare status." }
+      - alert: ZedgeServerErrors
+        expr: sum(increase(zedge_http_requests_total{status="5xx"}[10m])) > 5
+        labels: { severity: warning }
+        annotations: { summary: "Zedge is returning server errors" }
+      - alert: ZedgeRateLimiting
+        expr: increase(zedge_rate_limited_total[10m]) > 20
+        labels: { severity: info }
+        annotations: { summary: "Users or scripts are hitting the API rate limit", description: "Someone may be running a loop against the console." }
+      - alert: ZedgeSigninFailures
+        expr: sum(increase(zedge_http_requests_total{method="POST",status="4xx"}[10m])) > 30
+        labels: { severity: warning }
+        annotations: { summary: "Many rejected requests", description: "A burst of 4xx on write calls can mean a password-guessing attempt or a broken client." }
+      - alert: ZedgeRestarted
+        expr: zedge_uptime_seconds < 300
+        labels: { severity: info }
+        annotations: { summary: "Zedge restarted recently" }

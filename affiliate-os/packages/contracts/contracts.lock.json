@@ -1,0 +1,86 @@
+{
+  "approval-request": {
+    "version": 1,
+    "hash": "fa66eeaf931b3622c9a29785c47259576b89d4c4a9e75c93295e446cccab3fa5"
+  },
+  "click": {
+    "version": 1,
+    "hash": "750ab1375a9f0126e7e3e532055270c078aa02cfdc94f97d1521276a2684a0bd"
+  },
+  "common": {
+    "version": 1,
+    "hash": "e5a19ba7e682a54c17b012d98e0491ebf9c80198b51af5a90c08aec4c54c6647"
+  },
+  "content": {
+    "version": 1,
+    "hash": "a532b19461a9d632d7bec6c190684c215bf7fafe49aa248534e0f489d374a3e9"
+  },
+  "event-envelope": {
+    "version": 1,
+    "hash": "95f41e07b4a6f0892fe1ea4c058b70590a37641d733a8b82c8ab11dff967c32d"
+  },
+  "events/CampaignCreated.v1": {
+    "version": 1,
+    "hash": "f9335fbdf12f43f4807fd77944597486d0ae369d7fd897727e91970d7368fd1f"
+  },
+  "events/ClickRecorded.v1": {
+    "version": 1,
+    "hash": "38063f4b93bd2202f925510705a36a0815ff48a5c22b3e674d3089316d9e87c7"
+  },
+  "events/CommissionRecorded.v1": {
+    "version": 1,
+    "hash": "4090c530302173371cad1a02fc89e0874fa1fb2c23b3edabbc9b5360659bb721"
+  },
+  "events/ContentFailed.v1": {
+    "version": 1,
+    "hash": "55ab6a7d96c4e5c57a0c2f0e28a6b9cd25594d3b60aabfacef4d18d8e2eeaf13"
+  },
+  "events/ContentPublished.v1": {
+    "version": 1,
+    "hash": "1b51cf3d384b368a3938e40e2868bab723fba5118cf9709f8b0f0d73c9c36a09"
+  },
+  "events/ContentScheduled.v1": {
+    "version": 1,
+    "hash": "75a70ca531911e893786757c4a06e8836baaba8e734e712e67034732b6f4419c"
+  },
+  "events/ConversionRecorded.v1": {
+    "version": 1,
+    "hash": "e9841ba5a0ae2e6a71502a8e787aeca4d81d1b33b061f32359f676061289d8ff"
+  },
+  "events/CreativeApproved.v1": {
+    "version": 1,
+    "hash": "72f263da02f9726d5050c993c697d54abd3f943dca4aa10c14a18602be49d50e"
+  },
+  "events/CreativeGenerated.v1": {
+    "version": 1,
+    "hash": "ad7d82e39cb839b24a49fdac3f75392429e7c150a603b73bc3824292da8e4915"
+  },
+  "events/CreativeRequested.v1": {
+    "version": 1,
+    "hash": "008b8590a1a3a0349ee184e274a5c7ec20bc5c7c715ea9cbfc9c2b8cfb9e1997"
+  },
+  "events/OptimizationRequested.v1": {
+    "version": 1,
+    "hash": "ef0cf81ca1bc4d3a1620a3debcab086a0980939021e8af9967165a2e9fda9bf1"
+  },
+  "events/PerformanceWindowCompleted.v1": {
+    "version": 1,
+    "hash": "13183af9e198ea58b4dacf92293da85404234a785590492640971dfdefd21414"
+  },
+  "events/ProductDiscovered.v1": {
+    "version": 1,
+    "hash": "77e419b85ce6fa898441d9f81434c9f0a71b3c70e8e17cc08d2aaeb90ece724b"
+  },
+  "events/ProductRanked.v1": {
+    "version": 1,
+    "hash": "ea6a7f126e4f255b029dc6b90eab0fb6cd2ec34aa9e5fa634d9156a17b85374f"
+  },
+  "link": {
+    "version": 1,
+    "hash": "c262ba1cd63ce7f44351b5c646ad9fdb2d960616b72075fe41eaaf5c6a840d21"
+  },
+  "publication": {
+    "version": 1,
+    "hash": "f64a8cb0136cd6b064afdfb85c1b410ede0fcc0040ae2b793b4e281cff83eb75"
+  }
+}

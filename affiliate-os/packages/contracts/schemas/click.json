@@ -1,0 +1,41 @@
+{
+  "$id": "click",
+  "x-version": 1,
+  "title": "Click (observed)",
+  "type": "object",
+  "properties": {
+    "slug": {
+      "$ref": "common#/$defs/slug"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "day": {
+      "type": "string",
+      "format": "date"
+    },
+    "platform": {
+      "$ref": "common#/$defs/platform"
+    },
+    "country": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[A-Z]{2}$"
+    },
+    "is_bot": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "slug",
+    "ts",
+    "day",
+    "platform",
+    "is_bot"
+  ],
+  "additionalProperties": false,
+  "description": "Never contains an IP address or user agent."
+}

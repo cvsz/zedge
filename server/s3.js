@@ -45,6 +45,7 @@ export function parseList(xml) {
 
 /** R2 object operations over its S3-compatible API (needs an R2 access key pair). */
 export function createR2(config, { fetchImpl = fetch } = {}) {
+  /** @param {any} accountId @param {string} method @param {string} bucket @param {string} key @param {{ query?: any, body?: any, contentType?: string }} [opts] */
   async function call(accountId, method, bucket, key, { query = {}, body, contentType } = {}) {
     const { accessKeyId, secretAccessKey, endpoint } = config.r2;
     if (!accessKeyId || !secretAccessKey) {
@@ -74,6 +75,7 @@ export function createR2(config, { fetchImpl = fetch } = {}) {
   }
 
   return {
+    /** @param {any} accountId @param {string} bucket @param {{ prefix?: string, token?: string }} [opts] */
     async list(accountId, bucket, { prefix = '', token } = {}) {
       const query = { 'list-type': '2', delimiter: '/', 'max-keys': '200' };
       if (prefix) query.prefix = prefix;

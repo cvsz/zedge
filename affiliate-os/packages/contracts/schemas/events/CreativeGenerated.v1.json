@@ -1,0 +1,40 @@
+{
+  "$id": "events/CreativeGenerated.v1",
+  "x-version": 1,
+  "title": "CreativeGenerated",
+  "type": "object",
+  "properties": {
+    "creative_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "content_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "variant_of": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "asset_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "maxItems": 50
+    },
+    "model": {
+      "type": "string",
+      "maxLength": 120
+    },
+    "cost": {
+      "$ref": "common#/$defs/money"
+    }
+  },
+  "required": [
+    "creative_id",
+    "content_id"
+  ],
+  "additionalProperties": false
+}

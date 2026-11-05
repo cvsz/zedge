@@ -1,4 +1,5 @@
 import { HttpError, bad } from '../errors.js';
+import { guardProxy } from '../limits.js';
 import { permissionFor, cleanQuery } from '../allowlist.js';
 import { can } from '../rbac.js';
 
@@ -22,7 +23,7 @@ export function registerCore(app, ctx) {
 
   app.param('zid', (req, res, next, v) => {
     if (!ID_RE.test(v)) return next(bad('Invalid zone id'));
-    return Promise.resolve(assertZone(v)).then(() => next(), next);
+    return Promise.resolve(assertZone(v, req)).then(() => next(), next);
   });
 
   app.get('/api/meta', wrap(async (req, res) => {
@@ -48,15 +49,26 @@ export function registerCore(app, ctx) {
     const am = cfPath.match(/^\/accounts\/([^/]+)/);
     if (am && !(await accounts()).some((a) => a.id === am[1])) throw new HttpError(403, 'That account is not available to this console');
     const zm = cfPath.match(/^\/zones\/([^/]+)/);
-    if (zm) await assertZone(zm[1]);
+    if (zm) await assertZone(zm[1], req);
+    if (cfPath.startsWith('/certificates')) {
+      // Origin CA is a user-level API: list per zone, and only allow changes when the console is not restricted to specific accounts.
+      if (req.method === 'GET') {
+        if (!req.query.zone_id) throw bad('zone_id is required');
+        await assertZone(String(req.query.zone_id), req);
+      } else if (config.accountIds.length) throw new HttpError(403, 'Origin CA changes are disabled when CLOUDFLARE_ACCOUNT_IDS restricts this console');
+    }
+    if (req.body && typeof req.body.zone_id === 'string') await assertZone(req.body.zone_id, req); // e.g. Workers custom domains
+    const trim = guardProxy(req.user, req.method, cfPath, req.body);
     const query = cleanQuery(req.query);
     if (req.method === 'GET' && cfPath === '/zones') query['account.id'] = await accountId(req);
     const r = await cf.raw(req.method, cfPath, { body: ['POST', 'PUT', 'PATCH'].includes(req.method) ? req.body : undefined, query });
-    res.json(r);
+    if (req.method === 'GET' && cfPath === '/zones' && req.user.zones.length && Array.isArray(r.result)) r.result = r.result.filter((z) => req.user.zones.includes(z.id));
+    res.json(trim ? trim(r) : r);
   }));
 
   // ---- one-click: add domain ----
   app.post('/api/domains', need('domains.write'), wrap(async (req, res) => {
+    if (req.user.zones.length) throw new HttpError(403, 'Your account is limited to specific domains and cannot add new ones');
     const name = String((req.body && req.body.name) || '').trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
     if (!DOMAIN_RE.test(name)) throw bad('Enter a valid domain such as example.com');
     const r = await cf.post('/zones', { name, account: { id: await accountId(req) }, type: 'full' });
@@ -101,7 +113,7 @@ export function registerCore(app, ctx) {
     if (!ID_RE.test(req.params.tid)) throw bad('Invalid tunnel id');
     const { zoneId } = req.body || {};
     if (!ID_RE.test(String(zoneId || ''))) throw bad('Choose a zone');
-    await assertZone(zoneId);
+    await assertZone(zoneId, req);
     const service = String((req.body && req.body.service) || '').trim();
     if (!SERVICE_RE.test(service)) throw bad('Service must look like http://localhost:3000');
     const aid = await accountId(req);
@@ -146,7 +158,7 @@ export function registerCore(app, ctx) {
     if (!tpl) throw bad('Unknown template');
     const days = [30, 90, 365].includes(Number(ttlDays)) ? Number(ttlDays) : 90;
     if (tpl.zone.length && !zoneId) throw bad('Choose a zone for this template');
-    if (zoneId) { if (!ID_RE.test(String(zoneId))) throw bad('Invalid zone'); await assertZone(zoneId); }
+    if (zoneId) { if (!ID_RE.test(String(zoneId))) throw bad('Invalid zone'); await assertZone(zoneId, req); }
     const aid = await accountId(req);
     const groups = (await cf.get('/user/tokens/permission_groups')).result || [];
     const byName = new Map(groups.map((g) => [g.name, g]));

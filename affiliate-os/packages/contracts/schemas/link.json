@@ -1,0 +1,55 @@
+{
+  "$id": "link",
+  "x-version": 1,
+  "title": "Affiliate link",
+  "type": "object",
+  "properties": {
+    "slug": {
+      "$ref": "common#/$defs/slug"
+    },
+    "destination": {
+      "type": "string",
+      "format": "uri-https",
+      "maxLength": 2000
+    },
+    "provider": {
+      "type": "string",
+      "pattern": "^[a-z0-9_-]{1,40}$"
+    },
+    "campaign_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "content_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "creative_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "platform": {
+      "$ref": "common#/$defs/platform"
+    },
+    "disclosure": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 300,
+      "description": "Required. Every tracked link carries the disclosure to show next to it."
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "slug",
+    "destination",
+    "platform",
+    "disclosure"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,36 @@
+{
+  "$id": "events/ContentFailed.v1",
+  "x-version": 1,
+  "title": "ContentFailed",
+  "type": "object",
+  "properties": {
+    "content_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "channel_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "publication_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "error_code": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "retryable": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "content_id",
+    "channel_id",
+    "publication_id",
+    "error_code",
+    "retryable"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,43 @@
+{
+  "$id": "events/ProductDiscovered.v1",
+  "x-version": 1,
+  "title": "ProductDiscovered",
+  "type": "object",
+  "properties": {
+    "product_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "provider_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "provider",
+        "manual",
+        "import"
+      ]
+    },
+    "url": {
+      "type": "string",
+      "format": "uri-https"
+    },
+    "price": {
+      "$ref": "common#/$defs/money"
+    }
+  },
+  "required": [
+    "product_id",
+    "provider_id",
+    "title",
+    "source"
+  ],
+  "additionalProperties": false
+}

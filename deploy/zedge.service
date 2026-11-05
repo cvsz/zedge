@@ -1,0 +1,34 @@
+# systemd unit: copy to /etc/systemd/system/, create /etc/zedge.env from .env.example, then
+#   sudo systemctl enable --now zedge
+[Unit]
+Description=Zedge (Cloudflare control panel)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=zedge
+Group=zedge
+WorkingDirectory=/opt/zedge
+EnvironmentFile=/etc/zedge.env
+Environment=DATA_DIR=/var/lib/zedge
+ExecStart=/usr/bin/node server/index.js
+Restart=on-failure
+RestartSec=3
+StateDirectory=zedge
+StateDirectoryMode=0700
+# hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+LockPersonality=true
+ReadWritePaths=/var/lib/zedge
+
+[Install]
+WantedBy=multi-user.target

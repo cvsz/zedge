@@ -1,0 +1,76 @@
+{
+  "$id": "common",
+  "x-version": 1,
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "money": {
+      "type": "object",
+      "properties": {
+        "amount_minor": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        }
+      },
+      "required": [
+        "amount_minor",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "description": "Integer minor units plus ISO 4217 currency. Never a float."
+    },
+    "basis": {
+      "type": "string",
+      "enum": [
+        "observed",
+        "modeled"
+      ],
+      "description": "Observed metrics were measured; modeled ones were estimated and must be labelled."
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "tiktok",
+        "shopee",
+        "facebook",
+        "instagram",
+        "youtube",
+        "line",
+        "web",
+        "other"
+      ]
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "th",
+        "en",
+        "th-en"
+      ]
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{1,63}$"
+    },
+    "autonomy_level": {
+      "type": "string",
+      "enum": [
+        "MANUAL",
+        "DRAFT_ONLY",
+        "APPROVAL_REQUIRED",
+        "AUTO_PUBLISH_APPROVED_TEMPLATES",
+        "AUTONOMOUS_WITH_POLICY"
+      ]
+    }
+  }
+}

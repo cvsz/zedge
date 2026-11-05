@@ -1,0 +1,46 @@
+{
+  "$id": "events/CreativeRequested.v1",
+  "x-version": 1,
+  "title": "CreativeRequested",
+  "type": "object",
+  "properties": {
+    "creative_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "campaign_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "product_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "format": {
+      "type": "string",
+      "enum": [
+        "image",
+        "video",
+        "text",
+        "carousel"
+      ]
+    },
+    "language": {
+      "$ref": "common#/$defs/language"
+    },
+    "requested_by": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    }
+  },
+  "required": [
+    "creative_id",
+    "campaign_id",
+    "product_id",
+    "format",
+    "language",
+    "requested_by"
+  ],
+  "additionalProperties": false
+}

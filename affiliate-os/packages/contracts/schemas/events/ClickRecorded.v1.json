@@ -1,0 +1,40 @@
+{
+  "$id": "events/ClickRecorded.v1",
+  "x-version": 1,
+  "title": "ClickRecorded",
+  "type": "object",
+  "properties": {
+    "slug": {
+      "$ref": "common#/$defs/slug"
+    },
+    "day": {
+      "type": "string",
+      "format": "date"
+    },
+    "platform": {
+      "$ref": "common#/$defs/platform"
+    },
+    "country": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[A-Z]{2}$"
+    },
+    "is_bot": {
+      "type": "boolean"
+    },
+    "basis": {
+      "const": "observed"
+    }
+  },
+  "required": [
+    "slug",
+    "day",
+    "platform",
+    "is_bot",
+    "basis"
+  ],
+  "additionalProperties": false,
+  "description": "No IP address or user agent field exists, by design (ADR 0003)."
+}

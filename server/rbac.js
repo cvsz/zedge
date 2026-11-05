@@ -10,9 +10,15 @@ export const PERMISSIONS = {
   'r2.write': 'Create buckets; upload and delete objects; lifecycle and CORS',
   'zerotrust.write': 'Tunnels, Access apps and policies, device posture, Gateway',
   'email.write': 'Email routing and DMARC',
+  'pages.write': 'Pages: rollback, retry, custom domains, environment variables',
+  'lb.write': 'Load balancers, pools, monitors and health checks',
+  'data.access': 'KV values, KV and D1 management, D1 SQL console, Queues',
+  'ssl.write': 'Certificates, Origin CA, Universal SSL and authenticated origin pulls',
+  'snapshots.write': 'Restore DNS and rule snapshots',
   'tokens.read': 'List API tokens',
   'tokens.write': 'Create, roll and revoke API tokens',
   'audit.read': 'View the Cloudflare account audit log and the console audit log',
+  'approvals.decide': 'Approve or reject risky actions requested by other people',
   'users.admin': 'Manage console users and roles'
 };
 

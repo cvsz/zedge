@@ -1,0 +1,44 @@
+{
+  "$id": "events/ConversionRecorded.v1",
+  "x-version": 1,
+  "title": "ConversionRecorded",
+  "type": "object",
+  "properties": {
+    "conversion_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "provider_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "order_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "link_slug": {
+      "$ref": "common#/$defs/slug"
+    },
+    "amount": {
+      "$ref": "common#/$defs/money"
+    },
+    "basis": {
+      "$ref": "common#/$defs/basis"
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    }
+  },
+  "required": [
+    "conversion_id",
+    "provider_id",
+    "order_ref",
+    "amount",
+    "basis",
+    "source"
+  ],
+  "additionalProperties": false
+}

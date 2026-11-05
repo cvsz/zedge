@@ -1,0 +1,76 @@
+{
+  "$id": "approval-request",
+  "x-version": 1,
+  "title": "Approval request",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "organization_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "publish",
+        "raise_autonomy",
+        "spend",
+        "sensitive_category",
+        "link_destination"
+      ]
+    },
+    "subject_type": {
+      "type": "string",
+      "maxLength": 40
+    },
+    "subject_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "requested_by": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected",
+        "expired"
+      ]
+    },
+    "decided_by": {
+      "type": "string",
+      "maxLength": 120
+    },
+    "decided_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "id",
+    "organization_id",
+    "kind",
+    "subject_type",
+    "subject_id",
+    "summary",
+    "requested_by",
+    "status"
+  ],
+  "additionalProperties": false
+}

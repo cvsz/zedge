@@ -1,0 +1,32 @@
+{
+  "$id": "events/ContentScheduled.v1",
+  "x-version": 1,
+  "title": "ContentScheduled",
+  "type": "object",
+  "properties": {
+    "content_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "channel_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "scheduled_for": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 128
+    }
+  },
+  "required": [
+    "content_id",
+    "channel_id",
+    "scheduled_for",
+    "idempotency_key"
+  ],
+  "additionalProperties": false
+}

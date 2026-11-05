@@ -5,6 +5,7 @@ COPY package.json package-lock.json* ./
 RUN npm install --omit=dev --no-audit --no-fund && npm cache clean --force
 COPY server ./server
 COPY public ./public
+COPY scripts/backup.mjs ./scripts/backup.mjs
 RUN mkdir -p /data && chown -R node:node /data /app
 USER node
 VOLUME /data

@@ -1,7 +1,8 @@
+import { groupsTab, serviceTokensTab, devicesTab } from './zt-extra.js';
 import { h, fill, api, cf, toast, badge, btn, card, field, input, empty, segmented, toggle, confirmAsk, selectOf, lines, fmtDate } from '../lib.js';
 import { S, zone, header, statusKind, can } from '../ctx.js';
 
-const TABS = [['tunnels', 'Tunnels'], ['access', 'Access'], ['posture', 'Device posture'], ['gateway', 'Gateway']];
+const TABS = [['tunnels', 'Tunnels'], ['access', 'Access'], ['groups', 'Access groups'], ['tokens', 'Service tokens'], ['devices', 'WARP profiles'], ['posture', 'Device posture'], ['gateway', 'Gateway']];
 const noAcct = () => card('', empty('No Cloudflare account is available to this console.'));
 
 // ------------------------------------------------------------------ tunnels
@@ -156,25 +157,49 @@ async function gatewayTab(a) {
   const box = h('div');
   const body = (r, over) => { const { id, created_at, updated_at, deleted_at, version, sharable, read_only, source_account, ...rest } = r; void id; void created_at; void updated_at; void deleted_at; void version; void sharable; void read_only; void source_account; return { ...rest, ...over }; };
   const draw = () => fill(box, rules.length ? rules.map((r) => h('div', { class: 'li' },
-    h('div', { class: 'col' }, h('div', { class: 'row' }, h('strong', null, r.name), badge(r.action, r.action === 'block' ? 'bad' : 'info')), h('span', { class: 'mono xs mute' }, r.traffic || '')),
+    h('div', { class: 'col' }, h('div', { class: 'row' }, h('strong', null, r.name), badge(r.action, r.action === 'block' ? 'bad' : 'info')), h('span', { class: 'mono xs mute' }, `${(r.filters || []).join('+') || 'dns'} · ${r.traffic || ''}`)),
     h('div', { class: 'row' }, toggle(r.enabled !== false, `Enable ${r.name}`, async (on) => { await cf('PUT', `/accounts/${a}/gateway/rules/${r.id}`, body(r, { enabled: on })); r.enabled = on; }),
       btn('Delete', async () => { if (!confirmAsk(`Delete Gateway rule ${r.name}?`)) return; await cf('DELETE', `/accounts/${a}/gateway/rules/${r.id}`); rules = rules.filter((x) => x.id !== r.id); draw(); toast('Rule deleted'); }, 'danger')))) : empty('No Gateway rules.'));
   draw();
   const name = input({ placeholder: 'Block ad networks', 'aria-label': 'Rule name' });
+  const type = selectOf('Applies to', [['dns', 'DNS queries'], ['http', 'Web traffic (HTTP)'], ['l4', 'Network (IP and port)']], 'dns');
   const domains = h('textarea', { rows: '3', placeholder: 'bad.example\nads.example', 'aria-label': 'Domains to match' });
+  const ips = h('textarea', { rows: '3', placeholder: '203.0.113.0/24\n198.51.100.7', 'aria-label': 'Destination IPs' });
+  const ports = input({ placeholder: '22 3389 (optional)', 'aria-label': 'Destination ports' });
   const catBox = cats.map((c) => ({ c, el: h('input', { type: 'checkbox' }) }));
-  const action = selectOf('Action', [['block', 'Block'], ['allow', 'Allow']], 'block');
-  return [card('DNS filtering rules', box),
-    card('Add a DNS rule', h('span', { class: 'small soft' }, 'Matches DNS queries for the listed domains (and subdomains) or content categories.'), field('Name', name), field('Domains (one per line)', domains),
-      cats.length > 0 && h('details', null, h('summary', { class: 'small' }, `Content categories (${cats.length})`), h('div', { class: 'checks' }, catBox.map(({ c, el }) => h('label', { class: 'check' }, el, c.name)))),
+  const ACTIONS = { dns: [['block', 'Block'], ['allow', 'Allow']], http: [['block', 'Block'], ['allow', 'Allow'], ['isolate', 'Open in Browser Isolation'], ['noscan', 'Skip scanning']], l4: [['block', 'Block'], ['allow', 'Allow']] };
+  const action = selectOf('Action', ACTIONS.dns, 'block');
+  const dnsFields = h('div', { class: 'stack' }, field('Domains (one per line)', domains),
+    cats.length > 0 && h('details', null, h('summary', { class: 'small' }, `Content categories (${cats.length})`), h('div', { class: 'checks' }, catBox.map(({ c, el }) => h('label', { class: 'check' }, el, c.name)))));
+  const netFields = h('div', { class: 'stack' }, field('Destination IPs or ranges (one per line)', ips), field('Destination ports', ports));
+  const sync = () => {
+    const t = type.value;
+    action.replaceChildren(...ACTIONS[t].map(([v, l]) => h('option', { value: v }, l)));
+    netFields.hidden = t !== 'l4';
+    dnsFields.hidden = t === 'l4';
+  };
+  type.addEventListener('change', sync); sync();
+  const expr = (t) => {
+    const parts = [];
+    if (t === 'l4') {
+      const i = lines(ips.value).map(q); const pt = ports.value.split(/[\s,]+/).filter((x) => /^\d{1,5}$/.test(x));
+      if (i.length) parts.push(`net.dst.ip in {${i.join(' ')}}`);
+      if (pt.length) parts.push(`net.dst.port in {${pt.join(' ')}}`);
+      return parts.join(' and ');
+    }
+    const d = lines(domains.value).map(q); const ids = catBox.filter((x) => x.el.checked).map((x) => x.c.id);
+    if (t === 'http') { if (d.length) parts.push(`any(http.request.domains[*] in {${d.map((x) => `"${x}"`).join(' ')}})`); } else if (d.length) parts.push(`any(dns.domains[*] in {${d.map((x) => `"${x}"`).join(' ')}})`);
+    if (ids.length) parts.push(t === 'http' ? `any(http.request.uri.content_category[*] in {${ids.join(' ')}})` : `any(dns.content_category[*] in {${ids.join(' ')}})`);
+    return parts.join(' or ');
+  };
+  return [card('Gateway rules', h('span', { class: 'small soft' }, 'DNS, web and network policies. Rules run in precedence order, lowest number first.'), box),
+    can('zerotrust.write') && card('Add a rule', h('span', { class: 'small soft' }, 'Web and network rules need Gateway HTTP/proxy features turned on in Zero Trust settings. Cloudflare will say if your plan or settings do not allow a rule.'),
+      field('Name', name), field('Applies to', type), dnsFields, netFields,
       h('div', { class: 'row end' }, field('Action', action), btn('Add rule', async () => {
-        const d = lines(domains.value).map(q); const ids = catBox.filter((x) => x.el.checked).map((x) => x.c.id);
-        if (!name.value.trim() || (!d.length && !ids.length)) throw new Error('Give the rule a name and at least one domain or category');
-        const parts = [];
-        if (d.length) parts.push(`any(dns.domains[*] in {${d.map((x) => `"${x}"`).join(' ')}})`);
-        if (ids.length) parts.push(`any(dns.content_category[*] in {${ids.join(' ')}})`);
-        const r = await cf('POST', `/accounts/${a}/gateway/rules`, { name: name.value.trim(), action: action.value, enabled: true, filters: ['dns'], traffic: parts.join(' or '), description: 'Added from Zedge', precedence: 1000 + rules.length });
-        rules.push(r.result); name.value = ''; domains.value = ''; catBox.forEach((x) => { x.el.checked = false; }); draw(); toast('Gateway rule added');
+        const t = type.value; const traffic = expr(t);
+        if (!name.value.trim() || !traffic) throw new Error('Give the rule a name and something to match');
+        const r = await cf('POST', `/accounts/${a}/gateway/rules`, { name: name.value.trim(), action: action.value, enabled: true, filters: [t], traffic, description: 'Added from Zedge', precedence: 1000 + rules.length });
+        rules.push(r.result); name.value = ''; domains.value = ''; ips.value = ''; ports.value = ''; catBox.forEach((x) => { x.el.checked = false; }); draw(); toast('Gateway rule added');
       }, 'primary')))];
 }
 
@@ -187,7 +212,7 @@ export async function zeroTrustView() {
   const render = async (t) => {
     tab = t; try { localStorage.setItem('zedge.ztTab', t); } catch { /* ignore */ }
     fill(body, h('div', { class: 'spin' }, 'Loading…'));
-    try { fill(body, await ({ tunnels: tunnelsTab, access: accessTab, posture: postureTab, gateway: gatewayTab })[t](a)); } catch (e) { fill(body, card('', h('div', { class: 'err' }, e.message))); }
+    try { fill(body, await ({ tunnels: tunnelsTab, access: accessTab, groups: groupsTab, tokens: serviceTokensTab, devices: devicesTab, posture: postureTab, gateway: gatewayTab })[t](a)); } catch (e) { fill(body, card('', h('div', { class: 'err' }, e.message))); }
   };
   await render(tab);
   void fmtDate;

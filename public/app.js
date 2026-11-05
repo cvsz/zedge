@@ -7,8 +7,29 @@ import { workersView } from './views/workers.js';
 import { storageView } from './views/storage.js';
 import { zeroTrustView } from './views/zerotrust.js';
 import { usersView, auditView, accountView } from './views/admin.js';
+import { pagesView } from './views/pages.js';
+import { lbView } from './views/lb.js';
+import { edgeView } from './views/edge.js';
+import { dataView } from './views/data.js';
+import { sslView } from './views/ssl.js';
+import { snapshotsView } from './views/snapshots.js';
+import { approvalsView } from './views/approvals.js';
 
 const app = document.getElementById('app');
+
+// Settings saved under the old product name (edge.*) move to zedge.* once, so nobody loses their theme or selected domain.
+try {
+  for (const k of Object.keys(localStorage)) {
+    if (/^edge\.[A-Za-z]+$/.test(k) && localStorage.getItem(`z${k}`) === null) localStorage.setItem(`z${k}`, localStorage.getItem(k));
+    if (/^edge\.[A-Za-z]+$/.test(k)) localStorage.removeItem(k);
+  }
+} catch { /* storage unavailable */ }
+
+
+// Theme: follows the system until the user picks one.
+const savedTheme = (() => { try { return localStorage.getItem('zedge.theme'); } catch { return null; } })();
+function setTheme(t) { document.documentElement.dataset.theme = t; try { localStorage.setItem('zedge.theme', t); } catch { /* ignore */ } }
+document.documentElement.dataset.theme = savedTheme || (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
 
 // [id, label, view, needsZone, permission]
 const ROUTES = [
@@ -19,9 +40,16 @@ const ROUTES = [
   ['security', 'Security & WAF', securityView, true, 'read'],
   ['rules', 'Rules', rulesView, true, 'read'],
   ['workers', 'Workers', workersView, false, 'read'],
+  ['edge', 'Edge', edgeView, false, 'read'],
+  ['pages', 'Pages', pagesView, false, 'read'],
+  ['lb', 'Load balancing', lbView, false, 'read'],
+  ['data', 'Data (KV, D1)', dataView, false, 'read'],
+  ['ssl', 'SSL & Bots', sslView, true, 'read'],
+  ['snapshots', 'Snapshots', snapshotsView, true, 'read'],
   ['storage', 'Storage', storageView, false, 'read'],
   ['zerotrust', 'Zero Trust', zeroTrustView, false, 'read'],
   ['tokens', 'API Tokens', tokensView, false, 'tokens.read'],
+  ['approvals', 'Approvals', approvalsView, false, 'read'],
   ['audit', 'Audit log', auditView, false, 'audit.read'],
   ['users', 'Users & Roles', usersView, false, 'users.admin'],
   ['account', 'My account', async () => accountView(), false, 'read']
@@ -48,11 +76,12 @@ function shell() {
   const acctSelect = S.accounts.length > 1 && h('label', { class: 'f' }, 'Account', h('select', { 'aria-label': 'Account', onchange: (e) => switchAccount(e.target.value) },
     S.accounts.map((a) => h('option', { value: a.id, selected: a.id === S.accountId }, a.name || a.id))));
   const side = h('aside', { class: 'side' },
-    h('div', { class: 'brand' }, h('div', { class: 'mark' }, 'ZD'), h('div', { class: 'col' }, h('strong', null, 'Zedge'), h('span', { class: 'xs mute' }, S.me ? `${S.me.name} · ${S.me.role}` : ''))),
+    h('div', { class: 'brand' }, h('div', { class: 'mark' }, 'ZE'), h('div', { class: 'col' }, h('strong', null, 'Zedge'), h('span', { class: 'xs mute' }, S.me ? `${S.me.name} · ${S.me.role}` : ''))),
     can('domains.write') && h('a', { class: 'btn primary', href: '#/domains', id: 'add-domain-link' }, '+ Add domain'),
     acctSelect,
     h('label', { class: 'f' }, 'Zone', zoneSelect),
     h('nav', { class: 'nav', 'aria-label': 'Primary' }, allowedRoutes().map(([id, label]) => h('a', { href: `#/${id}`, 'aria-current': id === route[0] ? 'page' : 'false' }, label))),
+    h('div', { class: 'row' }, btn(document.documentElement.dataset.theme === 'light' ? 'Dark theme' : 'Light theme', async () => { setTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'); render(); }, 'link')),
     h('div', { class: 'row' }, btn('Sign out', async () => { await api('POST', 'logout'); location.reload(); }, 'link')));
   app.replaceChildren(h('div', { class: 'shell' }, side, h('main', { class: 'main', id: 'view' })));
 }
@@ -75,7 +104,7 @@ async function render() {
   view.replaceChildren(h('div', { class: 'spin' }, 'Loading…'));
   const [, , fn, needsZone] = currentRoute();
   try {
-    const node = needsZone && !zone() ? noZone() : await fn();
+    const node = needsZone && !zone() ? noZone() : await /** @type {any} */ (fn)();
     if (seq === renderSeq) view.replaceChildren(node);
   } catch (e) {
     if (seq === renderSeq) view.replaceChildren(card('Something went wrong', h('div', { class: 'err' }, e.message), btn('Retry', render)));
@@ -118,6 +147,19 @@ async function overviewView() {
   };
   loadTraffic();
 
+  const TOPS = [['path', 'Top paths'], ['country', 'Countries'], ['status', 'Status codes'], ['fw_action', 'Firewall actions'], ['fw_source', 'Firewall sources']];
+  const topBox = h('div');
+  let topBy = 'path';
+  const loadTop = async () => {
+    fill(topBox, h('div', { class: 'spin' }, 'Loading…'));
+    try {
+      const r = await api('GET', `analytics/${z.id}/top?by=${topBy}&range=${range}`);
+      const max = Math.max(1, ...r.rows.map((x) => x.count));
+      fill(topBox, r.rows.length ? r.rows.map((x) => h('div', { class: 'li' }, h('span', { class: 'mono small' }, x.key), h('div', { class: 'row' }, h('progress', { class: 'bar', max, value: x.count, 'aria-label': `${x.key}: ${x.count}` }), h('span', { class: 'xs mute' }, fmtNum(x.count))))) : empty('Nothing recorded in this period.'));
+    } catch (e) { fill(topBox, empty(`Not available: ${e.message}`)); }
+  };
+  loadTop();
+
   return h('div', { class: 'stack' },
     !can('zone.write') && h('div', { class: 'note' }, 'Your role is read-only. Changes on this page will be refused.'),
     header('Overview', zd.name, badge(zd.status, statusKind(zd.status)), btn('Purge everything', async () => {
@@ -128,6 +170,7 @@ async function overviewView() {
     h('div', { class: 'grid2' },
       h('div', { class: 'wide stack' },
         card('Traffic', segmented('Time range', [['24h', '24 hours'], ['7d', '7 days'], ['30d', '30 days']], range, async (v) => { range = v; await loadTraffic(); }), traffic),
+        card('Top lists', segmented('What to rank', TOPS, topBy, async (v) => { topBy = v; await loadTop(); }), topBox, h('span', { class: 'xs mute' }, 'Uses the time range chosen above.')),
         card('Quick zone settings',
           'ssl' in settings && h('div', { class: 'col' }, h('strong', null, 'SSL/TLS encryption mode'),
             segmented('SSL mode', [['off', 'Off'], ['flexible', 'Flexible'], ['full', 'Full'], ['strict', 'Full (strict)']], settings.ssl, (v) => set('ssl', v, 'SSL mode'))),
@@ -215,9 +258,9 @@ async function dnsView() {
   function row(r) {
     const can_ = ['A', 'AAAA', 'CNAME'].includes(r.type);
     const prox = h('button', {
-      type: 'button', class: 'proxy', disabled: !can_, 'aria-pressed': String(!!r.proxied), 'aria-label': `Toggle proxy for ${r.name}`,
+      type: 'button', class: 'proxy', disabled: !can_, 'aria-pressed': String(!!r.proxied), 'aria-label': `${can_ && r.proxied ? 'Proxied' : 'DNS only'}: toggle proxy for ${r.name}`,
       onclick: (e) => run(e.currentTarget, async () => { const res = await cf('PATCH', `/zones/${z.id}/dns_records/${r.id}`, { proxied: !r.proxied }); Object.assign(r, res.result); draw(); })
-    }, h('span', { class: `dot${can_ && r.proxied ? ' on' : ''}` }), can && r.proxied ? 'Proxied' : 'DNS only');
+    }, h('span', { class: `dot${can_ && r.proxied ? ' on' : ''}` }), can_ && r.proxied ? 'Proxied' : 'DNS only');
     if (editing === r.id) {
       const n = input({ value: r.name, 'aria-label': 'Name' });
       const c = input({ value: r.content, 'aria-label': 'Content' });
@@ -282,8 +325,20 @@ async function dnsView() {
     })));
 
   draw();
+  // zone file import / export
+  const zoneText = h('textarea', { class: 'code', 'aria-label': 'BIND zone file', spellcheck: 'false', placeholder: '$ORIGIN example.com.\nwww 300 IN A 203.0.113.10' });
+  const zoneFile = h('input', { type: 'file', 'aria-label': 'Zone file to load' });
+  zoneFile.addEventListener('change', async () => { const f = zoneFile.files[0]; if (f) zoneText.value = await f.text(); });
+  const proxiedImport = h('input', { type: 'checkbox', 'aria-label': 'Proxy imported records' });
+  const importExport = can('dns.write') ? card('Import and export', h('span', { class: 'small soft' }, 'Export downloads every record as a BIND zone file. Import adds the records in a zone file; existing records are not removed.'),
+    h('div', { class: 'row' }, h('a', { class: 'btn', href: `/api/zones/${z.id}/dns/export`, download: '' }, 'Export zone file')),
+    zoneFile, zoneText, h('label', { class: 'row small' }, proxiedImport, 'Proxy imported A, AAAA and CNAME records'),
+    h('div', { class: 'row end' }, btn('Import', async () => {
+      const r = await api('POST', `zones/${z.id}/dns/import`, { text: zoneText.value, proxied: proxiedImport.checked });
+      toast(`Imported ${r.added ?? '?'} of ${r.parsed ?? '?'} records`); zoneText.value = ''; records = await cfAll(`/zones/${z.id}/dns_records`); draw();
+    }, 'primary'))) : h('div', { class: 'row' }, h('a', { class: 'btn', href: `/api/zones/${z.id}/dns/export`, download: '' }, 'Export zone file'));
   return h('div', { class: 'stack' }, header('DNS', `Records for ${z.name}`), quick, card('', box),
-    h('div', { class: 'grid2' }, h('div', { class: 'wide' }, adv), h('div', { class: 'narrow' }, bulk)));
+    h('div', { class: 'grid2' }, h('div', { class: 'wide' }, adv), h('div', { class: 'narrow' }, bulk)), importExport);
 }
 
 // ---------------------------------------------------------------- security
@@ -384,18 +439,30 @@ async function tokensView() {
 }
 
 // ---------------------------------------------------------------- login + boot
-function loginView() {
+async function loginView() {
+  let sso = null;
+  try { sso = (await api('GET', 'session')).sso; } catch { /* show the password form */ }
   const user = h('input', { type: 'text', autocomplete: 'username', value: 'admin', 'aria-label': 'Username' });
   const pw = h('input', { type: 'password', autocomplete: 'current-password', 'aria-label': 'Password' });
+  const code = h('input', { type: 'text', inputmode: 'numeric', autocomplete: 'one-time-code', 'aria-label': 'Authentication code', placeholder: '123456 or a recovery code' });
+  const codeRow = h('label', { class: 'f', hidden: true }, 'Authentication code', code);
   const msg = h('div', { class: 'err small', role: 'alert' });
+  const fromSso = new URLSearchParams(location.search).get('sso_error');
+  if (fromSso) { msg.textContent = fromSso; history.replaceState(null, '', location.pathname + location.hash); }
   const go = async (e) => {
     e.preventDefault();
-    try { await api('POST', 'login', { username: user.value, password: pw.value }); boot(); } catch (err) { msg.textContent = err.message; }
+    try { await api('POST', 'login', { username: user.value, password: pw.value, code: code.value.trim() || undefined }); boot(); } catch (err) {
+      msg.textContent = err.message;
+      if (err.json && err.json.totpRequired) { codeRow.hidden = false; code.focus(); }
+    }
   };
+  const passwordForm = [h('label', { class: 'f' }, 'Username', user), h('label', { class: 'f' }, 'Password', pw), codeRow, h('button', { type: 'submit', class: sso ? 'btn' : 'btn primary' }, 'Sign in')];
   app.replaceChildren(h('form', { class: 'login', onsubmit: go },
-    h('div', { class: 'brand' }, h('div', { class: 'mark' }, 'ZD'), h('strong', null, 'Zedge')),
-    h('label', { class: 'f' }, 'Username', user), h('label', { class: 'f' }, 'Password', pw), msg, h('button', { type: 'submit', class: 'btn primary' }, 'Sign in')));
-  pw.focus();
+    h('div', { class: 'brand' }, h('div', { class: 'mark' }, 'ZE'), h('strong', null, 'Zedge')),
+    sso && h('a', { class: 'btn primary', href: '/api/oidc/login' }, sso.label),
+    msg,
+    sso && !sso.passwordLogin ? h('details', null, h('summary', { class: 'small' }, 'Local administrator sign-in'), h('div', { class: 'stack' }, passwordForm)) : [sso && h('div', { class: 'xs mute' }, 'or use a local account'), passwordForm]));
+  (sso ? undefined : pw).focus?.();
 }
 
 async function boot() {
@@ -410,8 +477,14 @@ async function boot() {
     if (saved && !S.accounts.some((a) => a.id === saved)) localStorage.removeItem('zedge.account');
     S.accountId = S.meta.accountId || '';
     if (S.meta.accountError) toast(`Account: ${S.meta.accountError}`, true);
+    const exp = S.meta.token && S.meta.token.expires_on && new Date(S.meta.token.expires_on).getTime();
+    if (exp) {
+      const days = Math.ceil((exp - Date.now()) / 86400000);
+      if (days <= 14) toast(days <= 0 ? 'The Cloudflare API token has expired. Create a new one and restart the console.' : `The Cloudflare API token expires in ${days} day${days === 1 ? '' : 's'}.`, true);
+    }
     await loadZones();
-    if (!boot.listening) { window.addEventListener('hashchange', render); boot.listening = true; }
+    const state = /** @type {any} */ (boot);
+    if (!state.listening) { window.addEventListener('hashchange', render); state.listening = true; }
     if (!S.zones.length && !location.hash && can('domains.write')) location.hash = '#/domains';
     render();
   } catch (e) {

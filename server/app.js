@@ -15,6 +15,9 @@ import { registerR2 } from './routes/r2.js';
 import { registerAnalytics } from './routes/analytics.js';
 import { registerEmail } from './routes/email.js';
 import { registerAdmin } from './routes/admin.js';
+import { registerEdge } from './routes/edge.js';
+import { registerSnapshots } from './routes/snapshots.js';
+import { registerLimits } from './limits.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 
@@ -158,6 +161,10 @@ export function createApp(config, opts = {}) {
   registerAnalytics(app, ctx);
   registerEmail(app, ctx);
   registerAdmin(app, ctx);
+  registerEdge(app, ctx);
+  registerSnapshots(app, ctx);
+  // Param-based resource limits for the dedicated account-level routes (workers, r2, kv, d1, pages).
+  registerLimits(app);
 
   // ---- errors ----
   app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));

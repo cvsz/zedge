@@ -89,7 +89,7 @@ function shell() {
     h('div', { class: 'mobile-menu', id: 'mobile-menu' },
       h('nav', { class: 'nav', 'aria-label': t('primary_nav') }, allowedRoutes().map(([id, label]) => h('a', { href: `#/${id}`, 'aria-current': id === route[0] ? 'page' : 'false', onclick: () => { const m = document.getElementById('mobile-menu'); m.classList.remove('open'); } }, t(label)))),
       h('div', { class: 'row' }, btn(document.documentElement.dataset.theme === 'light' ? t('dark_theme') : t('light_theme'), async () => { setTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'); render(); }, 'link')),
-      h('div', { class: 'row' }, btn(t('sign_out'), async () => { await api('POST', 'logout'); location.reload(); }, 'link')))));
+      h('div', { class: 'row' }, btn(t('sign_out'), async () => { await api('POST', 'logout'); location.reload(); }, 'link'))));
   app.replaceChildren(h('div', { class: 'shell' }, side, h('main', { class: 'main', id: 'view' })));
 }
 

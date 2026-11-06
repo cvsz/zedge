@@ -7,7 +7,7 @@ import { createStore } from './store.js';
 import { can } from './rbac.js';
 import { HttpError } from './errors.js';
 import { recordMetric, getMetrics } from './metrics.js';
-import { openApiSpec } from './openapi.js';
+import { build as buildOpenApi } from './openapi.js';
 import { registerCore } from './routes/core.js';
 import { registerRules } from './routes/rules.js';
 import { registerWorkers } from './routes/workers.js';
@@ -170,5 +170,6 @@ export function createApp(config, opts = {}) {
     return res.status(500).json({ error: 'Internal error' });
   });
 
+  const openApiSpec = buildOpenApi(app);
   return app;
 }

@@ -1,18 +1,21 @@
-# Test Verification Audit (Phase B)
+# Test Verification Audit - Local Only
 
+**Repository:** `cvsz/zedge`  
 **Command Executed:** `npm test`  
 **Node Version:** `v22.22.1`  
-**Test Runner:** Node.js native test runner (`node --test "test/*.test.js"`)  
-**Date:** November 1, 2026  
+**Date:** 2026-11-06  
+**Environment:** mock Cloudflare API (not real Cloudflare)
 
 ## Test Execution Summary
-- **Total Tests:** 54
-- **Passed:** 54 (`100%`)
+
+- **Total Tests:** 56
+- **Passed:** 56
 - **Failed:** 0
-- **Duration:** ~5.04s
+- **Duration:** ~3.7s
 
 ## Verified Test Suites
-1. Configuration validation (`config.js`)
+
+1. Configuration validation (`config.js`) - includes COOKIE_SECURE enforcement for non-loopback HOST
 2. Session & Authentication (`auth.js`)
 3. RBAC & Permissions (`rbac.js`)
 4. Proxy & Allowlist (`allowlist.js`)
@@ -20,9 +23,12 @@
 6. WAF, rate limits, redirect rules, cache rules, page rules (`routes/rules.js`)
 7. Workers deployment, variables, secrets, rollbacks (`routes/workers.js`)
 8. R2 storage & S3 SigV4 signing (`s3.js`, `routes/r2.js`)
-9. Zero Trust tunnels, Access, device posture, Gateway rules (`routes/zerotrust.js`)
-10. Email routing & DMARC helper (`routes/email.js`)
-11. Audit logs & Multi-account switching (`routes/admin.js`)
-12. Prometheus metrics & OpenAPI spec (`metrics.js`, `openapi.js`)
+9. Email routing & DMARC helper (`routes/email.js`)
+10. Audit logs & Multi-account switching (`routes/admin.js`)
+11. Prometheus metrics & OpenAPI spec (`metrics.js`, `openapi.js`) - authenticated endpoints
 
-**Status:** `VERIFIED`
+## Verification Scope
+
+Tests run against mock Cloudflare API only. Real Cloudflare API calls are not tested. CI has not been verified to pass on the exact audited SHA.
+
+**Status:** LOCAL TESTS PASS (mock environment). NOT VERIFIED in CI or against real Cloudflare.

@@ -9,7 +9,7 @@ const enc = (s) => encodeURIComponent(s).replace(/[!'()*]/g, (c) => `%${c.charCo
 export function signV4({ method, host, pathname, query = {}, headers = {}, payloadHash, accessKeyId, secretAccessKey, region = 'auto', service = 's3', amzDate }) {
   const dateStamp = amzDate.slice(0, 8);
   const h = { host, 'x-amz-content-sha256': payloadHash, 'x-amz-date': amzDate };
-  for (const [k, v] of Object.entries(headers)) h[k.toLowerCase()] = String(v).trim().replace(/\s+/g, ' ');
+  for (const [k, v] of Object.entries(headers)) {h[k.toLowerCase()] = String(v).trim().replace(/\s+/g, ' ');}
   const names = Object.keys(h).sort();
   const canonicalHeaders = names.map((n) => `${n}:${h[n]}\n`).join('');
   const signedHeaders = names.join(';');
@@ -78,8 +78,8 @@ export function createR2(config, { fetchImpl = fetch } = {}) {
     /** @param {any} accountId @param {string} bucket @param {{ prefix?: string, token?: string }} [opts] */
     async list(accountId, bucket, { prefix = '', token } = {}) {
       const query = { 'list-type': '2', delimiter: '/', 'max-keys': '200' };
-      if (prefix) query.prefix = prefix;
-      if (token) query['continuation-token'] = token;
+      if (prefix) {query.prefix = prefix;}
+      if (token) {query['continuation-token'] = token;}
       return parseList(await (await call(accountId, 'GET', bucket, undefined, { query })).text());
     },
     put: (accountId, bucket, key, body, contentType) => call(accountId, 'PUT', bucket, key, { body, contentType }),

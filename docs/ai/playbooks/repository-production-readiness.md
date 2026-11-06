@@ -4,7 +4,9 @@ Assess each applicable gate as `VERIFIED`, `PARTIALLY VERIFIED`, `UNVERIFIED`, `
 
 Review build/reproducibility, testing, security, data/migrations, backup/restore/RPO/RTO, CI/CD, deployment/rollback, runtime reliability, observability, runbooks, ownership and incident response.
 
-## Readiness evidence vs risk acceptance
+Evidence for this repository (cvsz/zedge, HEAD `b3b1333`, 2026-11-06): see `docs/audit/FINAL-PRODUCTION-CERTIFICATION.md`, `docs/audit/TEST-VERIFICATION.md`, and `Final-Report.md`. All gates are currently `UNVERIFIED` or `BLOCKED`; none are `VERIFIED`.
+
+Readiness state and release authorization are separate decisions.
 
 Readiness state and release authorization are separate decisions.
 

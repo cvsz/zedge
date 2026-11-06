@@ -17,12 +17,12 @@ export function registerAdmin(app, ctx) {
 
   app.patch('/api/admin/users/:name', admin, wrap(async (req, res) => {
     const b = req.body || {};
-    if (req.params.name === req.user.name && (b.role !== undefined || b.disabled !== undefined)) throw bad('You cannot change your own role or disable yourself');
+    if (req.params.name === req.user.name && (b.role !== undefined || b.disabled !== undefined)) {throw bad('You cannot change your own role or disable yourself');}
     res.json(store.updateUser(req.params.name, { role: b.role, disabled: b.disabled, password: b.password }));
   }));
 
   app.delete('/api/admin/users/:name', admin, wrap(async (req, res) => {
-    if (req.params.name === req.user.name) throw bad('You cannot delete yourself');
+    if (req.params.name === req.user.name) {throw bad('You cannot delete yourself');}
     store.deleteUser(req.params.name);
     res.json({ ok: true });
   }));

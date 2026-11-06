@@ -20,7 +20,7 @@ export function encrypt(buf, passphrase) {
   return Buffer.concat([MAGIC, salt, iv, c.getAuthTag(), body]);
 }
 export function decrypt(buf, passphrase) {
-  if (!buf.subarray(0, 4).equals(MAGIC)) throw new Error('Not an encrypted Zedge backup');
+  if (!buf.subarray(0, 4).equals(MAGIC)) {throw new Error('Not an encrypted Zedge backup');}
   const salt = buf.subarray(4, 20); const iv = buf.subarray(20, 32); const tag = buf.subarray(32, 48);
   const key = crypto.scryptSync(passphrase, salt, 32);
   const d = crypto.createDecipheriv('aes-256-gcm', key, iv);
@@ -30,12 +30,12 @@ export function decrypt(buf, passphrase) {
 
 function tar(args, opts = {}) {
   const r = spawnSync('tar', args, { encoding: 'buffer', maxBuffer: 1 << 30, ...opts });
-  if (r.status !== 0) throw new Error(`tar failed: ${String(r.stderr || '').slice(0, 200)}`);
+  if (r.status !== 0) {throw new Error(`tar failed: ${String(r.stderr || '').slice(0, 200)}`);}
   return r.stdout;
 }
 
 export function createBackup({ dataDir, out, passphrase }) {
-  if (!fs.existsSync(dataDir)) throw new Error(`No such directory: ${dataDir}`);
+  if (!fs.existsSync(dataDir)) {throw new Error(`No such directory: ${dataDir}`);}
   const tmp = path.join(os.tmpdir(), `zedge-backup-${process.pid}.tgz`);
   tar(['-czf', tmp, '-C', dataDir, '.']);
   const raw = fs.readFileSync(tmp);
@@ -47,7 +47,7 @@ export function createBackup({ dataDir, out, passphrase }) {
 export function restoreBackup({ file, to, passphrase }) {
   let buf = fs.readFileSync(file);
   if (buf.subarray(0, 4).equals(MAGIC)) {
-    if (!passphrase) throw new Error('This backup is encrypted: set BACKUP_PASSPHRASE');
+    if (!passphrase) {throw new Error('This backup is encrypted: set BACKUP_PASSPHRASE');}
     buf = decrypt(buf, passphrase);
   }
   fs.mkdirSync(to, { recursive: true, mode: 0o700 });

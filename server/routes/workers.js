@@ -39,10 +39,10 @@ export function registerWorkers(app, ctx) {
   /** Upload new module code. Existing bindings and secrets are kept. */
   app.post('/api/workers/:name/deploy', need('workers.write'), wrap(async (req, res) => {
     const code = String((req.body && req.body.code) || '');
-    if (!code.trim()) throw bad('Paste the Worker code first');
-    if (Buffer.byteLength(code) > MAX_CODE) throw bad('Worker code is larger than 1 MB');
+    if (!code.trim()) {throw bad('Paste the Worker code first');}
+    if (Buffer.byteLength(code) > MAX_CODE) {throw bad('Worker code is larger than 1 MB');}
     const date = (req.body && req.body.compatibilityDate) || new Date().toISOString().slice(0, 10);
-    if (!DATE_RE.test(date)) throw bad('Compatibility date must look like 2026-01-31');
+    if (!DATE_RE.test(date)) {throw bad('Compatibility date must look like 2026-01-31');}
     const form = new FormData();
     form.append('metadata', new Blob([JSON.stringify({ main_module: 'worker.js', compatibility_date: date, keep_bindings: KEEP_BINDINGS })], { type: 'application/json' }));
     form.append('worker.js', new Blob([code], { type: 'application/javascript+module' }), 'worker.js');
@@ -61,7 +61,7 @@ export function registerWorkers(app, ctx) {
   /** Send 100% of traffic back to an earlier version. */
   app.post('/api/workers/:name/rollback', need('workers.write'), wrap(async (req, res) => {
     const versionId = String((req.body && req.body.versionId) || '');
-    if (!VERSION_RE.test(versionId)) throw bad('Choose a version to roll back to');
+    if (!VERSION_RE.test(versionId)) {throw bad('Choose a version to roll back to');}
     const p = await base(req);
     const r = await cf.post(`${p}/deployments`, {
       strategy: 'percentage',
@@ -81,9 +81,9 @@ export function registerWorkers(app, ctx) {
   }
 
   app.put('/api/workers/:name/vars/:key', need('workers.write'), wrap(async (req, res) => {
-    if (!KEY_RE.test(req.params.key)) throw bad('Variable names use letters, digits and underscores');
+    if (!KEY_RE.test(req.params.key)) {throw bad('Variable names use letters, digits and underscores');}
     const value = String((req.body && req.body.value) ?? '');
-    if (value.length > 5000) throw bad('Value is too long');
+    if (value.length > 5000) {throw bad('Value is too long');}
     const p = await base(req);
     const others = (await readBindings(p)).filter((b) => b.name !== req.params.key);
     await writeBindings(p, [...others, { type: 'plain_text', name: req.params.key, text: value }]);
@@ -91,26 +91,26 @@ export function registerWorkers(app, ctx) {
   }));
 
   app.delete('/api/workers/:name/vars/:key', need('workers.write'), wrap(async (req, res) => {
-    if (!KEY_RE.test(req.params.key)) throw bad('Invalid variable name');
+    if (!KEY_RE.test(req.params.key)) {throw bad('Invalid variable name');}
     const p = await base(req);
     const all = await readBindings(p);
-    if (!all.some((b) => b.name === req.params.key && b.type === 'plain_text')) throw new HttpError(404, 'No such variable');
+    if (!all.some((b) => b.name === req.params.key && b.type === 'plain_text')) {throw new HttpError(404, 'No such variable');}
     await writeBindings(p, all.filter((b) => b.name !== req.params.key));
     res.json({ ok: true });
   }));
 
   app.put('/api/workers/:name/secrets/:key', need('workers.write'), wrap(async (req, res) => {
-    if (!KEY_RE.test(req.params.key)) throw bad('Secret names use letters, digits and underscores');
+    if (!KEY_RE.test(req.params.key)) {throw bad('Secret names use letters, digits and underscores');}
     const value = String((req.body && req.body.value) || '');
-    if (!value || value.length > 5000) throw bad('Enter the secret value (up to 5000 characters)');
+    if (!value || value.length > 5000) {throw bad('Enter the secret value (up to 5000 characters)');}
     await cf.put(`${await base(req)}/secrets`, { name: req.params.key, text: value, type: 'secret_text' });
     res.json({ ok: true });
   }));
 
   app.delete('/api/workers/:name/secrets/:key', need('workers.write'), wrap(async (req, res) => {
-    if (!KEY_RE.test(req.params.key)) throw bad('Invalid secret name');
+    if (!KEY_RE.test(req.params.key)) {throw bad('Invalid secret name');}
     try { await cf.del(`${await base(req)}/secrets/${req.params.key}`); } catch (e) {
-      if (e instanceof CFError && e.status === 404) throw new HttpError(404, 'No such secret');
+      if (e instanceof CFError && e.status === 404) {throw new HttpError(404, 'No such secret');}
       throw e;
     }
     res.json({ ok: true });

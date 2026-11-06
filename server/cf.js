@@ -14,9 +14,9 @@ export function createCF({ token, apiBase, fetchImpl = fetch }) {
   /** @param {string} method @param {string} path @param {{ body?: any, query?: any, form?: any }} [opts] */
   async function raw(method, path, { body, query, form } = {}) {
     const url = new URL(apiBase + path);
-    for (const [k, v] of Object.entries(query || {})) if (v !== undefined && v !== '') url.searchParams.set(k, v);
+    for (const [k, v] of Object.entries(query || {})) {if (v !== undefined && v !== '') {url.searchParams.set(k, v);}}
     const headers = { Authorization: `Bearer ${token}`, Accept: 'application/json' };
-    if (!form) headers['Content-Type'] = 'application/json'; // multipart sets its own boundary
+    if (!form) {headers['Content-Type'] = 'application/json';} // multipart sets its own boundary
     const res = await fetchImpl(url, {
       method,
       headers,
@@ -65,9 +65,9 @@ export function createCF({ token, apiBase, fetchImpl = fetch }) {
         const r = await raw('GET', path, { query: { ...query, page, per_page: 100 } });
         out.push(...(r.result || []));
         const pages = (r.result_info && r.result_info.total_pages) || 1;
-        if (page >= pages) break;
+        if (page >= pages) {break;}
         page += 1;
-        if (page > 50) break; // safety stop
+        if (page > 50) {break;} // safety stop
       }
       return out;
     }

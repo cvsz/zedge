@@ -10,7 +10,7 @@ export function registerAnalytics(app, ctx) {
 
   app.get('/api/analytics/:zid', need('read'), wrap(async (req, res) => {
     const range = RANGES[req.query.range || '24h'];
-    if (!range) throw bad('range must be 24h, 7d or 30d');
+    if (!range) {throw bad('range must be 24h, 7d or 30d');}
     const now = new Date();
     const hourly = !!range.hours;
     const since = new Date(now.getTime() - (range.hours ? range.hours * 3600000 : range.days * 86400000));

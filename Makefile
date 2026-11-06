@@ -32,6 +32,9 @@ install-all: install install-aff ## Install both
 env: ## Create .env from .env.example if missing (never overwrites)
 	@if [ -f .env ]; then echo ".env exists, left alone"; else cp .env.example .env && chmod 600 .env && echo "Created .env: set CLOUDFLARE_API_TOKEN and ZEDGE_ADMIN_PASSWORD"; fi
 
+lint: ## Lint source code with eslint (fails on errors)
+	$(NPM) exec eslint "server/**/*.js" "public/**/*.js" "scripts/**/*.mjs" "test/**/*.mjs" 2>&1
+
 ##@ Run
 .PHONY: run run-studio migrate migrate-status migrate-down
 run: ## Start Zedge on http://127.0.0.1:8787 (reads .env)

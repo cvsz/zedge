@@ -111,7 +111,7 @@ export const isAllowed = (method, path) => permissionFor(method, path) !== null;
 export function cleanQuery(q) {
   const out = {};
   for (const [k, v] of Object.entries(q || {})) {
-    if (QUERY_KEY.test(k) && typeof v === 'string' && v.length <= 200) out[k] = v;
+    if (QUERY_KEY.test(k) && typeof v === 'string' && v.length <= 200) {out[k] = v;}
   }
   return out;
 }

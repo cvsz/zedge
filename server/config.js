@@ -8,21 +8,21 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
 function httpsOrLoopback(v, name) {
   let u;
   try { u = new URL(v); } catch { throw new Error(`${name} is not a valid URL`); }
-  if (u.protocol !== 'https:' && !LOOPBACK.includes(u.hostname)) throw new Error(`${name} must use https`);
+  if (u.protocol !== 'https:' && !LOOPBACK.includes(u.hostname)) {throw new Error(`${name} must use https`);}
   return u;
 }
 
 /** Single sign-on through any OpenID Connect provider. Off unless OIDC_ISSUER is set. */
 function parseOidc(env) {
-  if (!env.OIDC_ISSUER) return null;
-  if (!env.OIDC_CLIENT_ID) throw new Error('OIDC_CLIENT_ID is required when OIDC_ISSUER is set');
+  if (!env.OIDC_ISSUER) {return null;}
+  if (!env.OIDC_CLIENT_ID) {throw new Error('OIDC_CLIENT_ID is required when OIDC_ISSUER is set');}
   httpsOrLoopback(env.OIDC_ISSUER, 'OIDC_ISSUER');
-  if (!env.OIDC_REDIRECT_URL) throw new Error('OIDC_REDIRECT_URL is required (for example https://console.example.com/api/oidc/callback)');
+  if (!env.OIDC_REDIRECT_URL) {throw new Error('OIDC_REDIRECT_URL is required (for example https://console.example.com/api/oidc/callback)');}
   httpsOrLoopback(env.OIDC_REDIRECT_URL, 'OIDC_REDIRECT_URL');
   let roleMap = {};
   if (env.OIDC_ROLE_MAP) {
     try { roleMap = JSON.parse(env.OIDC_ROLE_MAP); } catch { throw new Error('OIDC_ROLE_MAP must be JSON like {"zedge-admins":"admin"}'); }
-    if (!roleMap || typeof roleMap !== 'object' || Array.isArray(roleMap) || Object.values(roleMap).some((r) => typeof r !== 'string')) throw new Error('OIDC_ROLE_MAP must map claim values to role names');
+    if (!roleMap || typeof roleMap !== 'object' || Array.isArray(roleMap) || Object.values(roleMap).some((r) => typeof r !== 'string')) {throw new Error('OIDC_ROLE_MAP must map claim values to role names');}
   }
   return {
     issuer: env.OIDC_ISSUER.replace(/\/$/, ''),
@@ -47,12 +47,12 @@ function parseOidc(env) {
 export function loadConfig(env = process.env) {
   // The CF_* names were used before 1.8.0; they still work but are deprecated.
   const legacy = ['CF_API_TOKEN', 'CF_ACCOUNT_IDS', 'CF_ACCOUNT_ID'].filter((k) => env[k] && !env[k.replace(/^CF_/, 'CLOUDFLARE_')]);
-  if (legacy.length) console.warn(`Deprecated variable name(s): ${legacy.join(', ')}. Rename to ${legacy.map((k) => k.replace(/^CF_/, 'CLOUDFLARE_')).join(', ')}.`);
+  if (legacy.length) {console.warn(`Deprecated variable name(s): ${legacy.join(', ')}. Rename to ${legacy.map((k) => k.replace(/^CF_/, 'CLOUDFLARE_')).join(', ')}.`);}
   // The EDGE_* names were used before the 2.0.0 rename to Zedge; they still work but are deprecated.
   const legacyEdge = ['EDGE_ADMIN_PASSWORD', 'EDGE_ALLOW_NO_AUTH'].filter((k) => env[k] && !env[`Z${k}`]);
-  if (legacyEdge.length) console.warn(`Deprecated variable name(s): ${legacyEdge.join(', ')}. Rename to ${legacyEdge.map((k) => `Z${k}`).join(', ')}.`);
+  if (legacyEdge.length) {console.warn(`Deprecated variable name(s): ${legacyEdge.join(', ')}. Rename to ${legacyEdge.map((k) => `Z${k}`).join(', ')}.`);}
   const token = env.CLOUDFLARE_API_TOKEN || env.CF_API_TOKEN;
-  if (!token) throw new Error('CLOUDFLARE_API_TOKEN is required');
+  if (!token) {throw new Error('CLOUDFLARE_API_TOKEN is required');}
 
   const host = env.HOST || '127.0.0.1';
   const secureCookie = env.COOKIE_SECURE === '1';
@@ -69,23 +69,23 @@ export function loadConfig(env = process.env) {
   if (!password && !hasUsers && !noAuth && !oidc) {
     throw new Error('ZEDGE_ADMIN_PASSWORD is required to create the first admin. (No-auth mode is only allowed with ZEDGE_ALLOW_NO_AUTH=1 on a loopback HOST.)');
   }
-  if (password && password.length < 12) throw new Error('ZEDGE_ADMIN_PASSWORD must be at least 12 characters');
+  if (password && password.length < 12) {throw new Error('ZEDGE_ADMIN_PASSWORD must be at least 12 characters');}
 
   if (env.ALERT_WEBHOOK_URL) {
     let u;
     try { u = new URL(env.ALERT_WEBHOOK_URL); } catch { throw new Error('ALERT_WEBHOOK_URL is not a valid URL'); }
-    if (u.protocol !== 'https:' && !LOOPBACK.includes(u.hostname)) throw new Error('ALERT_WEBHOOK_URL must use https');
+    if (u.protocol !== 'https:' && !LOOPBACK.includes(u.hostname)) {throw new Error('ALERT_WEBHOOK_URL must use https');}
   }
   if (env.SMTP_URL || env.ALERT_EMAIL_TO) {
-    if (!env.SMTP_URL || !env.ALERT_EMAIL_TO || !env.ALERT_EMAIL_FROM) throw new Error('Email alerts need SMTP_URL, ALERT_EMAIL_FROM and ALERT_EMAIL_TO together');
+    if (!env.SMTP_URL || !env.ALERT_EMAIL_TO || !env.ALERT_EMAIL_FROM) {throw new Error('Email alerts need SMTP_URL, ALERT_EMAIL_FROM and ALERT_EMAIL_TO together');}
     let u;
     try { u = new URL(env.SMTP_URL); } catch { throw new Error('SMTP_URL is not a valid URL (use smtps://user:pass@host:465 or smtp://user:pass@host:587)'); }
-    if (!['smtp:', 'smtps:'].includes(u.protocol)) throw new Error('SMTP_URL must start with smtp:// or smtps://');
-    if (u.protocol === 'smtp:' && u.searchParams.get('starttls') === '0' && !LOOPBACK.includes(u.hostname)) throw new Error('Plain SMTP is only allowed to a loopback host');
+    if (!['smtp:', 'smtps:'].includes(u.protocol)) {throw new Error('SMTP_URL must start with smtp:// or smtps://');}
+    if (u.protocol === 'smtp:' && u.searchParams.get('starttls') === '0' && !LOOPBACK.includes(u.hostname)) {throw new Error('Plain SMTP is only allowed to a loopback host');}
     const bad = list(env.ALERT_EMAIL_TO).concat([env.ALERT_EMAIL_FROM]).find((x) => !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$|^[^\s@<>]+@localhost$/.test(x));
-    if (bad) throw new Error(`"${bad}" is not an email address`);
+    if (bad) {throw new Error(`"${bad}" is not an email address`);}
   }
-  if (env.METRICS_TOKEN && env.METRICS_TOKEN.length < 16) throw new Error('METRICS_TOKEN must be at least 16 characters');
+  if (env.METRICS_TOKEN && env.METRICS_TOKEN.length < 16) {throw new Error('METRICS_TOKEN must be at least 16 characters');}
   const accountIds = list(env.CLOUDFLARE_ACCOUNT_IDS || env.CLOUDFLARE_ACCOUNT_ID || env.CF_ACCOUNT_IDS || env.CF_ACCOUNT_ID);
   return {
     token,

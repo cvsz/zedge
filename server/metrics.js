@@ -6,7 +6,7 @@ const statusCounts = {};
 
 export function recordMetric(statusCode) {
   requestCount++;
-  if (statusCode >= 400) errorCount++;
+  if (statusCode >= 400) {errorCount++;}
   statusCounts[statusCode] = (statusCounts[statusCode] || 0) + 1;
 }
 
@@ -17,9 +17,9 @@ export function getMetrics(store) {
     if (store && typeof store.auditTail === 'function') {
       auditCount = store.auditTail(10000).length;
     }
-  } catch {}
+  } catch { /* ignore - auditTail may not exist */ }
   
-  let lines = [
+  const lines = [
     '# HELP zedge_http_requests_total Total HTTP requests received',
     '# TYPE zedge_http_requests_total counter',
     `zedge_http_requests_total ${requestCount}`,

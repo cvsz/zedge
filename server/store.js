@@ -18,7 +18,7 @@ export function hashPassword(pw) {
 const DUMMY = hashPassword('dummy-password-for-timing');
 export function verifyPassword(pw, stored) {
   const [alg, s, h] = String(stored || DUMMY).split('$');
-  if (alg !== 'scrypt' || !s || !h) return false;
+  if (alg !== 'scrypt' || !s || !h) {return false;}
   const want = Buffer.from(h, 'base64');
   const got = crypto.scryptSync(String(pw), Buffer.from(s, 'base64'), want.length);
   return crypto.timingSafeEqual(want, got) && stored !== undefined && stored !== null;
@@ -27,13 +27,13 @@ export function verifyPassword(pw, stored) {
 const ZONE_ID_RE = /^[A-Za-z0-9_-]{6,64}$/;
 /** A zone allowlist: empty means every zone the console can see. */
 function checkZones(list) {
-  if (list === undefined || list === null) return [];
-  if (!Array.isArray(list) || list.length > 200 || list.some((z) => !ZONE_ID_RE.test(String(z)))) throw bad('Zones must be a list of zone ids');
+  if (list === undefined || list === null) {return [];}
+  if (!Array.isArray(list) || list.length > 200 || list.some((z) => !ZONE_ID_RE.test(String(z)))) {throw bad('Zones must be a list of zone ids');}
   return [...new Set(list.map(String))];
 }
 
 function checkPassword(pw) {
-  if (typeof pw !== 'string' || pw.length < MIN_PASSWORD) throw bad(`Password must be at least ${MIN_PASSWORD} characters`);
+  if (typeof pw !== 'string' || pw.length < MIN_PASSWORD) {throw bad(`Password must be at least ${MIN_PASSWORD} characters`);}
 }
 
 /** File-backed users, roles and audit log. Single process, synchronous writes, atomic replace. */
@@ -54,7 +54,7 @@ export function createStore(dir) {
   let lastHashCache;
   const readLines = () => { try { return fs.readFileSync(auditFile, 'utf8').split('\n').filter(Boolean); } catch { return []; } };
   const lastHash = () => {
-    if (lastHashCache !== undefined) return lastHashCache;
+    if (lastHashCache !== undefined) {return lastHashCache;}
     const l = readLines().at(-1);
     let h = '';
     try { h = (l && JSON.parse(l).h) || ''; } catch { /* keep empty */ }
@@ -76,10 +76,10 @@ export function createStore(dir) {
     createUser({ name, password, role, zones, resources }) {
       const data = load();
       name = String(name || '').trim().toLowerCase();
-      if (!USER_RE.test(name)) throw bad('Username: 2-32 characters, a-z 0-9 . _ -');
-      if (data.users[name]) throw new HttpError(409, 'That username already exists');
+      if (!USER_RE.test(name)) {throw bad('Username: 2-32 characters, a-z 0-9 . _ -');}
+      if (data.users[name]) {throw new HttpError(409, 'That username already exists');}
       checkPassword(password);
-      if (!permissionsFor(data, role).length) throw bad('Unknown role');
+      if (!permissionsFor(data, role).length) {throw bad('Unknown role');}
       data.users[name] = { name, hash: hashPassword(password), role, disabled: false, createdAt: new Date().toISOString(), zones: checkZones(zones), resources: checkResources(resources) };
       save(data);
       return publicUser(data.users[name]);
@@ -88,9 +88,9 @@ export function createStore(dir) {
     updateUser(name, { role, disabled, password, zones, resources, resetTotp }) {
       const data = load();
       const u = data.users[name];
-      if (!u) throw new HttpError(404, 'No such user');
+      if (!u) {throw new HttpError(404, 'No such user');}
       const nextRole = role === undefined ? u.role : role;
-      if (!permissionsFor(data, nextRole).length) throw bad('Unknown role');
+      if (!permissionsFor(data, nextRole).length) {throw bad('Unknown role');}
       const nextDisabled = disabled === undefined ? !!u.disabled : !!disabled;
       const stillAdmin = permissionsFor(data, nextRole).includes('*') && !nextDisabled;
       if (!stillAdmin && permissionsFor(data, u.role).includes('*') && !u.disabled && activeAdmins(data, name) === 0) {
@@ -99,9 +99,9 @@ export function createStore(dir) {
       u.role = nextRole;
       u.disabled = nextDisabled;
       if (password !== undefined) { checkPassword(password); u.hash = hashPassword(password); }
-      if (zones !== undefined) u.zones = checkZones(zones);
-      if (resources !== undefined) u.resources = checkResources(resources);
-      if (resetTotp) delete u.totp;
+      if (zones !== undefined) {u.zones = checkZones(zones);}
+      if (resources !== undefined) {u.resources = checkResources(resources);}
+      if (resetTotp) {delete u.totp;}
       save(data);
       return publicUser(u);
     },
@@ -109,8 +109,8 @@ export function createStore(dir) {
     deleteUser(name) {
       const data = load();
       const u = data.users[name];
-      if (!u) throw new HttpError(404, 'No such user');
-      if (permissionsFor(data, u.role).includes('*') && !u.disabled && activeAdmins(data, name) === 0) throw new HttpError(409, 'There must be at least one active admin');
+      if (!u) {throw new HttpError(404, 'No such user');}
+      if (permissionsFor(data, u.role).includes('*') && !u.disabled && activeAdmins(data, name) === 0) {throw new HttpError(409, 'There must be at least one active admin');}
       delete data.users[name];
       save(data);
     },
@@ -122,12 +122,12 @@ export function createStore(dir) {
     upsertSsoUser({ name, sub, issuer, email, role }) {
       const data = load();
       let u = data.users[name];
-      if (u && !(u.oidc && u.oidc.sub === sub && u.oidc.issuer === issuer)) throw new HttpError(409, 'A different account already uses this username');
+      if (u && !(u.oidc && u.oidc.sub === sub && u.oidc.issuer === issuer)) {throw new HttpError(409, 'A different account already uses this username');}
       if (!u) {
         u = data.users[name] = { name, role, disabled: false, createdAt: new Date().toISOString(), zones: [], oidc: { sub, issuer, email } };
       } else if (u.role !== role) {
         const wasAdmin = permissionsFor(data, u.role).includes('*');
-        if (wasAdmin && !permissionsFor(data, role).includes('*') && !u.disabled && activeAdmins(data, name) === 0) throw new HttpError(409, 'There must be at least one active admin');
+        if (wasAdmin && !permissionsFor(data, role).includes('*') && !u.disabled && activeAdmins(data, name) === 0) {throw new HttpError(409, 'There must be at least one active admin');}
         u.role = role;
       }
       u.oidc = { sub, issuer, email };
@@ -138,8 +138,8 @@ export function createStore(dir) {
     /** Two-factor state lives on the user record; secrets never leave the server except once at setup. */
     totpBegin(name, secret) {
       const data = load(); const u = data.users[name];
-      if (!u) throw new HttpError(404, 'No such user');
-      if (u.totp && u.totp.enabled) throw new HttpError(409, 'Two-factor sign-in is already on');
+      if (!u) {throw new HttpError(404, 'No such user');}
+      if (u.totp && u.totp.enabled) {throw new HttpError(409, 'Two-factor sign-in is already on');}
       u.totp = { secret, enabled: false };
       save(data);
     },
@@ -155,7 +155,7 @@ export function createStore(dir) {
     totpUseRecovery(name, hash) {
       const data = load(); const u = data.users[name];
       const list = (u && u.totp && u.totp.recovery) || [];
-      if (!list.includes(hash)) return false;
+      if (!list.includes(hash)) {return false;}
       u.totp.recovery = list.filter((h) => h !== hash);
       save(data);
       return true;
@@ -168,16 +168,16 @@ export function createStore(dir) {
     listRoles() {
       const data = load();
       const out = Object.entries(BUILTIN_ROLES).map(([name, permissions]) => ({ name, permissions, builtin: true }));
-      for (const [name, r] of Object.entries(data.roles)) out.push({ name, permissions: r.permissions, builtin: false });
+      for (const [name, r] of Object.entries(data.roles)) {out.push({ name, permissions: r.permissions, builtin: false });}
       return out;
     },
 
     saveRole({ name, permissions }) {
       const data = load();
       name = String(name || '').trim().toLowerCase();
-      if (!ROLE_RE.test(name)) throw bad('Role name: 2-32 characters, a-z 0-9 _ -');
-      if (BUILTIN_ROLES[name]) throw bad('Built-in roles cannot be changed');
-      if (!validPermissions(permissions) || !permissions.length) throw bad(`Choose permissions from: ${Object.keys(PERMISSIONS).join(', ')}`);
+      if (!ROLE_RE.test(name)) {throw bad('Role name: 2-32 characters, a-z 0-9 _ -');}
+      if (BUILTIN_ROLES[name]) {throw bad('Built-in roles cannot be changed');}
+      if (!validPermissions(permissions) || !permissions.length) {throw bad(`Choose permissions from: ${Object.keys(PERMISSIONS).join(', ')}`);}
       data.roles[name] = { permissions: [...new Set(permissions)] };
       save(data);
       return { name, permissions: data.roles[name].permissions, builtin: false };
@@ -185,9 +185,9 @@ export function createStore(dir) {
 
     deleteRole(name) {
       const data = load();
-      if (BUILTIN_ROLES[name]) throw bad('Built-in roles cannot be deleted');
-      if (!data.roles[name]) throw new HttpError(404, 'No such role');
-      if (Object.values(data.users).some((u) => u.role === name)) throw new HttpError(409, 'Users still have this role');
+      if (BUILTIN_ROLES[name]) {throw bad('Built-in roles cannot be deleted');}
+      if (!data.roles[name]) {throw new HttpError(404, 'No such role');}
+      if (Object.values(data.users).some((u) => u.role === name)) {throw new HttpError(409, 'Users still have this role');}
       delete data.roles[name];
       save(data);
     },
@@ -210,7 +210,7 @@ export function createStore(dir) {
         try { e = JSON.parse(line); } catch { return { ok: false, entries: n, brokenAt: n + 1 }; }
         const { prev: p, h, ...entry } = e;
         if (h === undefined) { n += 1; continue; } // entries written before chaining was added
-        if ((prev !== null && p !== prev) || crypto.createHash('sha256').update(String(p) + JSON.stringify(entry)).digest('hex') !== h) return { ok: false, entries: n, brokenAt: n + 1 };
+        if ((prev !== null && p !== prev) || crypto.createHash('sha256').update(String(p) + JSON.stringify(entry)).digest('hex') !== h) {return { ok: false, entries: n, brokenAt: n + 1 };}
         prev = h;
         n += 1;
       }
@@ -219,11 +219,11 @@ export function createStore(dir) {
     auditExport: () => readLines().join('\n') + (readLines().length ? '\n' : ''),
     /** Drop entries older than the retention window. The remaining chain still verifies. */
     auditPrune(days) {
-      if (!(days > 0)) return 0;
+      if (!(days > 0)) {return 0;}
       const cutoff = Date.now() - days * 86400000;
       const lines = readLines();
       const keep = lines.filter((l) => { try { return new Date(JSON.parse(l).t).getTime() >= cutoff; } catch { return true; } });
-      if (keep.length === lines.length) return 0;
+      if (keep.length === lines.length) {return 0;}
       fs.writeFileSync(auditFile, keep.length ? `${keep.join('\n')}\n` : '', { mode: 0o600 });
       lastHashCache = undefined;
       return lines.length - keep.length;

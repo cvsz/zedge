@@ -11,44 +11,44 @@ const MANAGED = {
 const text = (v) => String(v === undefined || v === null ? '' : v).trim();
 function required(v, name, max = 4000) {
   const s = text(v);
-  if (!s) throw bad(`${name} is required`);
-  if (s.length > max) throw bad(`${name} is too long`);
+  if (!s) {throw bad(`${name} is required`);}
+  if (s.length > max) {throw bad(`${name} is too long`);}
   return s;
 }
 /** A literal that will sit inside a quoted string in a wirefilter expression. */
 function literal(v, name) {
   const s = text(v);
-  if (/["\\\r\n]/.test(s) || s.length > 500) throw bad(`${name} contains characters that are not allowed`);
+  if (/["\\\r\n]/.test(s) || s.length > 500) {throw bad(`${name} contains characters that are not allowed`);}
   return s;
 }
 function oneOf(v, allowed, name) {
-  if (!allowed.includes(v)) throw bad(`${name} must be one of: ${allowed.join(', ')}`);
+  if (!allowed.includes(v)) {throw bad(`${name} must be one of: ${allowed.join(', ')}`);}
   return v;
 }
 function intIn(v, min, max, name) {
   const n = Number(v);
-  if (!Number.isInteger(n) || n < min || n > max) throw bad(`${name} must be a whole number from ${min} to ${max}`);
+  if (!Number.isInteger(n) || n < min || n > max) {throw bad(`${name} must be a whole number from ${min} to ${max}`);}
   return n;
 }
 function absoluteUrl(v, name) {
   const s = text(v);
   let u;
   try { u = new URL(s); } catch { throw bad(`${name} must be a full URL such as https://example.com/new`); }
-  if (!['http:', 'https:'].includes(u.protocol)) throw bad(`${name} must start with http:// or https://`);
+  if (!['http:', 'https:'].includes(u.protocol)) {throw bad(`${name} must start with http:// or https://`);}
   return s;
 }
 
 /** Build an expression from simple fields, or pass a custom one through. */
 export function matchExpression(b, { allowAll = false } = {}) {
-  if (text(b.expression)) return required(b.expression, 'Expression');
+  if (text(b.expression)) {return required(b.expression, 'Expression');}
   const parts = [];
-  if (text(b.fromHost)) parts.push(`http.host eq "${literal(b.fromHost, 'Host')}"`);
+  if (text(b.fromHost)) {parts.push(`http.host eq "${literal(b.fromHost, 'Host')}"`);}
   if (text(b.fromPath)) {
     const p = literal(b.fromPath, 'Path');
     parts.push(b.matchType === 'prefix' ? `starts_with(http.request.uri.path, "${p}")` : `http.request.uri.path eq "${p}"`);
   }
   if (!parts.length) {
-    if (allowAll) return 'true';
+    if (allowAll) {return 'true';}
     throw bad('Enter a host, a path or a custom expression');
   }
   return `(${parts.join(' and ')})`;
@@ -87,7 +87,7 @@ export const KINDS = {
     perm: 'rules.write',
     shape: (b) => {
       const m = MANAGED[b.ruleset];
-      if (!m) throw bad(`ruleset must be one of: ${Object.keys(MANAGED).join(', ')}`);
+      if (!m) {throw bad(`ruleset must be one of: ${Object.keys(MANAGED).join(', ')}`);}
       return { description: m.description, expression: 'true', action: 'execute', action_parameters: { id: m.id }, enabled: true };
     }
   },
@@ -108,7 +108,7 @@ export const KINDS = {
     shape: (b) => {
       const mode = oneOf(b.mode || 'ttl', ['ttl', 'bypass'], 'Mode');
       const params = mode === 'bypass' ? { cache: false } : { cache: true, edge_ttl: { mode: 'override_origin', default: intIn(b.edgeTtl, 60, 31536000, 'Edge TTL (seconds)') } };
-      if (mode === 'ttl' && text(b.browserTtl)) params.browser_ttl = { mode: 'override_origin', default: intIn(b.browserTtl, 0, 31536000, 'Browser TTL (seconds)') };
+      if (mode === 'ttl' && text(b.browserTtl)) {params.browser_ttl = { mode: 'override_origin', default: intIn(b.browserTtl, 0, 31536000, 'Browser TTL (seconds)') };}
       return { description: text(b.description).slice(0, 200) || 'Cache rule', expression: matchExpression(b), action: 'set_cache_settings', action_parameters: params, enabled: true };
     }
   }
@@ -121,17 +121,17 @@ export function registerRules(app, ctx) {
 
   const gate = (write) => (req, res, next) => {
     const k = KINDS[req.params.kind];
-    if (!k) return res.status(404).json({ error: 'Unknown rule type' });
+    if (!k) {return res.status(404).json({ error: 'Unknown rule type' });}
     return need(write ? k.perm : 'read')(req, res, next);
   };
   const ruleId = (req) => {
-    if (!ID_RE.test(req.params.rid)) throw bad('Invalid rule id');
+    if (!ID_RE.test(req.params.rid)) {throw bad('Invalid rule id');}
     return req.params.rid;
   };
 
   async function entry(zid, phase) {
     try { return (await cf.get(`/zones/${zid}/rulesets/phases/${phase}/entrypoint`)).result; } catch (e) {
-      if (e instanceof CFError && e.status === 404) return null;
+      if (e instanceof CFError && e.status === 404) {return null;}
       throw e;
     }
   }
@@ -148,8 +148,8 @@ export function registerRules(app, ctx) {
     if (req.params.kind === 'managed' && cur && cur.rules.some((r) => r.action_parameters && rule.action_parameters && r.action_parameters.id === rule.action_parameters.id)) {
       throw new HttpError(409, 'That managed ruleset is already deployed');
     }
-    if (cur && cur.id) await cf.post(`/zones/${req.params.zid}/rulesets/${cur.id}/rules`, rule);
-    else await cf.put(`/zones/${req.params.zid}/rulesets/phases/${k.phase}/entrypoint`, { rules: [rule] });
+    if (cur && cur.id) {await cf.post(`/zones/${req.params.zid}/rulesets/${cur.id}/rules`, rule);}
+    else {await cf.put(`/zones/${req.params.zid}/rulesets/phases/${k.phase}/entrypoint`, { rules: [rule] });}
     res.status(201).json(view(await entry(req.params.zid, k.phase)));
   }));
 
@@ -158,9 +158,9 @@ export function registerRules(app, ctx) {
     const rid = ruleId(req);
     const cur = await entry(req.params.zid, k.phase);
     const rule = cur && cur.rules.find((r) => r.id === rid);
-    if (!rule) throw new HttpError(404, 'Rule not found');
+    if (!rule) {throw new HttpError(404, 'Rule not found');}
     const body = { enabled: !!(req.body && req.body.enabled) };
-    for (const f of KEEP) if (rule[f] !== undefined) body[f] = rule[f];
+    for (const f of KEEP) {if (rule[f] !== undefined) {body[f] = rule[f];}}
     await cf.patch(`/zones/${req.params.zid}/rulesets/${cur.id}/rules/${rid}`, body);
     res.json({ ok: true });
   }));
@@ -169,7 +169,7 @@ export function registerRules(app, ctx) {
     const k = KINDS[req.params.kind];
     const rid = ruleId(req);
     const cur = await entry(req.params.zid, k.phase);
-    if (!cur || !cur.rules.some((r) => r.id === rid)) throw new HttpError(404, 'Rule not found');
+    if (!cur || !cur.rules.some((r) => r.id === rid)) {throw new HttpError(404, 'Rule not found');}
     await cf.del(`/zones/${req.params.zid}/rulesets/${cur.id}/rules/${rid}`);
     res.json({ ok: true });
   }));

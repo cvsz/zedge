@@ -26,20 +26,20 @@ export function registerEmail(app, ctx) {
   /** Create or update the _dmarc TXT record from a policy choice. */
   app.post('/api/zones/:zid/dmarc', need('email.write'), wrap(async (req, res) => {
     const b = req.body || {};
-    if (!['none', 'quarantine', 'reject'].includes(b.policy)) throw bad('Policy must be none, quarantine or reject');
+    if (!['none', 'quarantine', 'reject'].includes(b.policy)) {throw bad('Policy must be none, quarantine or reject');}
     const pct = b.pct === undefined || b.pct === '' ? 100 : Number(b.pct);
-    if (!Number.isInteger(pct) || pct < 1 || pct > 100) throw bad('Percentage must be 1 to 100');
+    if (!Number.isInteger(pct) || pct < 1 || pct > 100) {throw bad('Percentage must be 1 to 100');}
     const rua = String(b.rua || '').trim();
-    if (rua && !EMAIL_RE.test(rua)) throw bad('Report address must be a valid email address');
+    if (rua && !EMAIL_RE.test(rua)) {throw bad('Report address must be a valid email address');}
     const zone = (await cf.get(`/zones/${req.params.zid}`)).result;
     const name = `_dmarc.${zone.name}`;
     const parts = ['v=DMARC1', `p=${b.policy}`];
-    if (pct !== 100) parts.push(`pct=${pct}`);
-    if (rua) parts.push(`rua=mailto:${rua}`);
+    if (pct !== 100) {parts.push(`pct=${pct}`);}
+    if (rua) {parts.push(`rua=mailto:${rua}`);}
     const content = parts.join('; ');
     const existing = ((await cf.get(`/zones/${zone.id}/dns_records`, { type: 'TXT', name })).result || [])[0];
-    if (existing) await cf.patch(`/zones/${zone.id}/dns_records/${existing.id}`, { content });
-    else await cf.post(`/zones/${zone.id}/dns_records`, { type: 'TXT', name, content, ttl: 1 });
+    if (existing) {await cf.patch(`/zones/${zone.id}/dns_records/${existing.id}`, { content });}
+    else {await cf.post(`/zones/${zone.id}/dns_records`, { type: 'TXT', name, content, ttl: 1 });}
     res.status(existing ? 200 : 201).json({ name, content, updated: !!existing });
   }));
 }

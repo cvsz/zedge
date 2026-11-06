@@ -11,13 +11,13 @@ export const KINDS = {
 const ITEM_RE = /^[A-Za-z0-9._-]{1,64}$/;
 
 export function checkResources(v) {
-  if (v === undefined || v === null) return {};
-  if (typeof v !== 'object' || Array.isArray(v)) throw bad('resources must be an object');
+  if (v === undefined || v === null) {return {};}
+  if (typeof v !== 'object' || Array.isArray(v)) {throw bad('resources must be an object');}
   const out = {};
   for (const [k, list] of Object.entries(v)) {
-    if (!(k in KINDS)) throw bad(`Unknown resource type "${k}"`);
-    if (!Array.isArray(list) || list.length > 200 || list.some((x) => !ITEM_RE.test(String(x)))) throw bad(`${KINDS[k]} must be a list of names or ids`);
-    if (list.length) out[k] = [...new Set(list.map(String))];
+    if (!(k in KINDS)) {throw bad(`Unknown resource type "${k}"`);}
+    if (!Array.isArray(list) || list.length > 200 || list.some((x) => !ITEM_RE.test(String(x)))) {throw bad(`${KINDS[k]} must be a list of names or ids`);}
+    if (list.length) {out[k] = [...new Set(list.map(String))];}
   }
   return out;
 }
@@ -39,7 +39,7 @@ const MAP = [
 export function classify(cfPath) {
   for (const m of MAP) {
     const hit = cfPath.match(m.re);
-    if (hit) return { ...m, id: hit[1] || null };
+    if (hit) {return { ...m, id: hit[1] || null };}
   }
   return null;
 }
@@ -53,21 +53,21 @@ export function guardProxy(user, method, cfPath, body) {
   if (body && typeof body === 'object') {
     // a Worker route or custom domain names the Worker it sends traffic to
     const target = typeof body.service === 'string' ? body.service : typeof body.script === 'string' ? body.script : null;
-    if (target && !allowed(user, 'workers', target)) throw deny('Workers');
+    if (target && !allowed(user, 'workers', target)) {throw deny('Workers');}
   }
-  if (!c) return null;
-  if (!restricted(user, c.kind)) return null;
+  if (!c) {return null;}
+  if (!restricted(user, c.kind)) {return null;}
   if (c.id) {
-    if (!allowed(user, c.kind, c.id)) throw deny(c.label);
+    if (!allowed(user, c.kind, c.id)) {throw deny(c.label);}
     return null;
   }
-  if (method !== 'GET') throw new HttpError(403, `Your account is limited to specific ${c.label}, so it cannot create new ones`);
+  if (method !== 'GET') {throw new HttpError(403, `Your account is limited to specific ${c.label}, so it cannot create new ones`);}
   return (json) => {
     const r = json && json.result;
     const arr = c.nested ? r && r[c.nested] : r;
-    if (!Array.isArray(arr)) return json;
+    if (!Array.isArray(arr)) {return json;}
     const kept = arr.filter((x) => user.resources[c.kind].includes(String(x[c.listKey])));
-    if (c.nested) r[c.nested] = kept; else json.result = kept;
+    if (c.nested) {r[c.nested] = kept;} else {json.result = kept;}
     return json;
   };
 }

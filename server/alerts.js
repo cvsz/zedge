@@ -12,7 +12,7 @@ export async function sendMail({ url, from, to, subject, text, rejectUnauthorize
   const host = u.hostname;
   const port = Number(u.port) || (implicit ? 465 : 587);
   const wantStartTls = !implicit && u.searchParams.get('starttls') !== '0';
-  if (!implicit && !wantStartTls && !LOOPBACK.includes(host)) throw new Error('Plain SMTP to a remote host is not allowed; use smtps:// or STARTTLS');
+  if (!implicit && !wantStartTls && !LOOPBACK.includes(host)) {throw new Error('Plain SMTP to a remote host is not allowed; use smtps:// or STARTTLS');}
   const user = decodeURIComponent(u.username || '');
   const pass = decodeURIComponent(u.password || '');
 
@@ -25,9 +25,9 @@ export async function sendMail({ url, from, to, subject, text, rejectUnauthorize
   let buf = '';
   let waiter = null;
   const attach = (s) => {
-    s.on('data', (d) => { buf += d.toString('utf8'); if (waiter) waiter(); });
-    s.on('error', (e) => { if (waiter) waiter(e); });
-    s.on('close', () => { if (waiter) waiter(new Error('SMTP connection closed')); });
+    s.on('data', (d) => { buf += d.toString('utf8'); if (waiter) {waiter();} });
+    s.on('error', (e) => { if (waiter) {waiter(e);} });
+    s.on('close', () => { if (waiter) {waiter(new Error('SMTP connection closed'));} });
   };
   attach(socket);
   /** Read one full reply (all lines of a multi-line reply). */
@@ -45,13 +45,13 @@ export async function sendMail({ url, from, to, subject, text, rejectUnauthorize
   const cmd = async (line, ok) => {
     socket.write(line + CRLF);
     const r = await reply();
-    if (!ok.includes(r.code)) throw new Error(`SMTP refused "${line.split(' ')[0]}": ${r.text.slice(0, 120)}`);
+    if (!ok.includes(r.code)) {throw new Error(`SMTP refused "${line.split(' ')[0]}": ${r.text.slice(0, 120)}`);}
     return r;
   };
 
   try {
     const hello = await reply();
-    if (hello.code !== 220) throw new Error(`SMTP greeting: ${hello.text.slice(0, 80)}`);
+    if (hello.code !== 220) {throw new Error(`SMTP greeting: ${hello.text.slice(0, 80)}`);}
     let ehlo = await cmd('EHLO zedge', [250]);
     if (wantStartTls) {
       await cmd('STARTTLS', [220]);
@@ -62,12 +62,12 @@ export async function sendMail({ url, from, to, subject, text, rejectUnauthorize
       ehlo = await cmd('EHLO zedge', [250]);
     }
     if (user) {
-      if (!implicit && !wantStartTls && !LOOPBACK.includes(host)) throw new Error('Refusing to send credentials without TLS');
+      if (!implicit && !wantStartTls && !LOOPBACK.includes(host)) {throw new Error('Refusing to send credentials without TLS');}
       await cmd(`AUTH PLAIN ${Buffer.from(`\0${user}\0${pass}`).toString('base64')}`, [235]);
     }
     void ehlo;
     await cmd(`MAIL FROM:<${from}>`, [250]);
-    for (const r of to) await cmd(`RCPT TO:<${r}>`, [250, 251]);
+    for (const r of to) {await cmd(`RCPT TO:<${r}>`, [250, 251]);}
     await cmd('DATA', [354]);
     const b64 = (s) => Buffer.from(s, 'utf8').toString('base64');
     const body = Buffer.from(text, 'utf8').toString('base64').replace(/(.{76})/g, `$1${CRLF}`);
@@ -90,19 +90,19 @@ export function createAlerts(config, { fetchImpl = fetch, log = console.error } 
 
   async function deliver(text, subject, webhookOnly) {
     const jobs = [];
-    if (a.webhook) jobs.push(fetchImpl(a.webhook, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }), signal: AbortSignal.timeout(5000) }));
-    if (!webhookOnly && a.smtpUrl && a.emailTo.length) jobs.push(sendMail({ url: a.smtpUrl, from: a.emailFrom, to: a.emailTo, subject, text, rejectUnauthorized: a.smtpVerify }));
+    if (a.webhook) {jobs.push(fetchImpl(a.webhook, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }), signal: AbortSignal.timeout(5000) }));}
+    if (!webhookOnly && a.smtpUrl && a.emailTo.length) {jobs.push(sendMail({ url: a.smtpUrl, from: a.emailFrom, to: a.emailTo, subject, text, rejectUnauthorized: a.smtpVerify }));}
     const results = await Promise.allSettled(jobs);
-    for (const r of results) if (r.status === 'rejected') log(`alert delivery failed: ${r.reason && r.reason.message}`);
+    for (const r of results) {if (r.status === 'rejected') {log(`alert delivery failed: ${r.reason && r.reason.message}`);}}
     return results;
   }
 
   /** Fire and forget. `opts.key` + `opts.quietMinutes` turn on de-duplication; `opts.webhookOnly` keeps routine notices out of email. */
   function alert(text, opts = {}) {
-    if (!enabled) return Promise.resolve();
+    if (!enabled) {return Promise.resolve();}
     if (opts.key) {
       const now = Date.now();
-      if (last.has(opts.key) && now - last.get(opts.key) < (opts.quietMinutes || 30) * 60000) return Promise.resolve();
+      if (last.has(opts.key) && now - last.get(opts.key) < (opts.quietMinutes || 30) * 60000) {return Promise.resolve();}
       last.set(opts.key, now);
     }
     return deliver(text, opts.subject || String(text).replace(/^Zedge:\s*/, '').slice(0, 90), !!opts.webhookOnly).catch(() => {});

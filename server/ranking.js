@@ -12,14 +12,14 @@ const productRankedEvents = [];
  * Kept separate from modeled data
  * @type {Array<Object>}
  */
-let observedData = [];
+const observedData = [];
 
 /**
  * Modeled ranking data - derived/calculated rankings
  * Kept separate from observed data to avoid base mixing
  * @type {Array<Object>}
  */
-let modeledData = [];
+const modeledData = [];
 
 /**
  * Record observed ranking data from platform API responses

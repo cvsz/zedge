@@ -42,10 +42,10 @@ export function build() {
 
   // 1. the console's own routes, read from the Express router
   for (const layer of app._router.stack) {
-    if (!layer.route) continue;
+    if (!layer.route) {continue;}
     const route = layer.route;
-    if (typeof route.path !== 'string' || (!route.path.startsWith('/api/') && route.path !== '/metrics')) continue;
-    if (route.path === '/api/cf/*') continue; // described below from the allowlist
+    if (typeof route.path !== 'string' || (!route.path.startsWith('/api/') && route.path !== '/metrics')) {continue;}
+    if (route.path === '/api/cf/*') {continue;} // described below from the allowlist
     const oasPath = route.path.replace(/:(\w+)/g, '{$1}');
     const perm = route.stack.map((h) => h.handle.permission).find(Boolean);
     const pub = ['/api/login', '/api/logout', '/api/session', '/api/oidc/login', '/api/oidc/callback', '/metrics'].includes(route.path);

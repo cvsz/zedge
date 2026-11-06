@@ -8,14 +8,14 @@ export function base32Encode(buf) {
     value = (value << 8) | byte; bits += 8;
     while (bits >= 5) { out += ALPHABET[(value >>> (bits - 5)) & 31]; bits -= 5; }
   }
-  if (bits > 0) out += ALPHABET[(value << (5 - bits)) & 31];
+  if (bits > 0) {out += ALPHABET[(value << (5 - bits)) & 31];}
   return out;
 }
 export function base32Decode(str) {
   let bits = 0; let value = 0; const out = [];
   for (const ch of String(str).toUpperCase().replace(/=+$/, '').replace(/\s+/g, '')) {
     const i = ALPHABET.indexOf(ch);
-    if (i < 0) throw new Error('Invalid base32');
+    if (i < 0) {throw new Error('Invalid base32');}
     value = (value << 5) | i; bits += 5;
     if (bits >= 8) { out.push((value >>> (bits - 8)) & 255); bits -= 8; }
   }
@@ -42,12 +42,12 @@ export const stepAt = (ms = Date.now(), period = 30) => Math.floor(ms / 1000 / p
  */
 export function verifyTotp(secretBase32, code, { now = Date.now(), lastStep = -1, window = 1 } = {}) {
   const c = String(code || '').replace(/\s+/g, '');
-  if (!/^\d{6}$/.test(c)) return null;
+  if (!/^\d{6}$/.test(c)) {return null;}
   const cur = stepAt(now);
   for (let s = cur - window; s <= cur + window; s += 1) {
-    if (s <= lastStep) continue;
+    if (s <= lastStep) {continue;}
     const want = Buffer.from(hotp(secretBase32, s));
-    if (crypto.timingSafeEqual(want, Buffer.from(c))) return s;
+    if (crypto.timingSafeEqual(want, Buffer.from(c))) {return s;}
   }
   return null;
 }

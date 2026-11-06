@@ -43,7 +43,7 @@ export function createApp(config, opts = {}) {
   if (config.trustCfIp) {
     app.use((req, res, next) => {
       const v = req.get('cf-connecting-ip');
-      if (v && /^[0-9a-fA-F:.]{3,45}$/.test(v)) Object.defineProperty(req, 'ip', { value: v, configurable: true });
+      if (v && /^[0-9a-fA-F:.]{3,45}$/.test(v)) {Object.defineProperty(req, 'ip', { value: v, configurable: true });}
       next();
     });
   }
@@ -51,12 +51,12 @@ export function createApp(config, opts = {}) {
   // ---- accounts: every account this console may act on (all the token can see, or the configured subset) ----
   let accountCache = { at: 0, list: [] };
   async function accounts() {
-    if (Date.now() - accountCache.at < 60000 && accountCache.list.length) return accountCache.list;
+    if (Date.now() - accountCache.at < 60000 && accountCache.list.length) {return accountCache.list;}
     let list = [];
     try {
       list = ((await cf.get('/accounts', { per_page: '50' })).result || []).map((a) => ({ id: a.id, name: a.name }));
     } catch (e) {
-      if (!config.accountIds.length) throw e;
+      if (!config.accountIds.length) {throw e;}
     }
     if (config.accountIds.length) {
       const byId = new Map(list.map((a) => [a.id, a]));
@@ -67,10 +67,10 @@ export function createApp(config, opts = {}) {
   }
   async function accountId(req) {
     const list = await accounts();
-    if (!list.length) throw new HttpError(409, 'This token cannot see any account. Set CLOUDFLARE_ACCOUNT_ID.');
+    if (!list.length) {throw new HttpError(409, 'This token cannot see any account. Set CLOUDFLARE_ACCOUNT_ID.');}
     const want = req && req.get && req.get('x-account-id');
     if (want) {
-      if (!list.some((a) => a.id === want)) throw new HttpError(403, 'That account is not available to this console');
+      if (!list.some((a) => a.id === want)) {throw new HttpError(403, 'That account is not available to this console');}
       return want;
     }
     return list[0].id;
@@ -79,18 +79,18 @@ export function createApp(config, opts = {}) {
   // When CLOUDFLARE_ACCOUNT_IDS limits the console to some accounts, zone ids must belong to one of them.
   const zoneCache = new Map();
   async function assertZone(zid) {
-    if (!config.accountIds.length) return;
+    if (!config.accountIds.length) {return;}
     const hit = zoneCache.get(zid);
-    if (hit && hit.until > Date.now()) { if (hit.ok) return; throw new HttpError(403, 'That zone is not in an account available to this console'); }
+    if (hit && hit.until > Date.now()) { if (hit.ok) {return;} throw new HttpError(403, 'That zone is not in an account available to this console'); }
     const z = (await cf.get(`/zones/${zid}`)).result;
     const ok = !!(z && z.account && config.accountIds.includes(z.account.id));
     zoneCache.set(zid, { ok, until: Date.now() + 300000 });
-    if (!ok) throw new HttpError(403, 'That zone is not in an account available to this console');
+    if (!ok) {throw new HttpError(403, 'That zone is not in an account available to this console');}
   }
 
   const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res)).catch(next);
   const need = (perm) => (req, res, next) => {
-    if (can(req.user.permissions, perm)) return next();
+    if (can(req.user.permissions, perm)) {return next();}
     return res.status(403).json({ error: `Your role (${req.user.role}) does not allow this (${perm})` });
   };
   const ctx = { cf, config, store, auth, wrap, need, accountId, accounts, assertZone, fetchImpl };
@@ -141,7 +141,7 @@ export function createApp(config, opts = {}) {
     const token = req.get('authorization') || '';
     const ok = config.metricsToken && token === `Bearer ${config.metricsToken}`;
     const canReadAudit = can(req.user.permissions, 'audit.read');
-    if (!ok && !canReadAudit) return res.status(401).json({ error: 'Metrics require Bearer token or audit.read permission' });
+    if (!ok && !canReadAudit) {return res.status(401).json({ error: 'Metrics require Bearer token or audit.read permission' });}
     res.type('text/plain').send(getMetrics(store));
   });
   app.get('/openapi.json', auth.require, (req, res) => res.json(openApiSpec));
@@ -158,13 +158,13 @@ export function createApp(config, opts = {}) {
   app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
   // eslint-disable-next-line no-unused-vars
   app.use((err, req, res, next) => {
-    if (err instanceof HttpError) return res.status(err.status).json({ error: err.message });
+    if (err instanceof HttpError) {return res.status(err.status).json({ error: err.message });}
     if (err instanceof CFError) {
       const status = err.status >= 400 && err.status < 500 && err.status !== 401 ? err.status : 502;
       return res.status(status).json({ error: err.message, cloudflare: err.errors });
     }
-    if (err && err.type === 'entity.parse.failed') return res.status(400).json({ error: 'Invalid JSON' });
-    if (err && err.type === 'entity.too.large') return res.status(413).json({ error: 'Request is too large' });
+    if (err && err.type === 'entity.parse.failed') {return res.status(400).json({ error: 'Invalid JSON' });}
+    if (err && err.type === 'entity.too.large') {return res.status(413).json({ error: 'Request is too large' });}
     console.error(err);
     return res.status(500).json({ error: 'Internal error' });
   });

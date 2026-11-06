@@ -6,7 +6,7 @@ import { createAuth } from './auth.js';
 import { createStore } from './store.js';
 import { can } from './rbac.js';
 import { HttpError } from './errors.js';
-import { recordMetric, getMetrics } from './metrics.js';
+import { createMetrics } from './metrics.js';
 import { build as buildOpenApi } from './openapi.js';
 import { registerCore } from './routes/core.js';
 import { registerRules } from './routes/rules.js';
@@ -27,15 +27,16 @@ export function createApp(config, opts = {}) {
   if (store.isEmpty() && config.password) {
     store.createUser({ name: 'admin', password: config.password, role: 'admin' });
   }
-  const cf = createCF({ token: config.token, apiBase: config.apiBase, fetchImpl });
-  const auth = createAuth(config, store);
+  const metrics = createMetrics(); // X4: per-app metrics state
+  const cf = createCF({ token: config.token, apiBase: config.apiBase, fetchImpl, metrics });
+  const auth = createAuth(config, store, { metrics });
   const app = express();
   app.disable('x-powered-by');
   app.set('trust proxy', false);
   
   app.use((req, res, next) => {
     const start = Date.now();
-    res.on('finish', () => recordMetric(res.statusCode, Date.now() - start));
+    res.on('finish', () => metrics.recordMetric(res.statusCode, Date.now() - start));
     next();
   });
 
@@ -138,12 +139,15 @@ export function createApp(config, opts = {}) {
   });
 
   // ---- authenticated-only endpoints ----
-  app.get('/metrics', auth.require, (req, res) => {
+  // ---- /metrics: Bearer token first (scrapers), else a session with audit.read (X5) ----
+  app.get('/metrics', (req, res) => {
     const token = req.get('authorization') || '';
     const ok = config.metricsToken && token === `Bearer ${config.metricsToken}`;
-    const canReadAudit = can(req.user.permissions, 'audit.read');
-    if (!ok && !canReadAudit) {return res.status(401).json({ error: 'Metrics require Bearer token or audit.read permission' });}
-    res.type('text/plain').send(getMetrics(store));
+    if (ok) { return res.type('text/plain').send(metrics.getMetrics(store)); }
+    const user = auth.resolve(req);
+    if (!user) { return res.status(401).json({ error: 'Not signed in' }); }
+    if (!can(user.permissions, 'audit.read')) { return res.status(403).json({ error: 'Forbidden' }); }
+    res.type('text/plain').send(metrics.getMetrics(store));
   });
   app.get('/openapi.json', auth.require, (req, res) => res.json(openApiSpec));
 

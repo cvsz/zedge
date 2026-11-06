@@ -2,7 +2,6 @@ import crypto from 'node:crypto';
 import { verifyPassword, hashPassword, MIN_PASSWORD } from './store.js';
 import { HttpError, bad } from './errors.js';
 import { verifyTotp, hashRecovery } from './totp.js';
-import { recordLoginFailure, recordRateLimit } from './metrics.js';
 
 const COOKIE = 'zedge_session';
 const LOCAL_ADMIN = { name: 'local', role: 'admin', permissions: ['*'], zones: [], resources: {} };
@@ -22,8 +21,8 @@ function parseCookies(header = '') {
   return out;
 }
 
-/** @param {any} config @param {any} store @param {{ alert?: (message: string) => void }} [deps] */
-export function createAuth(config, store, { alert = (_message) => {} } = {}) {
+/** @param {any} config @param {any} store @param {{ alert?: (message: string) => void, metrics?: { recordLoginFailure(): void, recordRateLimit(): void } }} [deps] */
+export function createAuth(config, store, { alert = (_message) => {}, metrics } = {}) {
   const attempts = new Map(); // ip -> { count, resetAt }
 
   function issue(res, username) {
@@ -59,6 +58,7 @@ export function createAuth(config, store, { alert = (_message) => {} } = {}) {
     const now = Date.now();
     const rec = attempts.get(ip);
     if (rec && rec.resetAt > now && rec.count >= 5) {
+      if (metrics) { metrics.recordRateLimit(); } // X2: count actual rate-limited (429) responses, not failures
       return res.status(429).json({ error: 'Too many attempts. Try again in a few minutes.' });
     }
     const username = String((req.body && req.body.username) || 'admin').trim().toLowerCase();
@@ -73,9 +73,8 @@ export function createAuth(config, store, { alert = (_message) => {} } = {}) {
       next.count += 1;
       attempts.set(ip, next);
       if (next.count === 5) {alert(`Zedge: sign-in locked for ${ip} after repeated failures`);}
-      recordRateLimit();
+      if (metrics) { metrics.recordLoginFailure(); }
       store.audit({ t: new Date().toISOString(), user: username, method: 'LOGIN', path: '/api/login', status: 401, ip });
-      recordLoginFailure();
       return res.status(401).json({ error: 'Incorrect username or password' });
     }
     // second factor: password first, then a code from the authenticator app (or a one-time recovery code)
@@ -91,7 +90,7 @@ export function createAuth(config, store, { alert = (_message) => {} } = {}) {
         attempts.set(ip, next);
         if (next.count === 5) {alert(`Zedge: sign-in locked for ${ip} after repeated failures`);}
         store.audit({ t: new Date().toISOString(), user: u.name, method: 'LOGIN', path: '/api/login (2fa)', status: 401, ip });
-        recordLoginFailure();
+        if (metrics) { metrics.recordLoginFailure(); }
         return res.status(401).json({ error: 'That code is not valid, or was already used', totpRequired: true });
       }
     }

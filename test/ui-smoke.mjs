@@ -37,12 +37,11 @@ async function runSmoke() {
       page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text()) && !/fonts[.]googleapis[.]com/.test(m.text())) errors.push(m.text()); });
       page.on('dialog', (d) => d.accept());
 
+      const label = `${vp.name}@${vp.width}x${vp.height}@${theme}`;
       try {
         // Set theme before navigation
         await page.goto(`${base}#theme=${theme}`);
         await page.waitForTimeout(200);
-
-        const label = `${vp.name}@${vp.width}x${vp.height}@${theme}`;
 
         await page.fill('input[type=password]', 'wrong-wrong-wrong');
         await page.click('button[type=submit]');

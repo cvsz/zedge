@@ -2,6 +2,7 @@ import { h, fill, api, cf, cfAll, toast, run, badge, btn, card, field, input, em
 import { S, zone, can, statusKind, header, noZone, nsBox, pick } from './ctx.js';
 import { barChart, legend } from './charts.js';
 import { loadI18n, t } from './i18n.js';
+import { initCommandPalette } from './ui/command-palette.js';
 import { rulesView } from './views/rules.js';
 import { emailView } from './views/email.js';
 import { workersView } from './views/workers.js';
@@ -34,26 +35,26 @@ document.documentElement.dataset.theme = savedTheme || (window.matchMedia && win
 
 // [id, label, view, needsZone, permission]
 const ROUTES = [
-  ['overview', 'Overview', overviewView, true, 'read'],
-  ['domains', 'Domains', domainsView, false, 'read'],
-  ['dns', 'DNS', dnsView, true, 'read'],
-  ['email', 'Email', emailView, true, 'read'],
-  ['security', 'Security & WAF', securityView, true, 'read'],
-  ['rules', 'Rules', rulesView, true, 'read'],
-  ['workers', 'Workers', workersView, false, 'read'],
-  ['edge', 'Edge', edgeView, false, 'read'],
-  ['pages', 'Pages', pagesView, false, 'read'],
+  ['overview', t('domains_page'), overviewView, true, 'read'],
+  ['domains', t('domains_page'), domainsView, false, 'read'],
+  ['dns', t('domains_page'), dnsView, true, 'read'],
+  ['email', t('email'), emailView, true, 'read'],
+  ['security', t('security_settings'), securityView, true, 'read'],
+  ['rules', t('rules_page'), rulesView, true, 'read'],
+  ['workers', t('workers_page'), workersView, false, 'read'],
+  ['edge', t('edge'), edgeView, false, 'read'],
+  ['pages', t('pages_page'), pagesView, false, 'read'],
   ['lb', 'Load balancing', lbView, false, 'read'],
   ['data', 'Data (KV, D1)', dataView, false, 'read'],
   ['ssl', 'SSL & Bots', sslView, true, 'read'],
   ['snapshots', 'Snapshots', snapshotsView, true, 'read'],
-  ['storage', 'Storage', storageView, false, 'read'],
-  ['zerotrust', 'Zero Trust', zeroTrustView, false, 'read'],
-  ['tokens', 'API Tokens', tokensView, false, 'tokens.read'],
-  ['approvals', 'Approvals', approvalsView, false, 'read'],
-  ['audit', 'Audit log', auditView, false, 'audit.read'],
-  ['users', 'Users & Roles', usersView, false, 'users.admin'],
-  ['account', 'My account', async () => accountView(), false, 'read']
+  ['storage', t('r2_page'), storageView, false, 'read'],
+  ['zerotrust', t('zerotrust'), zeroTrustView, false, 'read'],
+  ['tokens', t('api_tokens'), tokensView, false, 'tokens.read'],
+  ['approvals', t('approvals'), approvalsView, false, 'read'],
+  ['audit', t('audit_page'), auditView, false, 'audit.read'],
+  ['users', t('admin'), usersView, false, 'users.admin'],
+  ['account', t('my_account'), async () => accountView(), false, 'read']
 ];
 const allowedRoutes = () => ROUTES.filter((r) => can(r[4]));
 
@@ -491,6 +492,7 @@ async function boot() {
       if (days <= 14) {toast(days <= 0 ? 'The Cloudflare API token has expired. Create a new one and restart the console.' : `The Cloudflare API token expires in ${days} day${days === 1 ? '' : 's'}.`, true);}
     }
     await loadZones();
+    initCommandPalette();
     const state = /** @type {any} */ (boot);
     if (!state.listening) { window.addEventListener('hashchange', render); state.listening = true; }
     if (!S.zones.length && !location.hash && can('domains.write')) {location.hash = '#/domains';}

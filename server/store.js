@@ -53,6 +53,8 @@ export function createStore(dir) {
 
   let lastHashCache;
   const readLines = () => { try { return fs.readFileSync(auditFile, 'utf8').split('\n').filter(Boolean); } catch { return []; } };
+  /** Running count of audit lines written by this store instance (X3). */
+  let auditCount = readLines().length;
   const lastHash = () => {
     if (lastHashCache !== undefined) {return lastHashCache;}
     const l = readLines().at(-1);
@@ -200,8 +202,10 @@ export function createStore(dir) {
         const h = crypto.createHash('sha256').update(prev + body).digest('hex');
         fs.appendFileSync(auditFile, `${JSON.stringify({ ...entry, prev, h })}\n`, { mode: 0o600 });
         lastHashCache = h;
+        auditCount += 1;
       } catch { /* auditing must never break a request */ }
     },
+    auditCount: () => auditCount,
     auditVerify() {
       let prev = null;
       let n = 0;

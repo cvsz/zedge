@@ -1,6 +1,7 @@
 import { h, fill, api, cf, cfAll, toast, run, badge, btn, card, field, input, empty, segmented, toggle, confirmAsk, secretBox, fmtDate, fmtNum, fmtBytes, setUnauthorizedHandler, ApiError } from './lib.js';
 import { S, zone, can, statusKind, header, noZone, nsBox, pick } from './ctx.js';
 import { barChart, legend } from './charts.js';
+import { loadI18n, t, L, setLang, getLang } from './i18n.js';
 import { rulesView } from './views/rules.js';
 import { emailView } from './views/email.js';
 import { workersView } from './views/workers.js';
@@ -466,6 +467,7 @@ async function loginView() {
 }
 
 async function boot() {
+  await loadI18n();
   setUnauthorizedHandler(loginView);
   try {
     const sess = await api('GET', 'session');

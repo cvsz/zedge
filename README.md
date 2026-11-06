@@ -179,6 +179,26 @@ Final-Report.md
 - Rate limiting on login attempts
 - No secrets logged or committed
 
+## GPG Commit Signing
+
+Commits can be signed non-interactively using the `GPG_PASS` passphrase:
+
+```bash
+# Set once (locally, not committed):
+git config gpg.program "$PWD/scripts/git-gpg-sign.sh"
+git config commit.gpgsign true
+git config user.signingkey <YOUR_KEY_ID>
+
+# Then sign commits with GPG_PASS:
+export GPG_PASS="..."
+git commit -S -m "message"
+```
+
+`scripts/git-gpg-sign.sh` feeds `GPG_PASS` to `gpg` on fd 3
+(`--pinentry-mode loopback --passphrase-fd 3`), leaving stdin free for the
+payload git supplies. Requires `allow-loopback-pinentry` in
+`~/.gnupg/gpg-agent.conf` and a secret key whose passphrase matches `GPG_PASS`.
+
 ## Documentation
 
 - `AGENTS.md` — Agent instructions for this repository

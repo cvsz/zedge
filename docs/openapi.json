@@ -48,6 +48,52 @@
         }
       }
     },
+    "/api/admin/audit/export": {
+      "get": {
+        "summary": "GET /api/admin/audit/export",
+        "tags": [
+          "admin"
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/admin/audit/verify": {
+      "get": {
+        "summary": "GET /api/admin/audit/verify",
+        "tags": [
+          "admin"
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
     "/api/admin/permissions": {
       "get": {
         "summary": "GET /api/admin/permissions",
@@ -268,11 +314,172 @@
         }
       }
     },
+    "/api/analytics/{zid}/top": {
+      "get": {
+        "summary": "GET /api/analytics/{zid}/top",
+        "tags": [
+          "analytics"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/d1/{db}/query": {
+      "post": {
+        "summary": "POST /api/d1/{db}/query",
+        "tags": [
+          "d1"
+        ],
+        "parameters": [
+          {
+            "name": "db",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
     "/api/domains": {
       "post": {
         "summary": "POST /api/domains",
         "tags": [
           "domains"
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/kv/{ns}/value": {
+      "delete": {
+        "summary": "DELETE /api/kv/{ns}/value",
+        "tags": [
+          "kv"
+        ],
+        "parameters": [
+          {
+            "name": "ns",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      },
+      "get": {
+        "summary": "GET /api/kv/{ns}/value",
+        "tags": [
+          "kv"
+        ],
+        "parameters": [
+          {
+            "name": "ns",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      },
+      "put": {
+        "summary": "PUT /api/kv/{ns}/value",
+        "tags": [
+          "kv"
+        ],
+        "parameters": [
+          {
+            "name": "ns",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "x-permission": "any signed-in user",
         "responses": {
@@ -342,6 +549,98 @@
     "/api/me/password": {
       "post": {
         "summary": "POST /api/me/password",
+        "tags": [
+          "me"
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/me/totp": {
+      "get": {
+        "summary": "GET /api/me/totp",
+        "tags": [
+          "me"
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/me/totp/disable": {
+      "post": {
+        "summary": "POST /api/me/totp/disable",
+        "tags": [
+          "me"
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/me/totp/enable": {
+      "post": {
+        "summary": "POST /api/me/totp/enable",
+        "tags": [
+          "me"
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/me/totp/setup": {
+      "post": {
+        "summary": "POST /api/me/totp/setup",
         "tags": [
           "me"
         ],
@@ -931,6 +1230,39 @@
         }
       }
     },
+    "/api/zones/{zid}/clone-settings": {
+      "post": {
+        "summary": "POST /api/zones/{zid}/clone-settings",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
     "/api/zones/{zid}/dmarc": {
       "post": {
         "summary": "POST /api/zones/{zid}/dmarc",
@@ -964,9 +1296,108 @@
         }
       }
     },
+    "/api/zones/{zid}/dns/export": {
+      "get": {
+        "summary": "GET /api/zones/{zid}/dns/export",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/zones/{zid}/dns/import": {
+      "post": {
+        "summary": "POST /api/zones/{zid}/dns/import",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
     "/api/zones/{zid}/email-security": {
       "get": {
         "summary": "GET /api/zones/{zid}/email-security",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/zones/{zid}/export": {
+      "get": {
+        "summary": "GET /api/zones/{zid}/export",
         "tags": [
           "zones"
         ],
@@ -1157,6 +1588,306 @@
           }
         ],
         "x-permission": "depends on the rule type: read to view, rules.write (or security.write for custom rules) to change",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/zones/{zid}/snapshots": {
+      "get": {
+        "summary": "GET /api/zones/{zid}/snapshots",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      },
+      "post": {
+        "summary": "POST /api/zones/{zid}/snapshots",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/zones/{zid}/snapshots/{sid}": {
+      "delete": {
+        "summary": "DELETE /api/zones/{zid}/snapshots/{sid}",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/zones/{zid}/snapshots/{sid}/diff": {
+      "get": {
+        "summary": "GET /api/zones/{zid}/snapshots/{sid}/diff",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/zones/{zid}/snapshots/{sid}/restore": {
+      "post": {
+        "summary": "POST /api/zones/{zid}/snapshots/{sid}/restore",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/zones/{zid}/snippet-rules": {
+      "put": {
+        "summary": "PUT /api/zones/{zid}/snippet-rules",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/zones/{zid}/snippets/{name}": {
+      "delete": {
+        "summary": "DELETE /api/zones/{zid}/snippets/{name}",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      },
+      "put": {
+        "summary": "PUT /api/zones/{zid}/snippets/{name}",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
         "responses": {
           "200": {
             "description": "OK"

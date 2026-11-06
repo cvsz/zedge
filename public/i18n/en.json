@@ -115,5 +115,12 @@
   "primary_nav": "Primary navigation",
   "dark_theme": "Dark theme",
   "light_theme": "Light theme",
-  "sign_out": "Sign out"
+  "sign_out": "Sign out",
+  "menu": "Menu",
+  "cmd_palette_title": "Command palette",
+  "cmd_palette_placeholder": "Search commands…",
+  "cmd_palette_label": "Command palette",
+  "cmd_palette_empty": "No commands",
+  "cmd_palette_open": "Open",
+  "cmd_palette_no_results": "No results"
 }

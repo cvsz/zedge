@@ -103,5 +103,12 @@
   "approvals_page": "Approvals",
   "audit_page": "Audit",
   "settings_page": "Settings",
-  "language_updated": "Language updated successfully"
+  "language_updated": "Language updated successfully",
+  "zone": "Zone",
+  "no_domains": "No domains yet",
+  "add_domain": "Add domain",
+  "primary_nav": "Primary navigation",
+  "dark_theme": "Dark theme",
+  "light_theme": "Light theme",
+  "sign_out": "Sign out"
 }

@@ -103,5 +103,12 @@
   "approvals_page": "การอนุมัติ",
   "audit_page": "บันทึกการตรวจสอบ",
   "settings_page": "การตั้งค่า",
-  "language_updated": "เปลี่ยนภาษาสำเร็จ"
+  "language_updated": "เปลี่ยนภาษาสำเร็จ",
+  "zone": "โซน",
+  "no_domains": "ไม่มีโดเมน",
+  "add_domain": "เพิ่มโดเมน",
+  "primary_nav": "การนำทางหลัก",
+  "dark_theme": "โหมดมืด",
+  "light_theme": "โหมดสว่าง",
+  "sign_out": "ออกจากระบบ"
 }

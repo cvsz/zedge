@@ -72,18 +72,18 @@ function currentRoute() {
 
 function shell() {
   const route = currentRoute();
-  const zoneSelect = h('select', { 'aria-label': 'Zone', onchange: (e) => { pick(e.target.value); render(); } },
-    S.zones.length ? S.zones.map((z) => h('option', { value: z.id, selected: z.id === S.zoneId }, z.name)) : h('option', null, 'No domains yet'));
-  const acctSelect = S.accounts.length > 1 && h('label', { class: 'f' }, 'Account', h('select', { 'aria-label': 'Account', onchange: (e) => switchAccount(e.target.value) },
+  const zoneSelect = h('select', { 'aria-label': t('zone'), onchange: (e) => { pick(e.target.value); render(); } },
+    S.zones.length ? S.zones.map((z) => h('option', { value: z.id, selected: z.id === S.zoneId }, z.name)) : h('option', null, t('no_domains')));
+  const acctSelect = S.accounts.length > 1 && h('label', { class: 'f' }, t('account'), h('select', { 'aria-label': t('account'), onchange: (e) => switchAccount(e.target.value) },
     S.accounts.map((a) => h('option', { value: a.id, selected: a.id === S.accountId }, a.name || a.id))));
   const side = h('aside', { class: 'side' },
     h('div', { class: 'brand' }, h('div', { class: 'mark' }, 'ZE'), h('div', { class: 'col' }, h('strong', null, 'Zedge'), h('span', { class: 'xs mute' }, S.me ? `${S.me.name} · ${S.me.role}` : ''))),
-    can('domains.write') && h('a', { class: 'btn primary', href: '#/domains', id: 'add-domain-link' }, '+ Add domain'),
+    can('domains.write') && h('a', { class: 'btn primary', href: '#/domains', id: 'add-domain-link' }, '+ ' + t('add_domain')),
     acctSelect,
-    h('label', { class: 'f' }, 'Zone', zoneSelect),
-    h('nav', { class: 'nav', 'aria-label': 'Primary' }, allowedRoutes().map(([id, label]) => h('a', { href: `#/${id}`, 'aria-current': id === route[0] ? 'page' : 'false' }, label))),
-    h('div', { class: 'row' }, btn(document.documentElement.dataset.theme === 'light' ? 'Dark theme' : 'Light theme', async () => { setTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'); render(); }, 'link')),
-    h('div', { class: 'row' }, btn('Sign out', async () => { await api('POST', 'logout'); location.reload(); }, 'link')));
+    h('label', { class: 'f' }, t('zone'), zoneSelect),
+    h('nav', { class: 'nav', 'aria-label': t('primary_nav') }, allowedRoutes().map(([id, label]) => h('a', { href: `#/${id}`, 'aria-current': id === route[0] ? 'page' : 'false' }, t(label)))),
+    h('div', { class: 'row' }, btn(document.documentElement.dataset.theme === 'light' ? t('dark_theme') : t('light_theme'), async () => { setTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'); render(); }, 'link')),
+    h('div', { class: 'row' }, btn(t('sign_out'), async () => { await api('POST', 'logout'); location.reload(); }, 'link')));
   app.replaceChildren(h('div', { class: 'shell' }, side, h('main', { class: 'main', id: 'view' })));
 }
 

@@ -1,7 +1,7 @@
-import { h, fill, api, cf, cfAll, toast, run, badge, btn, card, field, input, empty, segmented, toggle, confirmAsk, secretBox, fmtDate, fmtNum, fmtBytes, setUnauthorizedHandler, ApiError } from './lib.js';
+import { h, fill, api, cf, cfAll, toast, run, badge, btn, card, field, input, empty, segmented, toggle, confirmAsk, secretBox, fmtDate, fmtNum, fmtBytes, setUnauthorizedHandler } from './lib.js';
 import { S, zone, can, statusKind, header, noZone, nsBox, pick } from './ctx.js';
 import { barChart, legend } from './charts.js';
-import { loadI18n, t, L, setLang, getLang } from './i18n.js';
+import { loadI18n, t } from './i18n.js';
 import { rulesView } from './views/rules.js';
 import { emailView } from './views/email.js';
 import { workersView } from './views/workers.js';
@@ -21,8 +21,8 @@ const app = document.getElementById('app');
 // Settings saved under the old product name (edge.*) move to zedge.* once, so nobody loses their theme or selected domain.
 try {
   for (const k of Object.keys(localStorage)) {
-    if (/^edge\.[A-Za-z]+$/.test(k) && localStorage.getItem(`z${k}`) === null) localStorage.setItem(`z${k}`, localStorage.getItem(k));
-    if (/^edge\.[A-Za-z]+$/.test(k)) localStorage.removeItem(k);
+    if (/^edge\.[A-Za-z]+$/.test(k) && localStorage.getItem(`z${k}`) === null) {localStorage.setItem(`z${k}`, localStorage.getItem(k));}
+    if (/^edge\.[A-Za-z]+$/.test(k)) {localStorage.removeItem(k);}
   }
 } catch { /* storage unavailable */ }
 
@@ -59,7 +59,7 @@ const allowedRoutes = () => ROUTES.filter((r) => can(r[4]));
 
 async function loadZones() {
   S.zones = (await cfAll('/zones')).sort((a, b) => a.name.localeCompare(b.name));
-  if (!S.zones.some((z) => z.id === S.zoneId)) S.zoneId = (S.zones[0] && S.zones[0].id) || '';
+  if (!S.zones.some((z) => z.id === S.zoneId)) {S.zoneId = (S.zones[0] && S.zones[0].id) || '';}
   localStorage.setItem('zedge.zone', S.zoneId);
 }
 
@@ -98,7 +98,7 @@ async function switchAccount(id) {
   localStorage.setItem('zedge.account', id);
   S.zoneId = '';
   localStorage.removeItem('zedge.zone');
-  for (const k of ['zedge.worker', 'zedge.bucket']) localStorage.removeItem(k);
+  for (const k of ['zedge.worker', 'zedge.bucket']) {localStorage.removeItem(k);}
   await loadZones();
   render();
 }
@@ -112,9 +112,9 @@ async function render() {
   const [, , fn, needsZone] = currentRoute();
   try {
     const node = needsZone && !zone() ? noZone() : await /** @type {any} */ (fn)();
-    if (seq === renderSeq) view.replaceChildren(node);
+    if (seq === renderSeq) {view.replaceChildren(node);}
   } catch (e) {
-    if (seq === renderSeq) view.replaceChildren(card('Something went wrong', h('div', { class: 'err' }, e.message), btn('Retry', render)));
+    if (seq === renderSeq) {view.replaceChildren(card('Something went wrong', h('div', { class: 'err' }, e.message), btn('Retry', render)));}
   }
 }
 S.render = render;
@@ -170,7 +170,7 @@ async function overviewView() {
   return h('div', { class: 'stack' },
     !can('zone.write') && h('div', { class: 'note' }, 'Your role is read-only. Changes on this page will be refused.'),
     header('Overview', zd.name, badge(zd.status, statusKind(zd.status)), btn('Purge everything', async () => {
-      if (!confirmAsk(`Purge the entire cache for ${zd.name}?`)) return;
+      if (!confirmAsk(`Purge the entire cache for ${zd.name}?`)) {return;}
       await cf('POST', `/zones/${z.id}/purge_cache`, { purge_everything: true });
       toast('Cache purge started');
     })),
@@ -188,7 +188,7 @@ async function overviewView() {
           !Object.keys(settings).length && empty('Settings could not be read. The token needs Zone Settings: Read.')),
         card('Purge by URL',
           h('div', { class: 'row end' }, field('URL', purgeUrl), btn('Purge URL', async () => {
-            if (!purgeUrl.value.trim()) throw new Error('Enter a URL');
+            if (!purgeUrl.value.trim()) {throw new Error('Enter a URL');}
             await cf('POST', `/zones/${z.id}/purge_cache`, { files: [purgeUrl.value.trim()] });
             toast('URL purge started'); purgeUrl.value = '';
           })))),
@@ -200,7 +200,7 @@ async function overviewView() {
           dnssec && dnssec.ds && h('div', { class: 'mono xs soft' }, dnssec.ds),
           dnssec && btn(dnssec.status === 'active' ? 'Disable DNSSEC' : 'Enable DNSSEC', async () => {
             const next = dnssec.status === 'active' ? 'disabled' : 'active';
-            if (next === 'disabled' && !confirmAsk('Disable DNSSEC? Remove the DS record at your registrar first or the domain may stop resolving.')) return;
+            if (next === 'disabled' && !confirmAsk('Disable DNSSEC? Remove the DS record at your registrar first or the domain may stop resolving.')) {return;}
             await cf('PATCH', `/zones/${z.id}/dnssec`, { status: next }); toast('DNSSEC updated'); render();
           }),
           h('div', { class: 'col' }, h('span', { class: 'xs mute' }, 'Nameservers'), nsBox(zd))))));
@@ -274,8 +274,8 @@ async function dnsView() {
       return h('div', { class: 'tr editing' }, h('span', { class: 'mute' }, r.type), n, c, prox, h('div', { class: 'row' },
         btn('Save', async () => {
           const body = {};
-          if (n.value.trim() && n.value.trim() !== r.name) body.name = n.value.trim();
-          if (c.value.trim() && c.value.trim() !== r.content) body.content = c.value.trim();
+          if (n.value.trim() && n.value.trim() !== r.name) {body.name = n.value.trim();}
+          if (c.value.trim() && c.value.trim() !== r.content) {body.content = c.value.trim();}
           if (Object.keys(body).length) { const res = await cf('PATCH', `/zones/${z.id}/dns_records/${r.id}`, body); Object.assign(r, res.result); toast('Record updated'); }
           editing = null; draw();
         }, 'primary'), btn('Cancel', () => { editing = null; draw(); })));
@@ -283,7 +283,7 @@ async function dnsView() {
     return h('div', { class: 'tr' }, h('span', { class: 'mute' }, r.type), h('span', null, r.name), h('span', { class: 'soft' }, r.content), prox, h('div', { class: 'row' },
       btn('Edit', () => { editing = r.id; draw(); }),
       btn('Delete', async () => {
-        if (!confirmAsk(`Delete ${r.type} record ${r.name}?`)) return;
+        if (!confirmAsk(`Delete ${r.type} record ${r.name}?`)) {return;}
         await cf('DELETE', `/zones/${z.id}/dns_records/${r.id}`);
         records = records.filter((x) => x.id !== r.id); draw(); toast('Record deleted');
       }, 'danger')));
@@ -326,7 +326,7 @@ async function dnsView() {
   const adv = card('Advanced record', h('div', { class: 'row end' }, field('Type', at), field('Name', an), field('Content', ac), field('MX priority', ap), h('label', { class: 'check' }, ax, 'Proxied')),
     h('div', { class: 'row' }, btn('Save record', async () => {
       const body = { type: at.value, name: an.value.trim() || '@', content: ac.value.trim(), ttl: 1, proxied: ax.checked && ['A', 'AAAA', 'CNAME'].includes(at.value) };
-      if (at.value === 'MX') body.priority = Number(ap.value || 10);
+      if (at.value === 'MX') {body.priority = Number(ap.value || 10);}
       const res = await cf('POST', `/zones/${z.id}/dns_records`, body);
       records.unshift(res.result); draw(); toast('Record created');
     })));
@@ -335,7 +335,7 @@ async function dnsView() {
   // zone file import / export
   const zoneText = h('textarea', { class: 'code', 'aria-label': 'BIND zone file', spellcheck: 'false', placeholder: '$ORIGIN example.com.\nwww 300 IN A 203.0.113.10' });
   const zoneFile = h('input', { type: 'file', 'aria-label': 'Zone file to load' });
-  zoneFile.addEventListener('change', async () => { const f = zoneFile.files[0]; if (f) zoneText.value = await f.text(); });
+  zoneFile.addEventListener('change', async () => { const f = zoneFile.files[0]; if (f) {zoneText.value = await f.text();} });
   const proxiedImport = h('input', { type: 'checkbox', 'aria-label': 'Proxy imported records' });
   const importExport = can('dns.write') ? card('Import and export', h('span', { class: 'small soft' }, 'Export downloads every record as a BIND zone file. Import adds the records in a zone file; existing records are not removed.'),
     h('div', { class: 'row' }, h('a', { class: 'btn', href: `/api/zones/${z.id}/dns/export`, download: '' }, 'Export zone file')),
@@ -366,7 +366,7 @@ async function securityView() {
     h('div', { class: 'col' }, h('div', { class: 'row' }, h('strong', null, r.description || '(no description)'), badge(r.action, r.action === 'block' ? 'bad' : 'warn')), h('span', { class: 'mono xs mute' }, r.expression)),
     h('div', { class: 'row' }, toggle(r.enabled !== false, `Enable ${r.description || 'rule'}`, async (on) => { await api('PATCH', `${rbase}/${r.id}`, { enabled: on }); r.enabled = on; }),
       btn('Delete', async () => {
-        if (!confirmAsk('Delete this rule?')) return;
+        if (!confirmAsk('Delete this rule?')) {return;}
         await api('DELETE', `${rbase}/${r.id}`); rules = rules.filter((x) => x.id !== r.id); drawRules();
       }, 'danger')))) : empty('No custom rules yet.'));
   drawRules();
@@ -374,7 +374,7 @@ async function securityView() {
   const rx = h('textarea', { rows: '2', placeholder: '(http.request.uri.path eq "/xmlrpc.php")', 'aria-label': 'Rule expression' });
   const ra = h('select', { 'aria-label': 'Action' }, [['block', 'Block'], ['managed_challenge', 'Managed challenge'], ['js_challenge', 'JS challenge'], ['log', 'Log']].map(([v, t]) => h('option', { value: v }, t)));
   const create = card('Create custom rule', field('Description', rd), field('Expression', rx), h('div', { class: 'row end' }, field('Action', ra), btn('Create rule', async () => {
-    if (!rx.value.trim()) throw new Error('Enter an expression');
+    if (!rx.value.trim()) {throw new Error('Enter an expression');}
     const r = await api('POST', rbase, { description: rd.value.trim(), expression: rx.value.trim(), action: ra.value });
     rules = r.rules; drawRules(); rd.value = ''; rx.value = ''; toast('Rule created');
   }, 'primary')));
@@ -434,9 +434,9 @@ async function tokensView() {
       const holder = h('div');
       return h('div', { class: 'li' }, h('div', { class: 'col' }, h('div', { class: 'row' }, h('strong', { class: 'mono' }, t.name), badge(t.status, statusKind(t.status))), h('span', { class: 'xs mute' }, `expires ${fmtDate(t.expires_on)} · last used ${fmtDate(t.last_used_on)}`), holder),
         h('div', { class: 'row' }, btn('Roll', async () => {
-          if (!confirmAsk(`Roll ${t.name}? The old value stops working immediately.`)) return;
+          if (!confirmAsk(`Roll ${t.name}? The old value stops working immediately.`)) {return;}
           const r = await cf('PUT', `/user/tokens/${t.id}/value`, {}); holder.replaceChildren(secretBox('New value (shown once):', r.result));
-        }), btn('Revoke', async () => { if (!confirmAsk(`Revoke ${t.name}?`)) return; await cf('DELETE', `/user/tokens/${t.id}`); toast('Token revoked'); render(); }, 'danger')));
+        }), btn('Revoke', async () => { if (!confirmAsk(`Revoke ${t.name}?`)) {return;} await cf('DELETE', `/user/tokens/${t.id}`); toast('Token revoked'); render(); }, 'danger')));
     }) : empty('No tokens.')));
 
   const audit = card('Audit log', auditR.status === 'rejected' ? empty(`Not available: ${auditR.reason.message}`)
@@ -477,23 +477,23 @@ async function boot() {
   setUnauthorizedHandler(loginView);
   try {
     const sess = await api('GET', 'session');
-    if (!sess.signedIn) return loginView();
+    if (!sess.signedIn) {return loginView();}
     S.meta = await api('GET', 'meta');
     S.me = S.meta.me;
     S.accounts = S.meta.accounts || [];
     const saved = localStorage.getItem('zedge.account');
-    if (saved && !S.accounts.some((a) => a.id === saved)) localStorage.removeItem('zedge.account');
+    if (saved && !S.accounts.some((a) => a.id === saved)) {localStorage.removeItem('zedge.account');}
     S.accountId = S.meta.accountId || '';
-    if (S.meta.accountError) toast(`Account: ${S.meta.accountError}`, true);
+    if (S.meta.accountError) {toast(`Account: ${S.meta.accountError}`, true);}
     const exp = S.meta.token && S.meta.token.expires_on && new Date(S.meta.token.expires_on).getTime();
     if (exp) {
       const days = Math.ceil((exp - Date.now()) / 86400000);
-      if (days <= 14) toast(days <= 0 ? 'The Cloudflare API token has expired. Create a new one and restart the console.' : `The Cloudflare API token expires in ${days} day${days === 1 ? '' : 's'}.`, true);
+      if (days <= 14) {toast(days <= 0 ? 'The Cloudflare API token has expired. Create a new one and restart the console.' : `The Cloudflare API token expires in ${days} day${days === 1 ? '' : 's'}.`, true);}
     }
     await loadZones();
     const state = /** @type {any} */ (boot);
     if (!state.listening) { window.addEventListener('hashchange', render); state.listening = true; }
-    if (!S.zones.length && !location.hash && can('domains.write')) location.hash = '#/domains';
+    if (!S.zones.length && !location.hash && can('domains.write')) {location.hash = '#/domains';}
     render();
   } catch (e) {
     app.replaceChildren(h('div', { class: 'login' }, h('h1', null, 'Cannot reach Cloudflare'), h('div', { class: 'err' }, e.message), h('button', { class: 'btn', onclick: () => location.reload() }, 'Retry')));

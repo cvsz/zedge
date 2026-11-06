@@ -28,10 +28,10 @@ export function build(app) {
   const add = (p, method, op) => { (paths[p] ||= {})[method.toLowerCase()] = op; };
 
   for (const layer of app._router.stack) {
-    if (!layer.route) continue;
+    if (!layer.route) {continue;}
     const route = layer.route;
-    if (typeof route.path !== 'string' || (!route.path.startsWith('/api/') && route.path !== '/metrics')) continue;
-    if (route.path === '/api/cf/*') continue;
+    if (typeof route.path !== 'string' || (!route.path.startsWith('/api/') && route.path !== '/metrics')) {continue;}
+    if (route.path === '/api/cf/*') {continue;}
     const oasPath = route.path.replace(/:(\w+)/g, '{$1}');
     const perm = route.stack.map((h) => h.handle.permission).find(Boolean);
     const pub = ['/api/login', '/api/logout', '/api/session', '/api/oidc/login', '/api/oidc/callback', '/metrics'].includes(route.path);
@@ -57,4 +57,4 @@ export function build(app) {
   };
 }
 
-export let openApiSpec = null;
+export const openApiSpec = null;

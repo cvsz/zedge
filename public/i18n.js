@@ -12,7 +12,7 @@ export function setLang(l) {
 }
 
 export function getLang() {
-  try { const l = localStorage.getItem('zedge.lang'); if (l === 'en' || l === 'th') return l; } catch { /* ignore */ }
+  try { const l = localStorage.getItem('zedge.lang'); if (l === 'en' || l === 'th') {return l;} } catch { /* ignore */ }
   return 'en';
 }
 

@@ -3,16 +3,16 @@
 export function h(tag, props, ...kids) {
   const el = document.createElement(tag);
   for (const [k, v] of Object.entries(props || {})) {
-    if (v === undefined || v === null || v === false) continue;
-    if (k === 'class') el.className = v;
-    else if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.slice(2), v);
-    else if (k === 'value') el.value = v;
-    else if (k === 'checked' || k === 'disabled' || k === 'selected') el[k] = !!v;
-    else el.setAttribute(k, v === true ? '' : String(v));
+    if (v === undefined || v === null || v === false) {continue;}
+    if (k === 'class') {el.className = v;}
+    else if (k.startsWith('on') && typeof v === 'function') {el.addEventListener(k.slice(2), v);}
+    else if (k === 'value') {el.value = v;}
+    else if (k === 'checked' || k === 'disabled' || k === 'selected') {el[k] = !!v;}
+    else {el.setAttribute(k, v === true ? '' : String(v));}
   }
   const add = (kid) => {
-    if (kid === null || kid === undefined || kid === false) return;
-    if (Array.isArray(kid)) return kid.forEach(add);
+    if (kid === null || kid === undefined || kid === false) {return;}
+    if (Array.isArray(kid)) {return kid.forEach(add);}
     el.append(kid instanceof Node ? kid : document.createTextNode(String(kid)));
   };
   kids.forEach(add);
@@ -34,7 +34,7 @@ export const setUnauthorizedHandler = (fn) => { onUnauthorized = fn; };
 
 function baseHeaders() {
   const h0 = { 'X-Requested-With': 'zedge' };
-  try { const a = localStorage.getItem('zedge.account'); if (a) h0['X-Account-Id'] = a; } catch { /* storage unavailable */ }
+  try { const a = localStorage.getItem('zedge.account'); if (a) {h0['X-Account-Id'] = a;} } catch { /* storage unavailable */ }
   return h0;
 }
 
@@ -43,8 +43,8 @@ export async function apiRaw(method, path, body, headers = {}) {
   const res = await fetch(`/api/${path}`, { method, credentials: 'same-origin', headers: { ...baseHeaders(), 'Content-Type': 'application/octet-stream', ...headers }, body });
   let json = null;
   try { json = await res.json(); } catch { /* empty */ }
-  if (res.status === 401) onUnauthorized();
-  if (!res.ok) throw new ApiError(res.status, (json && json.error) || `Request failed (${res.status})`);
+  if (res.status === 401) {onUnauthorized();}
+  if (!res.ok) {throw new ApiError(res.status, (json && json.error) || `Request failed (${res.status})`);}
   return json;
 }
 
@@ -57,8 +57,8 @@ export async function api(method, path, body) {
   });
   let json = null;
   try { json = await res.json(); } catch { /* empty */ }
-  if (res.status === 401 && path !== 'login') onUnauthorized();
-  if (!res.ok) throw new ApiError(res.status, (json && json.error) || `Request failed (${res.status})`, json);
+  if (res.status === 401 && path !== 'login') {onUnauthorized();}
+  if (!res.ok) {throw new ApiError(res.status, (json && json.error) || `Request failed (${res.status})`, json);}
   return json;
 }
 export const cf = (method, path, body) => api(method, `cf${path}`, body);
@@ -70,7 +70,7 @@ export async function cfAll(path, query = {}) {
     const qs = new URLSearchParams({ ...query, page: String(page), per_page: '100' });
     const r = await cf('GET', `${path}?${qs}`);
     out.push(...(r.result || []));
-    if (page >= ((r.result_info && r.result_info.total_pages) || 1)) break;
+    if (page >= ((r.result_info && r.result_info.total_pages) || 1)) {break;}
   }
   return out;
 }
@@ -83,8 +83,8 @@ export function toast(msg, bad = false) {
 
 /** Run an async action with a disabled button and an error toast. */
 export async function run(btn, fn) {
-  if (btn) btn.disabled = true;
-  try { return await fn(); } catch (e) { toast(e.message || 'Something went wrong', true); return undefined; } finally { if (btn) btn.disabled = false; }
+  if (btn) {btn.disabled = true;}
+  try { return await fn(); } catch (e) { toast(e.message || 'Something went wrong', true); return undefined; } finally { if (btn) {btn.disabled = false;} }
 }
 
 // ---- components ----
@@ -136,8 +136,8 @@ export const fmtDate = (s) => (s ? new Date(s).toLocaleString() : 'never');
 
 export function svg(tag, attrs, ...kids) {
   const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
-  for (const [k, v] of Object.entries(attrs || {})) if (v !== undefined && v !== null) el.setAttribute(k, String(v));
-  for (const kid of kids.flat(Infinity)) if (kid !== null && kid !== undefined && kid !== false) el.append(kid instanceof Node ? kid : document.createTextNode(String(kid)));
+  for (const [k, v] of Object.entries(attrs || {})) {if (v !== undefined && v !== null) {el.setAttribute(k, String(v));}}
+  for (const kid of kids.flat(Infinity)) {if (kid !== null && kid !== undefined && kid !== false) {el.append(kid instanceof Node ? kid : document.createTextNode(String(kid)));}}
   return el;
 }
 

@@ -4,10 +4,10 @@ import { item, noAccount } from './kit.js';
 
 export async function pagesView() {
   const a = S.accountId;
-  if (!a) return noAccount();
+  if (!a) {return noAccount();}
   const projects = (await cf('GET', `/accounts/${a}/pages/projects`)).result || [];
   let selected = localStorage.getItem('zedge.pagesProject');
-  if (!projects.some((p) => p.name === selected)) selected = projects[0] && projects[0].name;
+  if (!projects.some((p) => p.name === selected)) {selected = projects[0] && projects[0].name;}
   const detail = h('div', { class: 'stack' });
   const list = h('div', { class: 'col' });
   const drawList = () => fill(list, projects.length ? projects.map((p) => h('button', { type: 'button', class: 'btn pick mono', 'aria-pressed': String(p.name === selected), onclick: () => { selected = p.name; localStorage.setItem('zedge.pagesProject', p.name); drawList(); show(); } }, p.name)) : empty('No Pages projects in this account.'));
@@ -28,13 +28,13 @@ export async function pagesView() {
         d.latest_stage && badge(d.latest_stage.status, d.latest_stage.status === 'success' ? 'ok' : d.latest_stage.status === 'failure' ? 'bad' : 'warn'),
         btn('Retry', async () => { await cf('POST', `${base}/deployments/${d.id}/retry`, {}); toast('Retry started'); await reload(); }),
         d.environment === 'production' && btn('Roll back to this', async () => {
-          if (!confirmAsk(`Send production traffic for ${selected} back to deployment ${d.id}?`)) return;
+          if (!confirmAsk(`Send production traffic for ${selected} back to deployment ${d.id}?`)) {return;}
           await cf('POST', `${base}/deployments/${d.id}/rollback`, {}); toast('Rolled back'); await reload();
         }, 'danger'))) : empty('No deployments yet.'));
 
     const dom = input({ placeholder: 'docs.example.com', 'aria-label': 'Custom domain' });
     const domains = card('Custom domains', (doms.result || []).length ? doms.result.map((d) => item(d.name, null, badge(d.status || 'pending', d.status === 'active' ? 'ok' : 'warn'),
-      btn('Remove', async () => { if (!confirmAsk(`Remove ${d.name} from ${selected}?`)) return; await cf('DELETE', `${base}/domains/${encodeURIComponent(d.name)}`); toast('Domain removed'); await reload(); }, 'danger'))) : empty('No custom domains.'),
+      btn('Remove', async () => { if (!confirmAsk(`Remove ${d.name} from ${selected}?`)) {return;} await cf('DELETE', `${base}/domains/${encodeURIComponent(d.name)}`); toast('Domain removed'); await reload(); }, 'danger'))) : empty('No custom domains.'),
       h('div', { class: 'row end' }, field('Add a domain', dom), btn('Add', async () => { await cf('POST', `${base}/domains`, { name: dom.value.trim().toLowerCase() }); toast('Domain added. It may take a few minutes to validate.'); await reload(); }, 'primary')));
 
     const env = selectOf('Environment', [['production', 'Production'], ['preview', 'Preview']], 'production');
@@ -45,10 +45,10 @@ export async function pagesView() {
       ['production', 'preview'].map((e) => {
         const ev = (p.deployment_configs && p.deployment_configs[e] && p.deployment_configs[e].env_vars) || {};
         return h('div', { class: 'col' }, h('strong', { class: 'small' }, e), Object.keys(ev).length ? Object.entries(ev).map(([k, v]) => item(k, v && v.type === 'plain_text' ? v.value : '(secret)',
-          btn('Delete', async () => { if (!confirmAsk(`Delete ${k} from ${e}?`)) return; await setVar(e, k, null); toast('Variable deleted'); await reload(); }, 'danger'))) : empty('None.'));
+          btn('Delete', async () => { if (!confirmAsk(`Delete ${k} from ${e}?`)) {return;} await setVar(e, k, null); toast('Variable deleted'); await reload(); }, 'danger'))) : empty('None.'));
       }),
       h('div', { class: 'row end' }, field('Environment', env), field('Name', vName), field('Value', vVal),
-        btn('Set variable', async () => { if (!vName.value.trim()) throw new Error('Enter a variable name'); await setVar(env.value, vName.value.trim(), { type: 'plain_text', value: vVal.value }); toast('Variable saved. It applies to the next deployment.'); await reload(); }, 'primary')));
+        btn('Set variable', async () => { if (!vName.value.trim()) {throw new Error('Enter a variable name');} await setVar(env.value, vName.value.trim(), { type: 'plain_text', value: vVal.value }); toast('Variable saved. It applies to the next deployment.'); await reload(); }, 'primary')));
 
     fill(detail, h('div', { class: 'row' }, h('strong', null, p.name), p.subdomain && h('span', { class: 'mono xs mute' }, p.subdomain), p.production_branch && badge(`branch ${p.production_branch}`)), deployments, domains, vars);
   }

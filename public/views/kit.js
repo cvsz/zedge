@@ -4,7 +4,7 @@ import { header, can } from '../ctx.js';
 
 export async function tabbedView({ title, sub, perm, tabs, builders, key }, ...args) {
   let tab = localStorage.getItem(key);
-  if (!builders[tab]) tab = tabs[0][0];
+  if (!builders[tab]) {tab = tabs[0][0];}
   const body = h('div', { class: 'stack' });
   const show = async (t) => {
     try { localStorage.setItem(key, t); } catch { /* storage unavailable */ }
@@ -23,7 +23,7 @@ export const item = (title, sub, ...actions) => h('div', { class: 'li' },
 
 export function table(rows) {
   const cols = [...new Set(rows.flatMap((r) => Object.keys(r)))];
-  if (!cols.length) return h('div', { class: 'empty' }, 'No rows.');
+  if (!cols.length) {return h('div', { class: 'empty' }, 'No rows.');}
   return h('div', { class: 'scroll' }, h('table', { class: 'tbl' },
     h('thead', null, h('tr', null, cols.map((c) => h('th', null, c)))),
     h('tbody', null, rows.map((r) => h('tr', null, cols.map((c) => h('td', { class: 'mono' }, r[c] === null || r[c] === undefined ? '' : typeof r[c] === 'object' ? JSON.stringify(r[c]) : String(r[c]))))))));

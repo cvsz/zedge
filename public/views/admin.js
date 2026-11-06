@@ -104,7 +104,7 @@ export async function accountView() {
   const cur = h('input', { type: 'password', autocomplete: 'current-password', 'aria-label': 'Current password' });
   const nw = h('input', { type: 'password', autocomplete: 'new-password', 'aria-label': 'New password' });
   const mine = S.me;
-  const langSel = h('select', { 'aria-label': 'Language', onchange: (e) => { setLang(e.target.value); toast('Language updated'); render(); } },
+  const langSel = h('select', { 'aria-label': 'Language', onchange: (e) => { setLang(e.target.value); toast('Language updated'); } },
     h('option', { value: 'en', selected: getLang() === 'en' }, t('language_english')),
     h('option', { value: 'th', selected: getLang() === 'th' }, t('language_thai')));
   return h('div', { class: 'stack' }, header('My account', `Signed in as ${mine.name} (${mine.role})`),

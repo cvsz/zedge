@@ -9,6 +9,8 @@ export class CFError extends Error {
   }
 }
 
+import { recordCfCall } from './metrics.js';
+
 /** @param {{ token: string, apiBase: string, fetchImpl?: typeof fetch }} options */
 export function createCF({ token, apiBase, fetchImpl = fetch }) {
   /** @param {string} method @param {string} path @param {{ body?: any, query?: any, form?: any }} [opts] */
@@ -25,6 +27,8 @@ export function createCF({ token, apiBase, fetchImpl = fetch }) {
     });
     let json = null;
     try { json = await res.json(); } catch { /* non-JSON error page */ }
+    const success = res.ok && !(json && json.success === false);
+    recordCfCall(success);
     if (!res.ok || (json && json.success === false)) {
       throw new CFError(res.status || 502, json && json.errors, path);
     }

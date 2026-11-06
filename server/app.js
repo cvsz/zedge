@@ -34,7 +34,8 @@ export function createApp(config, opts = {}) {
   app.set('trust proxy', false);
   
   app.use((req, res, next) => {
-    res.on('finish', () => recordMetric(res.statusCode));
+    const start = Date.now();
+    res.on('finish', () => recordMetric(res.statusCode, Date.now() - start));
     next();
   });
 

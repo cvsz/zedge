@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import { verifyPassword, hashPassword, MIN_PASSWORD } from './store.js';
 import { HttpError, bad } from './errors.js';
 import { verifyTotp, hashRecovery } from './totp.js';
+import { recordLoginFailure, recordRateLimit } from './metrics.js';
 
 const COOKIE = 'zedge_session';
 const LOCAL_ADMIN = { name: 'local', role: 'admin', permissions: ['*'], zones: [], resources: {} };
@@ -72,7 +73,9 @@ export function createAuth(config, store, { alert = (_message) => {} } = {}) {
       next.count += 1;
       attempts.set(ip, next);
       if (next.count === 5) {alert(`Zedge: sign-in locked for ${ip} after repeated failures`);}
+      recordRateLimit();
       store.audit({ t: new Date().toISOString(), user: username, method: 'LOGIN', path: '/api/login', status: 401, ip });
+      recordLoginFailure();
       return res.status(401).json({ error: 'Incorrect username or password' });
     }
     // second factor: password first, then a code from the authenticator app (or a one-time recovery code)
@@ -88,6 +91,7 @@ export function createAuth(config, store, { alert = (_message) => {} } = {}) {
         attempts.set(ip, next);
         if (next.count === 5) {alert(`Zedge: sign-in locked for ${ip} after repeated failures`);}
         store.audit({ t: new Date().toISOString(), user: u.name, method: 'LOGIN', path: '/api/login (2fa)', status: 401, ip });
+        recordLoginFailure();
         return res.status(401).json({ error: 'That code is not valid, or was already used', totpRequired: true });
       }
     }

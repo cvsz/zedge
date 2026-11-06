@@ -1,4 +1,5 @@
 import { h, fill, api, toast, badge, btn, card, field, input, empty, confirmAsk, fmtDate, selectOf, secretBox } from '../lib.js';
+import { t, setLang, getLang } from '../i18n.js';
 import { S, header } from '../ctx.js';
 
 function twoFactorCard(enabled) {
@@ -103,10 +104,14 @@ export async function accountView() {
   const cur = h('input', { type: 'password', autocomplete: 'current-password', 'aria-label': 'Current password' });
   const nw = h('input', { type: 'password', autocomplete: 'new-password', 'aria-label': 'New password' });
   const mine = S.me;
+  const langSel = h('select', { 'aria-label': 'Language', onchange: (e) => { setLang(e.target.value); toast('Language updated'); render(); } },
+    h('option', { value: 'en', selected: getLang() === 'en' }, t('language_english')),
+    h('option', { value: 'th', selected: getLang() === 'th' }, t('language_thai')));
   return h('div', { class: 'stack' }, header('My account', `Signed in as ${mine.name} (${mine.role})`),
     card('Change password', h('div', { class: 'row end' }, field('Current password', cur), field('New password (12+ characters)', nw), btn('Change password', async () => {
       await api('POST', 'me/password', { current: cur.value, next: nw.value }); cur.value = ''; nw.value = ''; toast('Password changed');
     }, 'primary'))),
+    card('Language', h('div', { class: 'row end' }, field('Language', langSel))),
     twoFactorCard(totp.enabled),
     card('What your role allows', h('div', { class: 'mono small soft' }, mine.permissions.includes('*') ? 'Everything' : mine.permissions.join(', '))));
 }

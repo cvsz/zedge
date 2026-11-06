@@ -13,7 +13,10 @@ test('config refuses to start without a password or with a weak one', () => {
   assert.throws(() => loadConfig({ CLOUDFLARE_API_TOKEN: 't', DATA_DIR, ZEDGE_ADMIN_PASSWORD: 'short' }), /12 characters/);
   assert.throws(() => loadConfig({ DATA_DIR }), /CLOUDFLARE_API_TOKEN/);
   assert.doesNotThrow(() => loadConfig({ CLOUDFLARE_API_TOKEN: 't', DATA_DIR, ZEDGE_ALLOW_NO_AUTH: '1' }));
-  assert.throws(() => loadConfig({ CLOUDFLARE_API_TOKEN: 't', DATA_DIR, ZEDGE_ALLOW_NO_AUTH: '1', HOST: '0.0.0.0' }), /ZEDGE_ADMIN_PASSWORD/);
+  assert.throws(() => loadConfig({ CLOUDFLARE_API_TOKEN: 't', DATA_DIR, ZEDGE_ALLOW_NO_AUTH: '1', HOST: '0.0.0.0', COOKIE_SECURE: '1' }), /ZEDGE_ADMIN_PASSWORD/);
+  assert.doesNotThrow(() => loadConfig({ CLOUDFLARE_API_TOKEN: 't', DATA_DIR, ZEDGE_ADMIN_PASSWORD: 'correct horse battery', HOST: '127.0.0.1', COOKIE_SECURE: '0' }));
+  assert.doesNotThrow(() => loadConfig({ CLOUDFLARE_API_TOKEN: 't', DATA_DIR, ZEDGE_ADMIN_PASSWORD: 'correct horse battery', HOST: '0.0.0.0', COOKIE_SECURE: '1' }));
+  assert.throws(() => loadConfig({ CLOUDFLARE_API_TOKEN: 't', DATA_DIR, ZEDGE_ADMIN_PASSWORD: 'correct horse battery', HOST: '0.0.0.0', COOKIE_SECURE: '0' }), /COOKIE_SECURE=1/);
 });
 
 test('API requires a session', async () => {

@@ -5,11 +5,11 @@
   "type": "module",
   "private": true,
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "start": "node server/index.js",
-    "test": "node --test \"test/*.test.js\"",
+    "test": "node test/run.mjs",
     "deploy": "node scripts/deploy.mjs",
     "smoke": "node test/ui-smoke.mjs",
     "backup": "node scripts/backup.mjs",

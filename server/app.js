@@ -38,8 +38,6 @@ export function createApp(config, opts = {}) {
     next();
   });
 
-  app.get('/metrics', (req, res) => res.type('text/plain').send(getMetrics(store)));
-  app.get('/openapi.json', (req, res) => res.json(openApiSpec));
   // Behind a Cloudflare Tunnel every request arrives from cloudflared. Cloudflare sets CF-Connecting-IP to the real
   // client, so the login rate limit and audit log can use it. Only enable when the tunnel is the sole way in.
   if (config.trustCfIp) {
@@ -103,8 +101,8 @@ export function createApp(config, opts = {}) {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'no-referrer');
     res.setHeader('Cache-Control', 'no-store');
-    // HSTS - only on HTTPS (skip for now since we're on loopback)
-    if (req.secure) {
+    // HSTS when cookies are marked secure (tunnel or public HTTPS)
+    if (config.secureCookie) {
       res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
     }
     next();
@@ -137,6 +135,16 @@ export function createApp(config, opts = {}) {
     }
     next();
   });
+
+  // ---- authenticated-only endpoints ----
+  app.get('/metrics', auth.require, (req, res) => {
+    const token = req.get('authorization') || '';
+    const ok = config.metricsToken && token === `Bearer ${config.metricsToken}`;
+    const canReadAudit = can(req.user.permissions, 'audit.read');
+    if (!ok && !canReadAudit) return res.status(401).json({ error: 'Metrics require Bearer token or audit.read permission' });
+    res.type('text/plain').send(getMetrics(store));
+  });
+  app.get('/openapi.json', auth.require, (req, res) => res.json(openApiSpec));
 
   registerCore(app, ctx);
   registerRules(app, ctx);

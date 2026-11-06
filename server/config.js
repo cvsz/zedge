@@ -55,6 +55,10 @@ export function loadConfig(env = process.env) {
   if (!token) throw new Error('CLOUDFLARE_API_TOKEN is required');
 
   const host = env.HOST || '127.0.0.1';
+  const secureCookie = env.COOKIE_SECURE === '1';
+  if (!LOOPBACK.includes(host) && !secureCookie) {
+    throw new Error('COOKIE_SECURE=1 is required when HOST is not loopback. Set HOST=127.0.0.1 for local-only use.');
+  }
   // EDGE_* names are the pre-2.0 spellings and still work
   const password = env.ZEDGE_ADMIN_PASSWORD || env.EDGE_ADMIN_PASSWORD || '';
   const dataDir = path.resolve(env.DATA_DIR || './data');

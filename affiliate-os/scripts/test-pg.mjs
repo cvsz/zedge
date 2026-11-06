@@ -1,7 +1,7 @@
 // Runs the Affiliate OS suites against a real Postgres started from the `embedded-postgres` npm package.
 // Postgres refuses to run as root, so when started as root this re-executes itself as user "nobody".
 // Usage: npm run test:pg   (needs: npm i --no-save embedded-postgres)
-import { execFileSync, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';

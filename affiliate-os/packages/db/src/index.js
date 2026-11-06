@@ -12,7 +12,7 @@ import { openTemporaryPostgres } from './pg.js';
  * creates a throw-away database on that real server, so the same suites run against a real Postgres.
  */
 export async function openMemory() {
-  if (process.env.AFF_TEST_PG_URL) return openTemporaryPostgres(process.env.AFF_TEST_PG_URL);
+  if (process.env.AFF_TEST_PG_URL) {return openTemporaryPostgres(process.env.AFF_TEST_PG_URL);}
   const db = new PGlite();
   await db.waitReady;
   return db;

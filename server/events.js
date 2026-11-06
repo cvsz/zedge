@@ -1,6 +1,5 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
 
 /** In-memory event store for the test/dev environment */
 const events = [];
@@ -112,7 +111,7 @@ export function relay({ deliver } = {}) {
         // Default: just mark as relayed
         event.relayed = new Date().toISOString();
       }
-    } catch (e) {
+    } catch {
       // On delivery failure, keep in outbox
       remaining.push(event);
     }
@@ -145,7 +144,7 @@ export function consume({ consume: consumeFn } = {}) {
         // Mark as consumed
         event.consumed = new Date().toISOString();
       }
-    } catch (e) {
+    } catch {
       remaining.push(event);
     }
   }

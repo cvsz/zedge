@@ -54,7 +54,7 @@ export function usernameFor(claims) {
 }
 
 /** @param {any} config @param {any} store @param {any} auth @param {{ alert?: (message: string) => void, fetchImpl?: any }} [deps] */
-export function createOidc(config, store, auth, { alert = (_message) => {}, fetchImpl = fetch } = {}) {
+export function createOidc(config, store, auth, { alert = () => {}, fetchImpl = fetch } = {}) {
   const cfg = config.oidc;
   let discovery; let jwks;
   const getJson = async (url) => {

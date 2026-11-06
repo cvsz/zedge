@@ -15,7 +15,6 @@ function readAll(dir, out = []) {
 }
 
 test('THREAT-MODEL.md threats each have corresponding tests', () => {
-  const tm = fs.readFileSync(path.join(ROOT, 'THREAT-MODEL.md'), 'utf8');
   const files = readAll(path.join(ROOT, 'test'));
   const testText = files.map((f) => fs.readFileSync(f, 'utf8')).join('\n');
 
@@ -25,7 +24,7 @@ test('THREAT-MODEL.md threats each have corresponding tests', () => {
     T2: ['session', 'cookie', 'HttpOnly', 'SameSite'],
     T3: ['CSRF', 'X-Requested-With', 'zedge'],
     T4: ['innerHTML', 'CSP', 'Content-Security-Policy'],
-    T5: ['need\(', 'permissions', 'rbac'],
+    T5: ['need(', 'permissions', 'rbac'],
     T6: ['assertZone', 'zone', 'account'],
     T7: ['latest', 'dependency', 'npm'],
     T8: ['audit', 'audit.jsonl', 'auditTail'],

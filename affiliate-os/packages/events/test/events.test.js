@@ -5,8 +5,8 @@ import { makeEvent } from '@affiliate-os/contracts';
 import { eventPayloads } from '@affiliate-os/contracts/src/examples.js';
 import { publish, relay, createConsumer } from '../src/index.js';
 
-let db, A, B, sa, sb;
-before(async () => { db = await openMemory(); await createMigrator(db).up(); A = await provisionOrganization(db, 'A'); B = await provisionOrganization(db, 'B'); sa = scoped(db, A); sb = scoped(db, B); });
+let db, A, B, sa;
+before(async () => { db = await openMemory(); await createMigrator(db).up(); A = await provisionOrganization(db, 'A'); B = await provisionOrganization(db, 'B'); sa = scoped(db, A); scoped(db, B); });
 after(async () => { await db.close(); });
 const ev = (org, type = 'ClickRecorded', payload = eventPayloads[type]) => makeEvent({ type, organization_id: org, payload });
 const count = async (s, table, where = '') => Number((await s.query(`SELECT count(*) AS n FROM ${table} ${where}`)).rows[0].n);

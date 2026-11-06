@@ -22,7 +22,7 @@ function parseCookies(header = '') {
 }
 
 /** @param {any} config @param {any} store @param {{ alert?: (message: string) => void, metrics?: { recordLoginFailure(): void, recordRateLimit(): void } }} [deps] */
-export function createAuth(config, store, { alert = (_message) => {}, metrics } = {}) {
+export function createAuth(config, store, { alert = () => {}, metrics } = {}) {
   const attempts = new Map(); // ip -> { count, resetAt }
 
   function issue(res, username) {

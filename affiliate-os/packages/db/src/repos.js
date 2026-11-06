@@ -22,8 +22,8 @@ export const content = {
   /** Only approved content can be scheduled, and only for a future time. */
   schedule: async (q, id, when, now = () => new Date()) => {
     const t = new Date(when);
-    if (Number.isNaN(t.getTime())) throw new Error('scheduled time is not a date');
-    if (t.getTime() <= now().getTime()) throw new Error('scheduled time must be in the future');
+    if (Number.isNaN(t.getTime())) {throw new Error('scheduled time is not a date');}
+    if (t.getTime() <= now().getTime()) {throw new Error('scheduled time must be in the future');}
     return (await q.query("UPDATE content SET status = 'SCHEDULED', scheduled_for = $2, updated_at = now() WHERE id = $1 AND status = 'APPROVED'", [id, t.toISOString()])).affectedRows;
   },
   unschedule: async (q, id) => (await q.query("UPDATE content SET status = 'APPROVED', scheduled_for = NULL, updated_at = now() WHERE id = $1 AND status = 'SCHEDULED'", [id])).affectedRows,

@@ -14,12 +14,12 @@ function api(run) {
 export async function openPostgres({ connectionString, pool, max = 10, onError = () => {} } = {}) {
   let p = pool;
   if (!p) {
-    if (!connectionString) throw new Error('openPostgres needs a connectionString or a pool');
+    if (!connectionString) {throw new Error('openPostgres needs a connectionString or a pool');}
     const pg = (await import('pg')).default;
     p = new pg.Pool({ connectionString, max });
   }
   // An idle connection that the server drops (restart, failover, DROP DATABASE) emits 'error' on the pool; without a listener Node crashes.
-  if (typeof p.on === 'function') p.on('error', onError);
+  if (typeof p.on === 'function') {p.on('error', onError);}
   const db = {
     ...api(p),
     async transaction(fn) {

@@ -3,7 +3,7 @@
  * Keyboard only, announced to screen readers.
  */
 import { h, fill } from '../lib.js';
-import { S, zone, can } from '../ctx.js';
+import { S } from '../ctx.js';
 import { t } from '../i18n.js';
 
 const PALETTE_ID = 'cmd-palette';

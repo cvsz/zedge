@@ -13,7 +13,7 @@ test('ledger invariants hold for random spend sequences (seeded)', async () => {
     const r = rng(seed); const org = await provisionOrganization(db, `prop-${seed}`); const s = scoped(db, org);
     const cats = ['llm', 'storage', 'media']; const total = 200 + Math.floor(r() * 800); const per = Math.floor(total / 2);
     await s.tx(async (q) => { await costs.setBudget(q, { period_minor: total, currency: 'USD' }); await costs.setBudget(q, { category: 'llm', period_minor: per, currency: 'USD' }); });
-    const ops = Array.from({ length: 30 }, (_, i) => ({ category: pick(r, cats), amount_minor: Math.floor(r() * 120), currency: 'USD', idempotency_key: `k${Math.floor(r() * 18)}` }));
+    const ops = Array.from({ length: 30 }, () => ({ category: pick(r, cats), amount_minor: Math.floor(r() * 120), currency: 'USD', idempotency_key: `k${Math.floor(r() * 18)}` }));
     const run = async () => { const out = []; for (const o of ops) { try { out.push((await s.tx((q) => costs.record(q, o, () => new Date('2026-10-10')))).recorded); } catch { out.push('refused'); } } return out; };
     const first = await run();
     const sum1 = await s.tx((q) => costs.summary(q, '2026-10'));

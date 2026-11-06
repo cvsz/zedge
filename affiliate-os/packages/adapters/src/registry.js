@@ -6,7 +6,7 @@ const STALE_DAYS = 90;
 /** Declared status of a capability; anything not listed is 'unsupported'. */
 export function statusOf(provider, capability, reg = registry) {
   const p = reg.providers[provider];
-  if (!p) return 'unsupported';
+  if (!p) {return 'unsupported';}
   return p.status[capability] ?? p.status['*'] ?? 'unsupported';
 }
 
@@ -18,7 +18,7 @@ export function mayCallPlatform(provider, capability, reg = registry) {
 
 export function staleness(provider, now = new Date(), reg = registry) {
   const p = reg.providers[provider];
-  if (!p || !p.last_verified_at) return { stale: true, reason: 'never verified' };
+  if (!p || !p.last_verified_at) {return { stale: true, reason: 'never verified' };}
   const days = Math.floor((now - new Date(p.last_verified_at)) / 86400000);
   return days > STALE_DAYS ? { stale: true, reason: `${days} days old` } : { stale: false };
 }
@@ -28,9 +28,9 @@ export function checkRegistry(reg = registry) {
   const errs = [];
   for (const [name, p] of Object.entries(reg.providers)) {
     for (const [cap, st] of Object.entries(p.status)) {
-      if (cap !== '*' && !reg.capabilities.includes(cap)) errs.push(`${name}: unknown capability ${cap}`);
-      if (!STATUSES.has(st)) errs.push(`${name}.${cap}: unknown status ${st}`);
-      if (st === 'verified' && (!p.last_verified_at || !p.source_url)) errs.push(`${name}.${cap}: 'verified' needs last_verified_at and source_url`);
+      if (cap !== '*' && !reg.capabilities.includes(cap)) {errs.push(`${name}: unknown capability ${cap}`);}
+      if (!STATUSES.has(st)) {errs.push(`${name}.${cap}: unknown status ${st}`);}
+      if (st === 'verified' && (!p.last_verified_at || !p.source_url)) {errs.push(`${name}.${cap}: 'verified' needs last_verified_at and source_url`);}
     }
   }
   return errs;

@@ -40,10 +40,11 @@ export function getAllowedNext(from) {
  * @param {string} from - Current status
  * @param {string} to - Target status
  * @param {number} autonomyLevel - User's autonomy level (require higher for sensitive transitions)
- * @param {string} userId - User ID performing the transition
+ * @param {string} _userId - User ID performing the transition (unused, kept for API compatibility)
  * @returns {Object} Result with success flag and message
  */
-export function transitionStatus(from, to, autonomyLevel, userId) {
+export function transitionStatus(from, to, autonomyLevel, _userId) {
+  void _userId;
   if (!isValidTransition(from, to)) {
     return { success: false, error: `Invalid transition from ${from} to ${to}` };
   }

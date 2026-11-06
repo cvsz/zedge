@@ -1,4 +1,4 @@
-import { h, fill, api, toast, badge, btn, card, field, input, empty, confirmAsk, fmtDate, selectOf, secretBox } from '../lib.js';
+import { h, api, toast, badge, btn, card, field, input, empty, confirmAsk, fmtDate, selectOf, secretBox } from '../lib.js';
 import { t, setLang, getLang } from '../i18n.js';
 import { S, header } from '../ctx.js';
 

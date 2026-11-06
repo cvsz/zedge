@@ -6,7 +6,7 @@ import { setup } from '../../auth/test/helpers.js';
 import { createStudio, createAccessVerifier } from '../src/index.js';
 
 const ISS = 'https://team.cloudflareaccess.com', AUD = 'app-aud-tag';
-let env, server, base, key, now = Date.now();
+let env, server, base, key; const now = Date.now();
 const b64 = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
 const accessToken = (claims = {}, k = key) => { const h = b64({ alg: 'RS256', kid: k.kid }); const p = b64({ iss: ISS, aud: [AUD], sub: 's', email: 'x@example.com', exp: now / 1000 + 600, ...claims }); return `${h}.${p}.${crypto.sign('RSA-SHA256', Buffer.from(`${h}.${p}`), k.privateKey).toString('base64url')}`; };
 const call = async (method, path, { token, body, headers = {} } = {}) => { const r = await fetch(base + path, { method, headers: { ...(token ? { 'cf-access-jwt-assertion': token } : {}), ...(body ? { 'content-type': 'application/json', 'x-studio': '1' } : {}), ...headers }, body: body ? JSON.stringify(body) : undefined }); const t = await r.text(); let j; try { j = JSON.parse(t); } catch { j = t; } return { status: r.status, json: j, headers: r.headers }; };

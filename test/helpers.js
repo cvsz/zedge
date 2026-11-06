@@ -35,11 +35,11 @@ export async function boot({ env = {}, mockOpts, s3 = false } = {}) {
       set cookie(v) { cookie = v; },
       async login(username = 'admin', password = PASSWORD, code) {
         const r = await call('POST', '/api/login', { username, password, ...(code ? { code } : {}) });
-        if (r.ok) cookie = r.headers.get('set-cookie').split(';')[0];
+        if (r.ok) { cookie = r.headers.get('set-cookie').split(';')[0]; }
         return r;
       },
       async json(method, p, body, headers) { const r = await call(method, p, body, headers); return { status: r.status, body: await r.json().catch(() => null) }; }
     };
   };
-  return { app, mock, s3: s3m, base, config, dataDir, client, close: async () => { server.closeAllConnections(); server.close(); await mock.close(); if (s3m) await s3m.close(); } };
+  return { app, mock, s3: s3m, base, config, dataDir, client, close: async () => { server.closeAllConnections(); server.close(); await mock.close(); if (s3m) { await s3m.close(); } } };
 }

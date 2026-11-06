@@ -17,8 +17,8 @@ import { createStudio } from './server.js';
 export function readConfig(env = process.env) {
   const need = ['DATABASE_URL', 'ORGANIZATION_ID', 'SESSION_SECRET', 'ACCESS_TEAM_DOMAIN', 'ACCESS_AUD'];
   const missing = need.filter((k) => !env[k]);
-  if (missing.length) throw new Error(`Missing environment variables: ${missing.join(', ')}`);
-  if (env.SESSION_SECRET.length < 32) throw new Error('SESSION_SECRET must be at least 32 characters');
+  if (missing.length) {throw new Error(`Missing environment variables: ${missing.join(', ')}`);}
+  if (env.SESSION_SECRET.length < 32) {throw new Error('SESSION_SECRET must be at least 32 characters');}
   const team = env.ACCESS_TEAM_DOMAIN.replace(/^https?:\/\//, '').replace(/\/+$/, '');
   return { databaseUrl: env.DATABASE_URL, organizationId: env.ORGANIZATION_ID, sessionSecret: env.SESSION_SECRET, issuer: `https://${team}`, audience: env.ACCESS_AUD, metricsToken: env.METRICS_TOKEN || null, securityContact: env.SECURITY_CONTACT || null, host: env.HOST || '127.0.0.1', port: Number(env.PORT || 8790) };
 }
@@ -40,4 +40,4 @@ export async function start(env = process.env) {
   return { server, db };
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) start().catch((e) => { console.error(e.message); process.exit(1); });
+if (import.meta.url === `file://${process.argv[1]}`) {start().catch((e) => { console.error(e.message); process.exit(1); });}

@@ -35,6 +35,17 @@ export function createCF({ token, apiBase, fetchImpl = fetch, metrics }) {
 
   const cf = {
     raw,
+    /** @param {string} method @param {string} path @param {{ body?: any, query?: any, headers?: Record<string,string> }} [opts] Same as raw but returns the response body as text instead of parsing JSON. For KV values, zone files, etc. */
+    rawText: async (method, path, { body, query, headers = {} } = {}) => {
+      const url = new URL(apiBase + path);
+      for (const [k, v] of Object.entries(query || {})) {if (v !== undefined && v !== '') {url.searchParams.set(k, v);}}
+      const h = { Authorization: `Bearer ${token}`, Accept: '*/*', ...headers };
+      if (!headers['Content-Type']) {h['Content-Type'] = 'application/json';}
+      const res = await fetchImpl(url, { method, headers: h, body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(30000) });
+      if (metrics) { metrics.recordCfCall(res.ok); }
+      if (!res.ok) { throw new CFError(res.status || 502, undefined, path); }
+      return res.text();
+    },
     get: (p, query) => raw('GET', p, { query }),
     post: (p, body) => raw('POST', p, { body }),
     put: (p, body) => raw('PUT', p, { body }),

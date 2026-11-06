@@ -1,6 +1,6 @@
 import { h, cf, toast, badge, btn, card, field, input, empty, toggle, confirmAsk, selectOf, lines, secretBox, fmtDate } from '../lib.js';
 import { S, zone, can } from '../ctx.js';
-import { tabbedView, item, noAccount, textarea } from './kit.js';
+import { tabbedView, item, textarea } from './kit.js';
 
 const needZone = () => card('', empty('Add a domain first.'));
 

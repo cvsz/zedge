@@ -4,23 +4,6 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-const ID_CLASS = '[A-Za-z0-9_-]{6,64}';
-const NAME_CLASS = '[A-Za-z0-9][A-Za-z0-9_-]{0,62}';
-const DOMAIN_CLASS = '[A-Za-z0-9.-]{3,253}';
-const IMG_CLASS = '[A-Za-z0-9_./-]{6,128}';
-const BUCKET_CLASS = '[a-z0-9][a-z0-9-]{1,61}[a-z0-9]';
-const KEY_CLASS = '[a-z0-9_]{2,48}';
-
-function template(pattern) {
-  let n = 0;
-  let s = pattern;
-  for (const [cls, base] of [[ID_CLASS, 'id'], [NAME_CLASS, 'name'], [DOMAIN_CLASS, 'domain'], [IMG_CLASS, 'image'], [BUCKET_CLASS, 'bucket'], [KEY_CLASS, 'setting']]) {
-    s = s.split(cls).join(`{${base}}`);
-  }
-  s = s.replace(/\{(id|name|domain|image|bucket|setting)\}/g, (m, b) => { n += 1; return `{${b}${n}}`; });
-  s = s.replace(/\[a-z_\]\{5,50\}/g, '{phase}');
-  return s;
-}
 const params = (p) => [...p.matchAll(/\{(\w+)\}/g)].map((m) => ({ name: m[1], in: 'path', required: true, schema: { type: 'string' } }));
 
 export function build(app) {

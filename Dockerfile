@@ -1,4 +1,4 @@
-FROM node:25-alpine
+FROM node:22-alpine
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=8787 DATA_DIR=/data
 WORKDIR /app
 COPY package.json package-lock.json* ./

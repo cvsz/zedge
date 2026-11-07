@@ -1,4 +1,4 @@
-import { h, fill, api, toast, badge, btn, card, field, input, empty, confirmAsk, fmtDate, selectOf, secretBox } from '../lib.js';
+import { h, api, toast, badge, btn, card, field, input, empty, confirmAsk, fmtDate, selectOf, secretBox } from '../lib.js';
 import { t, setLang, getLang } from '../i18n.js';
 import { S, header } from '../ctx.js';
 
@@ -17,7 +17,7 @@ function twoFactorCard(enabled) {
         out.replaceChildren(h('div', { class: 'note' }, 'Save these recovery codes somewhere safe. Each works once if you lose your phone. They are not shown again.'), secretBox('Recovery codes', e.recoveryCodes.join('   ')));
       }, 'primary')));
   };
-  if (!enabled) return card('Two-factor sign-in', h('span', { class: 'small soft' }, 'Adds a code from your phone to your password. Strongly recommended for anyone who can change things.'), out, btn('Set up two-factor', start, 'primary'));
+  if (!enabled) {return card('Two-factor sign-in', h('span', { class: 'small soft' }, 'Adds a code from your phone to your password. Strongly recommended for anyone who can change things.'), out, btn('Set up two-factor', start, 'primary'));}
   return card('Two-factor sign-in', badge('on', 'ok'), h('span', { class: 'small soft' }, 'To turn it off, confirm with your password and a current code (or a recovery code).'),
     h('div', { class: 'row end' }, field('Password', pw), field('Code', off), btn('Turn off', async () => {
       await api('POST', 'me/totp/disable', { password: pw.value, code: off.value }); toast('Two-factor sign-in is off'); location.reload();
@@ -28,7 +28,7 @@ const RESOURCE_KINDS = [['workers', 'Workers (script names)'], ['buckets', 'R2 b
 
 function editZones(u, zones) {
   const old = document.getElementById('zone-editor');
-  if (old) old.remove();
+  if (old) {old.remove();}
   const boxes = zones.map((z) => ({ z, el: h('input', { type: 'checkbox', checked: u.zones.includes(z.id) }) }));
   const res = RESOURCE_KINDS.map(([k, label]) => ({ k, label, el: h('textarea', { rows: '2', class: 'code', 'aria-label': label, placeholder: 'one per line; empty = all', value: (u.resources[k] || []).join('\n') }) }));
   const panel = h('div', { id: 'zone-editor', class: 'card stack', role: 'group', 'aria-label': `Limits for ${u.name}` },
@@ -39,7 +39,7 @@ function editZones(u, zones) {
     res.map(({ label, el }) => h('label', { class: 'f' }, label, el)),
     h('div', { class: 'row end' }, btn('Cancel', async () => panel.remove()), btn('Save limits', async () => {
       const resources = {};
-      for (const { k, el } of res) { const list = el.value.split(/[\n,]+/).map((x) => x.trim()).filter(Boolean); if (list.length) resources[k] = list; }
+      for (const { k, el } of res) { const list = el.value.split(/[\n,]+/).map((x) => x.trim()).filter(Boolean); if (list.length) {resources[k] = list;} }
       await api('PATCH', `admin/users/${u.name}`, { zones: boxes.filter((x) => x.el.checked).map((x) => x.z.id), resources }); toast('Limits updated'); S.render();
     }, 'primary')));
   document.getElementById('view').prepend(panel);
@@ -61,9 +61,9 @@ export async function usersView() {
       btn('Set role', async () => { await api('PATCH', `admin/users/${u.name}`, { role: role.value }); toast('Role updated'); refresh(); }),
       !mine && btn(u.disabled ? 'Enable' : 'Disable', async () => { await api('PATCH', `admin/users/${u.name}`, { disabled: !u.disabled }); toast(u.disabled ? 'User enabled' : 'User disabled'); refresh(); }),
       btn('Limits…', () => editZones(u, S.zones)),
-      u.totp && btn('Reset 2FA', async () => { if (!confirmAsk(`Turn off two-factor for ${u.name}? They will sign in with just a password until they set it up again.`)) return; await api('PATCH', `admin/users/${u.name}`, { resetTotp: true }); toast('Two-factor reset'); refresh(); }),
+      u.totp && btn('Reset 2FA', async () => { if (!confirmAsk(`Turn off two-factor for ${u.name}? They will sign in with just a password until they set it up again.`)) {return;} await api('PATCH', `admin/users/${u.name}`, { resetTotp: true }); toast('Two-factor reset'); refresh(); }),
       !u.sso && pw, !u.sso && btn('Reset password', async () => { await api('PATCH', `admin/users/${u.name}`, { password: pw.value }); pw.value = ''; toast('Password changed'); }),
-      !mine && btn('Delete', async () => { if (!confirmAsk(`Delete user ${u.name}?`)) return; await api('DELETE', `admin/users/${u.name}`); toast('User deleted'); refresh(); }, 'danger')));
+      !mine && btn('Delete', async () => { if (!confirmAsk(`Delete user ${u.name}?`)) {return;} await api('DELETE', `admin/users/${u.name}`); toast('User deleted'); refresh(); }, 'danger')));
   });
 
   const un = input({ placeholder: 'alice', 'aria-label': 'New username' });
@@ -75,7 +75,7 @@ export async function usersView() {
 
   const roleRows = roles.map((r) => h('div', { class: 'li' }, h('div', { class: 'col' }, h('div', { class: 'row' }, h('strong', null, r.name), r.builtin && badge('built in')),
     h('span', { class: 'xs mute' }, r.permissions.includes('*') ? 'Everything' : r.permissions.join(', '))),
-  !r.builtin && btn('Delete', async () => { if (!confirmAsk(`Delete role ${r.name}?`)) return; await api('DELETE', `admin/roles/${r.name}`); toast('Role deleted'); refresh(); }, 'danger')));
+  !r.builtin && btn('Delete', async () => { if (!confirmAsk(`Delete role ${r.name}?`)) {return;} await api('DELETE', `admin/roles/${r.name}`); toast('Role deleted'); refresh(); }, 'danger')));
 
   const rn = input({ placeholder: 'dns-editor', 'aria-label': 'New role name' });
   const checks = Object.entries(perms).map(([k, desc]) => ({ k, el: h('input', { type: 'checkbox' }), desc }));
@@ -83,7 +83,7 @@ export async function usersView() {
     checks.map(({ k, el, desc }) => h('label', { class: 'perm' }, el, h('span', { class: 'col' }, h('strong', { class: 'mono small' }, k), h('span', { class: 'xs mute' }, desc)))),
     btn('Save role', async () => {
       const permissions = checks.filter((c) => c.el.checked).map((c) => c.k);
-      if (!permissions.length) throw new Error('Pick at least one permission');
+      if (!permissions.length) {throw new Error('Pick at least one permission');}
       await api('POST', 'admin/roles', { name: rn.value, permissions }); toast('Role saved'); refresh();
     }, 'primary'));
 

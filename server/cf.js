@@ -9,10 +9,8 @@ export class CFError extends Error {
   }
 }
 
-import { recordCfCall } from './metrics.js';
-
-/** @param {{ token: string, apiBase: string, fetchImpl?: typeof fetch }} options */
-export function createCF({ token, apiBase, fetchImpl = fetch }) {
+/** @param {{ token: string, apiBase: string, fetchImpl?: typeof fetch, metrics?: { recordCfCall(success: boolean): void } }} options */
+export function createCF({ token, apiBase, fetchImpl = fetch, metrics }) {
   /** @param {string} method @param {string} path @param {{ body?: any, query?: any, form?: any }} [opts] */
   async function raw(method, path, { body, query, form } = {}) {
     const url = new URL(apiBase + path);
@@ -28,7 +26,7 @@ export function createCF({ token, apiBase, fetchImpl = fetch }) {
     let json = null;
     try { json = await res.json(); } catch { /* non-JSON error page */ }
     const success = res.ok && !(json && json.success === false);
-    recordCfCall(success);
+    if (metrics) { metrics.recordCfCall(success); }
     if (!res.ok || (json && json.success === false)) {
       throw new CFError(res.status || 502, json && json.errors, path);
     }
@@ -37,6 +35,17 @@ export function createCF({ token, apiBase, fetchImpl = fetch }) {
 
   const cf = {
     raw,
+    /** @param {string} method @param {string} path @param {{ body?: any, query?: any, headers?: Record<string,string> }} [opts] Same as raw but returns the response body as text instead of parsing JSON. For KV values, zone files, etc. */
+    rawText: async (method, path, { body, query, headers = {} } = {}) => {
+      const url = new URL(apiBase + path);
+      for (const [k, v] of Object.entries(query || {})) {if (v !== undefined && v !== '') {url.searchParams.set(k, v);}}
+      const h = { Authorization: `Bearer ${token}`, Accept: '*/*', ...headers };
+      if (!headers['Content-Type']) {h['Content-Type'] = 'application/json';}
+      const res = await fetchImpl(url, { method, headers: h, body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(30000) });
+      if (metrics) { metrics.recordCfCall(res.ok); }
+      if (!res.ok) { throw new CFError(res.status || 502, undefined, path); }
+      return res.text();
+    },
     get: (p, query) => raw('GET', p, { query }),
     post: (p, body) => raw('POST', p, { body }),
     put: (p, body) => raw('PUT', p, { body }),

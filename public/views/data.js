@@ -7,7 +7,7 @@ const a = () => S.accountId;
 async function kvTab() {
   const nss = (await cf('GET', `/accounts/${a()}/storage/kv/namespaces`)).result || [];
   let sel = localStorage.getItem('zedge.kvNs');
-  if (!nss.some((n) => n.id === sel)) sel = nss[0] && nss[0].id;
+  if (!nss.some((n) => n.id === sel)) {sel = nss[0] && nss[0].id;}
   const detail = h('div', { class: 'stack' });
   const list = h('div', { class: 'col' });
   const drawList = () => fill(list, nss.length ? nss.map((n) => h('button', { type: 'button', class: 'btn pick', 'aria-pressed': String(n.id === sel), onclick: () => { sel = n.id; localStorage.setItem('zedge.kvNs', n.id); drawList(); show(); } }, n.title)) : empty('No namespaces.'));
@@ -26,7 +26,7 @@ async function kvTab() {
     fill(detail,
       card(`Keys (${keys.length}${keys.length >= 1000 ? '+' : ''})`, keys.length ? keys.slice(0, 200).map((k) => item(k.name, k.expiration ? `expires ${new Date(k.expiration * 1000).toLocaleString()}` : null,
         btn('Edit', async () => { const r = await api('GET', q(k.name)); key.value = k.name; val.value = r.value; key.scrollIntoView({ block: 'center' }); }),
-        btn('Delete', async () => { if (!confirmAsk(`Delete key ${k.name}?`)) return; await api('DELETE', q(k.name)); toast('Key deleted'); show(); }, 'danger'))) : empty('No keys.'), keys.length > 200 && h('div', { class: 'note' }, 'Showing the first 200 keys.')),
+        btn('Delete', async () => { if (!confirmAsk(`Delete key ${k.name}?`)) {return;} await api('DELETE', q(k.name)); toast('Key deleted'); show(); }, 'danger'))) : empty('No keys.'), keys.length > 200 && h('div', { class: 'note' }, 'Showing the first 200 keys.')),
       card('Add or change a value', field('Key', key), val, h('div', { class: 'row end' }, field('Expires after (optional)', ttl), btn('Save value', async () => {
         await api('PUT', q(key.value), { value: val.value, expirationTtl: ttl.value }); toast('Saved'); show();
       }, 'primary'))));
@@ -35,7 +35,7 @@ async function kvTab() {
   await show();
   return h('div', { class: 'grid2' }, h('div', { class: 'narrow' }, card('Namespaces', list,
     can('data.access') && [field('New namespace', title), btn('Create', async () => { await cf('POST', `/accounts/${a()}/storage/kv/namespaces`, { title: title.value.trim() }); toast('Namespace created'); location.reload(); }, 'primary'),
-      sel && btn('Delete selected namespace', async () => { const n = nss.find((x) => x.id === sel); if (!confirmAsk(`Delete namespace ${n.title} and ALL its keys? This cannot be undone.`)) return; await cf('DELETE', `/accounts/${a()}/storage/kv/namespaces/${sel}`); toast('Namespace deleted'); location.reload(); }, 'danger')])),
+      sel && btn('Delete selected namespace', async () => { const n = nss.find((x) => x.id === sel); if (!confirmAsk(`Delete namespace ${n.title} and ALL its keys? This cannot be undone.`)) {return;} await cf('DELETE', `/accounts/${a()}/storage/kv/namespaces/${sel}`); toast('Namespace deleted'); location.reload(); }, 'danger')])),
   h('div', { class: 'wide' }, detail));
 }
 
@@ -48,7 +48,7 @@ async function d1Tab() {
   const out = h('div');
   return [
     card('D1 databases', dbs.length ? dbs.map((d) => item(d.name, d.uuid, d.num_tables !== undefined && badge(`${d.num_tables} tables`),
-      can('data.access') && btn('Delete', async () => { if (!confirmAsk(`Delete database ${d.name} and all its data? This cannot be undone.`)) return; await cf('DELETE', `/accounts/${a()}/d1/database/${d.uuid}`); toast('Database deleted'); location.reload(); }, 'danger'))) : empty('No databases.'),
+      can('data.access') && btn('Delete', async () => { if (!confirmAsk(`Delete database ${d.name} and all its data? This cannot be undone.`)) {return;} await cf('DELETE', `/accounts/${a()}/d1/database/${d.uuid}`); toast('Database deleted'); location.reload(); }, 'danger'))) : empty('No databases.'),
       can('data.access') && h('div', { class: 'row end' }, field('New database', name), btn('Create', async () => { await cf('POST', `/accounts/${a()}/d1/database`, { name: name.value.trim() }); toast('Database created'); location.reload(); }, 'primary'))),
     can('data.access') && dbs.length > 0 && card('SQL console', h('span', { class: 'small soft' }, 'Reads run as they are. INSERT, UPDATE, DELETE and schema changes need "Allow changes".'), field('Database', db), sql,
       h('label', { class: 'row small' }, allow, 'Allow changes'),
@@ -62,7 +62,7 @@ async function d1Tab() {
 async function queuesTab() {
   const qs = (await cf('GET', `/accounts/${a()}/queues`)).result || [];
   const name = input({ placeholder: 'jobs', 'aria-label': 'Queue name' });
-  return card('Queues', qs.length ? qs.map((q) => item(q.queue_name || q.name, q.queue_id || q.id, can('data.access') && btn('Delete', async () => { if (!confirmAsk(`Delete queue ${q.queue_name}? Messages in it are lost.`)) return; await cf('DELETE', `/accounts/${a()}/queues/${q.queue_id || q.id}`); toast('Queue deleted'); location.reload(); }, 'danger'))) : empty('No queues.'),
+  return card('Queues', qs.length ? qs.map((q) => item(q.queue_name || q.name, q.queue_id || q.id, can('data.access') && btn('Delete', async () => { if (!confirmAsk(`Delete queue ${q.queue_name}? Messages in it are lost.`)) {return;} await cf('DELETE', `/accounts/${a()}/queues/${q.queue_id || q.id}`); toast('Queue deleted'); location.reload(); }, 'danger'))) : empty('No queues.'),
     can('data.access') && h('div', { class: 'row end' }, field('New queue', name), btn('Create', async () => { await cf('POST', `/accounts/${a()}/queues`, { queue_name: name.value.trim() }); toast('Queue created'); location.reload(); }, 'primary')));
 }
 
@@ -70,7 +70,7 @@ async function mediaTab() {
   const [st, im] = await Promise.allSettled([cf('GET', `/accounts/${a()}/stream`), cf('GET', `/accounts/${a()}/images/v1`)]);
   const videos = st.status === 'fulfilled' ? (Array.isArray(st.value.result) ? st.value.result : []) : [];
   const images = im.status === 'fulfilled' ? ((im.value.result && im.value.result.images) || []) : [];
-  const del = (path, what) => async () => { if (!confirmAsk(`Delete ${what}? This cannot be undone.`)) return; await cf('DELETE', path); toast('Deleted'); location.reload(); };
+  const del = (path, what) => async () => { if (!confirmAsk(`Delete ${what}? This cannot be undone.`)) {return;} await cf('DELETE', path); toast('Deleted'); location.reload(); };
   return [
     card('Stream videos', h('span', { class: 'small soft' }, 'Uploading and encoding are done with the Cloudflare dashboard or API; here you can review and remove.'),
       st.status === 'rejected' ? h('div', { class: 'xs mute' }, `Not available: ${st.reason.message}`) : videos.length ? videos.map((v) => item((v.meta && v.meta.name) || v.uid, `${v.uid}${v.duration ? ` · ${Math.round(v.duration)}s` : ''}`, can('data.access') && btn('Delete', del(`/accounts/${a()}/stream/${v.uid}`, `video ${(v.meta && v.meta.name) || v.uid}`), 'danger'))) : empty('No videos.')),
@@ -79,6 +79,6 @@ async function mediaTab() {
 }
 
 export async function dataView() {
-  if (!S.accountId) return noAccount();
+  if (!S.accountId) {return noAccount();}
   return tabbedView({ title: 'Data', sub: 'KV, D1 and Queues', perm: 'data.access', key: 'zedge.dataTab', tabs: [['kv', 'KV'], ['d1', 'D1'], ['queues', 'Queues'], ['media', 'Stream & Images']], builders: { kv: kvTab, d1: d1Tab, queues: queuesTab, media: mediaTab } });
 }

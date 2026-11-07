@@ -5,14 +5,14 @@ const METHODS = ['GET', 'PUT', 'POST', 'DELETE', 'HEAD'];
 
 export async function storageView() {
   const a = S.accountId;
-  if (!a) return card('', empty('No Cloudflare account is available to this console.'));
+  if (!a) {return card('', empty('No Cloudflare account is available to this console.'));}
   const [bR, kvR, d1R, stR] = await Promise.allSettled([
     cf('GET', `/accounts/${a}/r2/buckets`), cf('GET', `/accounts/${a}/storage/kv/namespaces`), cf('GET', `/accounts/${a}/d1/database`), api('GET', 'r2/status')
   ]);
   const buckets = bR.status === 'fulfilled' ? ((bR.value.result && bR.value.result.buckets) || []) : [];
   const status = stR.status === 'fulfilled' ? stR.value : { objectAccess: false };
   let selected = localStorage.getItem('zedge.bucket');
-  if (!buckets.some((b) => b.name === selected)) selected = buckets[0] && buckets[0].name;
+  if (!buckets.some((b) => b.name === selected)) {selected = buckets[0] && buckets[0].name;}
   let tab = 'objects';
   const detail = h('div', { class: 'stack' });
   const list = h('div', { class: 'col' });
@@ -40,15 +40,15 @@ export async function storageView() {
           h('div', { class: 'col' }, h('span', { class: 'mono' }, o.key.slice(prefix.length)), h('span', { class: 'xs mute' }, `${fmtBytes(o.size)} · ${fmtDate(o.modified)}`)),
           h('div', { class: 'row' },
             h('a', { class: 'btn', href: `/api/r2/${bucket}/object?key=${encodeURIComponent(o.key)}`, download: '' }, 'Download'),
-            btn('Delete', async () => { if (!confirmAsk(`Delete ${o.key}?`)) return; await api('DELETE', `r2/${bucket}/object?key=${encodeURIComponent(o.key)}`); toast('Deleted'); load(); }, 'danger')))),
+            btn('Delete', async () => { if (!confirmAsk(`Delete ${o.key}?`)) {return;} await api('DELETE', `r2/${bucket}/object?key=${encodeURIComponent(o.key)}`); toast('Deleted'); load(); }, 'danger')))),
         !r.prefixes.length && !r.objects.length && empty('This folder is empty.'),
         r.truncated && h('div', { class: 'note' }, 'Showing the first 200 entries. Use a deeper folder to narrow the list.'));
     };
     await load('');
     return card('Objects', crumbs, box, h('div', { class: 'row end' }, field(`Upload to this folder (max ${fmtBytes(status.maxUploadBytes)})`, fileIn), btn('Upload', async () => {
       const f = fileIn.files[0];
-      if (!f) throw new Error('Choose a file first');
-      if (f.size > status.maxUploadBytes) throw new Error(`That file is larger than the ${fmtBytes(status.maxUploadBytes)} limit`);
+      if (!f) {throw new Error('Choose a file first');}
+      if (f.size > status.maxUploadBytes) {throw new Error(`That file is larger than the ${fmtBytes(status.maxUploadBytes)} limit`);}
       await apiRaw('PUT', `r2/${bucket}/object?key=${encodeURIComponent(prefix + f.name)}`, f, { 'x-object-content-type': f.type || 'application/octet-stream' });
       toast(`Uploaded ${f.name}`); fileIn.value = ''; load();
     }, 'primary')));
@@ -67,7 +67,7 @@ export async function storageView() {
         r.deleteObjectsTransition ? `delete after ${Math.round(r.deleteObjectsTransition.condition.maxAge / 86400)} days` : null,
         r.abortMultipartUploadsTransition ? `abort incomplete uploads after ${Math.round(r.abortMultipartUploadsTransition.condition.maxAge / 86400)} days` : null
       ].filter(Boolean).join(' · '))),
-      btn('Delete', async () => { if (!confirmAsk(`Delete rule ${r.id}?`)) return; await save(rules.filter((x) => x.id !== r.id)); }, 'danger'))) : empty('No lifecycle rules.'));
+      btn('Delete', async () => { if (!confirmAsk(`Delete rule ${r.id}?`)) {return;} await save(rules.filter((x) => x.id !== r.id)); }, 'danger'))) : empty('No lifecycle rules.'));
     draw();
     const id = input({ placeholder: 'expire-tmp', 'aria-label': 'Rule name' });
     const prefix = input({ placeholder: 'tmp/ (empty = whole bucket)', 'aria-label': 'Prefix' });
@@ -76,13 +76,13 @@ export async function storageView() {
     return [card('Lifecycle rules', box), card('Add a lifecycle rule', h('div', { class: 'row end' }, field('Name', id), field('Prefix', prefix), field('Delete objects after (days)', del), field('Abort incomplete uploads after (days)', abort),
       btn('Add rule', async () => {
         const name = id.value.trim();
-        if (!name) throw new Error('Give the rule a name');
+        if (!name) {throw new Error('Give the rule a name');}
         const delDays = Number(del.value); const abDays = Number(abort.value);
-        if (!delDays && !abDays) throw new Error('Set at least one of the two day counts');
-        if (rules.some((r) => r.id === name)) throw new Error('A rule with that name already exists');
+        if (!delDays && !abDays) {throw new Error('Set at least one of the two day counts');}
+        if (rules.some((r) => r.id === name)) {throw new Error('A rule with that name already exists');}
         const rule = { id: name, enabled: true, conditions: { prefix: prefix.value.trim() } };
-        if (delDays > 0) rule.deleteObjectsTransition = { condition: { type: 'Age', maxAge: Math.round(delDays * 86400) } };
-        if (abDays > 0) rule.abortMultipartUploadsTransition = { condition: { type: 'Age', maxAge: Math.round(abDays * 86400) } };
+        if (delDays > 0) {rule.deleteObjectsTransition = { condition: { type: 'Age', maxAge: Math.round(delDays * 86400) } };}
+        if (abDays > 0) {rule.abortMultipartUploadsTransition = { condition: { type: 'Age', maxAge: Math.round(abDays * 86400) } };}
         await save([...rules, rule]); id.value = ''; prefix.value = ''; del.value = ''; abort.value = '';
       }, 'primary')))];
   }
@@ -93,10 +93,10 @@ export async function storageView() {
     let rules = [];
     try { rules = ((await cf('GET', path)).result || {}).rules || []; } catch { rules = []; }
     const box = h('div');
-    const save = async (next) => { if (next.length) await cf('PUT', path, { rules: next }); else await cf('DELETE', path); rules = next; draw(); toast('CORS rules saved'); };
+    const save = async (next) => { if (next.length) {await cf('PUT', path, { rules: next });} else {await cf('DELETE', path);} rules = next; draw(); toast('CORS rules saved'); };
     const draw = () => fill(box, rules.length ? rules.map((r, i) => h('div', { class: 'li' },
       h('div', { class: 'col' }, h('strong', { class: 'mono' }, (r.allowed.origins || []).join(', ')), h('span', { class: 'xs mute' }, `${(r.allowed.methods || []).join(', ')} · headers ${(r.allowed.headers || []).join(', ') || 'none'} · cache ${r.maxAgeSeconds || 0}s`)),
-      btn('Delete', async () => { if (!confirmAsk('Delete this CORS rule?')) return; await save(rules.filter((_, j) => j !== i)); }, 'danger'))) : empty('No CORS rules. Browsers on other sites cannot read this bucket directly.'));
+      btn('Delete', async () => { if (!confirmAsk('Delete this CORS rule?')) {return;} await save(rules.filter((_, j) => j !== i)); }, 'danger'))) : empty('No CORS rules. Browsers on other sites cannot read this bucket directly.'));
     draw();
     const origins = input({ placeholder: 'https://example.com, https://app.example.com', 'aria-label': 'Allowed origins' });
     const heads = input({ value: '*', 'aria-label': 'Allowed headers' });
@@ -107,8 +107,8 @@ export async function storageView() {
       h('div', { class: 'row end' }, field('Allowed headers', heads), field('Browser cache (seconds)', age), btn('Add rule', async () => {
         const o = lines(origins.value);
         const methods = checks.filter((c) => c.el.checked).map((c) => c.m);
-        if (!o.length) throw new Error('Enter at least one origin');
-        if (!methods.length) throw new Error('Choose at least one method');
+        if (!o.length) {throw new Error('Enter at least one origin');}
+        if (!methods.length) {throw new Error('Choose at least one method');}
         await save([...rules, { allowed: { methods, origins: o, headers: lines(heads.value) }, exposeHeaders: [], maxAgeSeconds: Number(age.value) || 0 }]); origins.value = '';
       }, 'primary')))];
   }

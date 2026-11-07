@@ -9,8 +9,8 @@ const short = (e) => String((e && e.message) || e).slice(0, 500);
  */
 export async function publish(q, envelope) {
   const v = validateEvent(envelope);
-  if (!v.valid) throw new Error(`Refusing to publish an invalid ${envelope && envelope.type} event: ${v.errors.join('; ')}`);
-  if (envelope.organization_id !== q.organizationId) throw new Error('An event can only be published for the organization of the current transaction');
+  if (!v.valid) {throw new Error(`Refusing to publish an invalid ${envelope && envelope.type} event: ${v.errors.join('; ')}`);}
+  if (envelope.organization_id !== q.organizationId) {throw new Error('An event can only be published for the organization of the current transaction');}
   await q.query('INSERT INTO outbox (organization_id, event_id, type, envelope) VALUES ($1,$2,$3,$4) ON CONFLICT (organization_id, event_id) DO NOTHING', [q.organizationId, envelope.id, envelope.type, JSON.stringify(envelope)]);
 }
 
@@ -24,7 +24,7 @@ export async function relay(db, organizationId, deliver, { batch = 100, maxAttem
   const rows = (await s.query('SELECT id, envelope, attempts FROM outbox WHERE published_at IS NULL ORDER BY id LIMIT $1', [batch])).rows;
   let sent = 0;
   for (const r of rows) {
-    if (r.attempts >= maxAttempts) return { sent, stuck: r.id };       // a human must look; nothing is dropped
+    if (r.attempts >= maxAttempts) {return { sent, stuck: r.id };}       // a human must look; nothing is dropped
     try {
       await deliver(r.envelope);
     } catch (e) {
@@ -43,7 +43,7 @@ export async function relay(db, organizationId, deliver, { batch = 100, maxAttem
  * event that does not validate, ends in the dead-letter queue with its error and attempt count. Nothing is dropped silently.
  */
 export function createConsumer({ db, name, handlers, maxAttempts = 3 }) {
-  if (!name) throw new Error('A consumer needs a name');
+  if (!name) {throw new Error('A consumer needs a name');}
 
   async function toDeadLetter(s, organizationId, envelope, error, attempts) {
     await s.query('INSERT INTO dead_letters (organization_id, consumer, event_id, envelope, error, attempts) VALUES ($1,$2,$3,$4,$5,$6)', [organizationId, name, envelope && /^[0-9a-f-]{36}$/i.test(String(envelope.id)) ? envelope.id : null, JSON.stringify(envelope ?? null), error, attempts]);
@@ -56,15 +56,15 @@ export function createConsumer({ db, name, handlers, maxAttempts = 3 }) {
     if (!v.valid) { await s.tx((q) => toDeadLetter(q, organizationId, envelope, `invalid event: ${v.errors.join('; ')}`, 0)); return 'dead'; }
     if (envelope.organization_id !== organizationId) { await s.tx((q) => toDeadLetter(q, organizationId, envelope, 'event belongs to a different organization', 0)); return 'dead'; }
     const handler = handlers[envelope.type];
-    if (!handler) return 'ignored';
+    if (!handler) {return 'ignored';}
 
     const dead = (await s.query('SELECT 1 FROM dead_letters WHERE consumer = $1 AND event_id = $2 AND replayed_at IS NULL', [name, envelope.id])).rows.length;
-    if (dead) return 'dead';
+    if (dead) {return 'dead';}
 
     try {
       return await s.tx(async (q) => {
         const fresh = await q.query('INSERT INTO processed_events (organization_id, consumer, event_id) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING', [organizationId, name, envelope.id]);
-        if (!fresh.affectedRows) return 'duplicate';
+        if (!fresh.affectedRows) {return 'duplicate';}
         await handler(q, envelope);
         return 'processed';
       });

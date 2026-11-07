@@ -1,0 +1,30 @@
+version: 2
+updates:
+  # Keep the console's npm dependencies current.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels: ["dependencies"]
+  # Keep Affiliate OS (present in the tree) current.
+  - package-ecosystem: "npm"
+    directory: "/affiliate-os"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels: ["dependencies"]
+  # Keep GitHub Actions pinned to current versions (we also SHA-pin them in ci.yml).
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels: ["dependencies"]
+  # Keep container base images current.
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels: ["dependencies"]

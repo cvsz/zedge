@@ -17,7 +17,7 @@ const token = `${h}.${p}.${crypto.sign('RSA-SHA256', Buffer.from(`${h}.${p}`), k
 const server = http.createServer(createStudio({ db: env.db, auth: env.auth, access: createAccessVerifier({ issuer: ISS, audience: AUD, keys: async () => [key.jwk] }), organizationId: env.orgA }));
 await new Promise((r) => server.listen(0, '127.0.0.1', r));
 const browser = await chromium.launch(); const page = await browser.newPage({ extraHTTPHeaders: { 'cf-access-jwt-assertion': token } });
-const problems = []; page.on('console', (m) => { if (/Content Security Policy|Refused/.test(m.text())) problems.push(m.text()); }); page.on('pageerror', (e) => problems.push(String(e)));
+const problems = []; page.on('console', (m) => { if (/Content Security Policy|Refused/.test(m.text())) {problems.push(m.text());} }); page.on('pageerror', (e) => problems.push(String(e)));
 await page.goto(`http://127.0.0.1:${server.address().port}/`);
 await page.waitForSelector('.week .card');
 const text = await page.locator('.week').innerText();

@@ -29,14 +29,14 @@ export async function verify(q, { anchor } = {}) {
   let expected = 1;
   for (const r of rows) {
     const e = { organization_id: r.organization_id, seq: Number(r.seq), ts: new Date(r.ts).toISOString(), actor: r.actor, action: r.action, subject_type: r.subject_type, subject_id: r.subject_id, detail: r.detail, prev_hash: r.prev_hash };
-    if (e.seq !== expected) return { ok: false, count: rows.length, brokenAt: expected, reason: 'sequence gap (an entry is missing)' };
-    if (r.prev_hash !== prev) return { ok: false, count: rows.length, brokenAt: e.seq, reason: 'chain link does not match the previous entry' };
-    if (hashEntry(e) !== r.hash) return { ok: false, count: rows.length, brokenAt: e.seq, reason: 'entry content does not match its hash' };
+    if (e.seq !== expected) {return { ok: false, count: rows.length, brokenAt: expected, reason: 'sequence gap (an entry is missing)' };}
+    if (r.prev_hash !== prev) {return { ok: false, count: rows.length, brokenAt: e.seq, reason: 'chain link does not match the previous entry' };}
+    if (hashEntry(e) !== r.hash) {return { ok: false, count: rows.length, brokenAt: e.seq, reason: 'entry content does not match its hash' };}
     prev = r.hash; expected += 1;
   }
   if (anchor) {
     const hit = rows.find((r) => Number(r.seq) === anchor.seq);
-    if (!hit || hit.hash !== anchor.hash) return { ok: false, count: rows.length, brokenAt: anchor.seq, reason: 'the anchored entry is missing or changed (the log was truncated or rewritten)' };
+    if (!hit || hit.hash !== anchor.hash) {return { ok: false, count: rows.length, brokenAt: anchor.seq, reason: 'the anchored entry is missing or changed (the log was truncated or rewritten)' };}
   }
   return { ok: true, count: rows.length, head: rows.length ? { seq: Number(rows.at(-1).seq), hash: rows.at(-1).hash } : null };
 }

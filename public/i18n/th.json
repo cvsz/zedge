@@ -103,6 +103,11 @@
   "approvals_page": "การอนุมัติ",
   "audit_page": "บันทึกการตรวจสอบ",
   "settings_page": "การตั้งค่า",
+  "email": "อีเมล",
+  "rules_page": "กฎ",
+  "edge": "เอดจ์",
+  "pages_page": "เพจ",
+  "zerotrust": "ซีโร่ทรัสต์",
   "language_updated": "เปลี่ยนภาษาสำเร็จ",
   "zone": "โซน",
   "no_domains": "ไม่มีโดเมน",
@@ -110,5 +115,12 @@
   "primary_nav": "การนำทางหลัก",
   "dark_theme": "โหมดมืด",
   "light_theme": "โหมดสว่าง",
-  "sign_out": "ออกจากระบบ"
+  "sign_out": "ออกจากระบบ",
+  "menu": "เมนู",
+  "cmd_palette_title": "แผงคำสั่ง",
+  "cmd_palette_placeholder": "ค้นหาคำสั่ง…",
+  "cmd_palette_label": "แผงคำสั่ง",
+  "cmd_palette_empty": "ไม่พบคำสั่ง",
+  "cmd_palette_open": "เปิด",
+  "cmd_palette_no_results": "ไม่พบผลลัพธ์"
 }

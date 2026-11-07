@@ -76,9 +76,56 @@ export const ALLOWED = [
   rule('PUT', `/accounts/${ID}/r2/buckets/${BUCKET}/cors`, 'r2.write'),
   rule('DELETE', `/accounts/${ID}/r2/buckets/${BUCKET}/cors`, 'r2.write'),
 
+  // SSL / certificates
+  rule('GET', `/zones/${ID}/ssl/certificate_packs`, 'ssl.write'),
+  rule('POST', `/zones/${ID}/ssl/certificate_packs/order`, 'ssl.write'),
+  rule('DELETE', `/zones/${ID}/ssl/certificate_packs/${ID}`, 'ssl.write'),
+  rule('GET', `/zones/${ID}/ssl/universal/settings`, 'ssl.write'),
+  rule('PATCH', `/zones/${ID}/ssl/universal/settings`, 'ssl.write'),
+  rule('GET', `/zones/${ID}/origin_tls_client_auth/settings`, 'ssl.write'),
+  rule('PUT', `/zones/${ID}/origin_tls_client_auth/settings`, 'ssl.write'),
+  rule('GET', `/certificates`, 'ssl.write'),
+  rule('POST', `/certificates`, 'ssl.write'),
+  rule('DELETE', `/certificates/${ID}`, 'ssl.write'),
+
+  // Turnstile
+  rule('GET', `/accounts/${ID}/challenges/widgets`, 'security.write'),
+  rule('POST', `/accounts/${ID}/challenges/widgets`, 'security.write'),
+  rule('POST', `/accounts/${ID}/challenges/widgets/${ID}/rotate_secret`, 'security.write'),
+  rule('DELETE', `/accounts/${ID}/challenges/widgets/${ID}`, 'security.write'),
+
+  // Bot management
+  rule('GET', `/zones/${ID}/bot_management`, 'security.write'),
+  rule('PUT', `/zones/${ID}/bot_management`, 'security.write'),
+
+  // Logpush
+  rule('GET', `/zones/${ID}/logpush/jobs`, 'zone.write'),
+  rule('POST', `/zones/${ID}/logpush/jobs`, 'zone.write'),
+  rule('PUT', `/zones/${ID}/logpush/jobs/${ID}`, 'zone.write'),
+  rule('DELETE', `/zones/${ID}/logpush/jobs/${ID}`, 'zone.write'),
+  rule('POST', `/zones/${ID}/logpush/ownership`, 'zone.write'),
+
+  // Workers routes, custom domains and cron schedules
+  rule('GET', `/zones/${ID}/workers/routes`, 'workers.write'),
+  rule('POST', `/zones/${ID}/workers/routes`, 'workers.write'),
+  rule('DELETE', `/zones/${ID}/workers/routes/${ID}`, 'workers.write'),
+  rule('GET', `/accounts/${ID}/workers/domains`, 'workers.write'),
+  rule('PUT', `/accounts/${ID}/workers/domains`, 'workers.write'),
+  rule('DELETE', `/accounts/${ID}/workers/domains/${ID}`, 'workers.write'),
+  rule('GET', `/accounts/${ID}/workers/scripts/${ID}/schedules`, 'workers.write'),
+  rule('PUT', `/accounts/${ID}/workers/scripts/${ID}/schedules`, 'workers.write'),
+
+  // Snippets
+  rule('GET', `/zones/${ID}/snippets`, 'workers.write'),
+  rule('PUT', `/zones/${ID}/snippets/${ID}`, 'workers.write'),
+  rule('DELETE', `/zones/${ID}/snippets/${ID}`, 'workers.write'),
+  rule('GET', `/zones/${ID}/snippets/snippet_rules`, 'workers.write'),
+  rule('PUT', `/zones/${ID}/snippets/snippet_rules`, 'workers.write'),
+
   // Zero Trust
   rule('GET', `/accounts/${ID}/cfd_tunnel`),
   rule('GET', `/accounts/${ID}/cfd_tunnel/${ID}/configurations`),
+  rule('PUT', `/accounts/${ID}/cfd_tunnel/${ID}/configurations`, 'zerotrust.write'),
   rule('GET', `/accounts/${ID}/access/apps`),
   rule('POST', `/accounts/${ID}/access/apps`, 'zerotrust.write'),
   rule('PUT', `/accounts/${ID}/access/apps/${ID}`, 'zerotrust.write'),
@@ -87,15 +134,70 @@ export const ALLOWED = [
   rule('POST', `/accounts/${ID}/access/apps/${ID}/policies`, 'zerotrust.write'),
   rule('PUT', `/accounts/${ID}/access/apps/${ID}/policies/${ID}`, 'zerotrust.write'),
   rule('DELETE', `/accounts/${ID}/access/apps/${ID}/policies/${ID}`, 'zerotrust.write'),
+  rule('GET', `/accounts/${ID}/access/groups`, 'zerotrust.write'),
+  rule('POST', `/accounts/${ID}/access/groups`, 'zerotrust.write'),
+  rule('DELETE', `/accounts/${ID}/access/groups/${ID}`, 'zerotrust.write'),
+  rule('GET', `/accounts/${ID}/access/service_tokens`, 'zerotrust.write'),
+  rule('POST', `/accounts/${ID}/access/service_tokens`, 'zerotrust.write'),
+  rule('POST', `/accounts/${ID}/access/service_tokens/${ID}/rotate`, 'zerotrust.write'),
+  rule('DELETE', `/accounts/${ID}/access/service_tokens/${ID}`, 'zerotrust.write'),
   rule('GET', `/accounts/${ID}/devices/posture`),
   rule('POST', `/accounts/${ID}/devices/posture`, 'zerotrust.write'),
   rule('PUT', `/accounts/${ID}/devices/posture/${ID}`, 'zerotrust.write'),
   rule('DELETE', `/accounts/${ID}/devices/posture/${ID}`, 'zerotrust.write'),
+  rule('GET', `/accounts/${ID}/devices/policies`, 'zerotrust.write'),
+  rule('POST', `/accounts/${ID}/devices/policy`, 'zerotrust.write'),
+  rule('DELETE', `/accounts/${ID}/devices/policy/${ID}`, 'zerotrust.write'),
+  rule('GET', `/accounts/${ID}/gateway/lists`, 'zerotrust.write'),
   rule('GET', `/accounts/${ID}/gateway/rules`),
   rule('POST', `/accounts/${ID}/gateway/rules`, 'zerotrust.write'),
   rule('PUT', `/accounts/${ID}/gateway/rules/${ID}`, 'zerotrust.write'),
   rule('DELETE', `/accounts/${ID}/gateway/rules/${ID}`, 'zerotrust.write'),
-  rule('GET', `/accounts/${ID}/gateway/categories`)
+  rule('GET', `/accounts/${ID}/gateway/categories`),
+
+  // Load balancing
+  rule('GET', `/zones/${ID}/load_balancers`, 'lb.write'),
+  rule('POST', `/zones/${ID}/load_balancers`, 'lb.write'),
+  rule('PATCH', `/zones/${ID}/load_balancers/${ID}`, 'lb.write'),
+  rule('DELETE', `/zones/${ID}/load_balancers/${ID}`, 'lb.write'),
+  rule('GET', `/accounts/${ID}/load_balancers/pools`, 'lb.write'),
+  rule('POST', `/accounts/${ID}/load_balancers/pools`, 'lb.write'),
+  rule('PATCH', `/accounts/${ID}/load_balancers/pools/${ID}`, 'lb.write'),
+  rule('DELETE', `/accounts/${ID}/load_balancers/pools/${ID}`, 'lb.write'),
+  rule('GET', `/accounts/${ID}/load_balancers/monitors`, 'lb.write'),
+  rule('POST', `/accounts/${ID}/load_balancers/monitors`, 'lb.write'),
+  rule('DELETE', `/accounts/${ID}/load_balancers/monitors/${ID}`, 'lb.write'),
+  rule('GET', `/zones/${ID}/healthchecks`, 'lb.write'),
+  rule('POST', `/zones/${ID}/healthchecks`, 'lb.write'),
+  rule('DELETE', `/zones/${ID}/healthchecks/${ID}`, 'lb.write'),
+
+  // Storage (KV, D1, queues, stream, images)
+  rule('GET', `/accounts/${ID}/storage/kv/namespaces/${ID}/keys`, 'data.access'),
+  rule('GET', `/accounts/${ID}/storage/kv/namespaces/${ID}/values/(.+)`, 'data.access'),
+  rule('PUT', `/accounts/${ID}/storage/kv/namespaces/${ID}/values/(.+)`, 'data.access'),
+  rule('DELETE', `/accounts/${ID}/storage/kv/namespaces/${ID}/values/(.+)`, 'data.access'),
+  rule('POST', `/accounts/${ID}/storage/kv/namespaces`, 'data.access'),
+  rule('DELETE', `/accounts/${ID}/storage/kv/namespaces/${ID}`, 'data.access'),
+  rule('POST', `/accounts/${ID}/d1/database`, 'data.access'),
+  rule('DELETE', `/accounts/${ID}/d1/database/${ID}`, 'data.access'),
+  rule('GET', `/accounts/${ID}/queues`, 'data.access'),
+  rule('POST', `/accounts/${ID}/queues`, 'data.access'),
+  rule('DELETE', `/accounts/${ID}/queues/${ID}`, 'data.access'),
+  rule('GET', `/accounts/${ID}/stream`, 'data.access'),
+  rule('DELETE', `/accounts/${ID}/stream/${ID}`, 'data.access'),
+  rule('GET', `/accounts/${ID}/images/v1`, 'data.access'),
+  rule('DELETE', `/accounts/${ID}/images/v1/(.+)`, 'data.access'),
+
+  // Pages
+  rule('GET', `/accounts/${ID}/pages/projects`, 'pages.write'),
+  rule('POST', `/accounts/${ID}/pages/projects`, 'pages.write'),
+  rule('GET', `/accounts/${ID}/pages/projects/${ID}`, 'pages.write'),
+  rule('PATCH', `/accounts/${ID}/pages/projects/${ID}`, 'pages.write'),
+  rule('GET', `/accounts/${ID}/pages/projects/${ID}/deployments`, 'pages.write'),
+  rule('POST', `/accounts/${ID}/pages/projects/${ID}/deployments/(retry|rollback)`, 'pages.write'),
+  rule('GET', `/accounts/${ID}/pages/projects/${ID}/domains`, 'pages.write'),
+  rule('POST', `/accounts/${ID}/pages/projects/${ID}/domains`, 'pages.write'),
+  rule('DELETE', `/accounts/${ID}/pages/projects/${ID}/domains/(.+)`, 'pages.write')
 ];
 
 const QUERY_KEY = /^[a-z_.]{1,40}$/;

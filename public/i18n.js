@@ -2,7 +2,7 @@
  * Loads public/i18n/{lang}.json and exposes t(key) for UI strings.
  * Language persists in localStorage under 'zedge.lang'.
  */
-const EN = {};
+let EN = {};
 let TH = {};
 let lang = 'en';
 
@@ -12,12 +12,13 @@ export function setLang(l) {
 }
 
 export function getLang() {
-  try { const l = localStorage.getItem('zedge.lang'); if (l === 'en' || l === 'th') return l; } catch { /* ignore */ }
+  try { const l = localStorage.getItem('zedge.lang'); if (l === 'en' || l === 'th') {return l;} } catch { /* ignore */ }
   return 'en';
 }
 
 export async function loadI18n() {
   lang = getLang();
+  try { EN = await (await fetch('/public/i18n/en.json')).json(); } catch { EN = {}; }
   try { TH = await (await fetch('/public/i18n/th.json')).json(); } catch { TH = {}; }
 }
 

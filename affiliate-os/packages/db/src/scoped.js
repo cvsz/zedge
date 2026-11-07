@@ -10,7 +10,7 @@ export const hashOf = (v) => crypto.createHash('sha256').update(canonical(v)).di
  * Code here never builds the organization filter by hand and never accepts an organization id from a caller's data.
  */
 export function scoped(db, organizationId) {
-  if (!UUID.test(String(organizationId))) throw new Error('organizationId must be a UUID');
+  if (!UUID.test(String(organizationId))) {throw new Error('organizationId must be a UUID');}
   const tx = (fn) => db.transaction(async (t) => {
     await t.exec('SET LOCAL ROLE aff_app');
     await t.query("SELECT set_config('app.organization_id', $1, true)", [organizationId]);
@@ -29,7 +29,7 @@ export async function provisionOrganization(db, name) {
 
 /** Run as the read-only role for one organization (reports, exports). */
 export function readonly(db, organizationId) {
-  if (!UUID.test(String(organizationId))) throw new Error('organizationId must be a UUID');
+  if (!UUID.test(String(organizationId))) {throw new Error('organizationId must be a UUID');}
   return {
     query: (sql, params) => db.transaction(async (t) => {
       await t.exec('SET LOCAL ROLE aff_readonly');

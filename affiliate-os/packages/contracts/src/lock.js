@@ -10,7 +10,7 @@ export const LOCK_FILE = path.join(path.dirname(SCHEMA_DIR), 'contracts.lock.jso
 
 export function currentState() {
   const out = {};
-  for (const [name, s] of Object.entries(loadSchemas())) out[name] = { version: s['x-version'], hash: sha256(JSON.stringify(s)) };
+  for (const [name, s] of Object.entries(loadSchemas())) {out[name] = { version: s['x-version'], hash: sha256(JSON.stringify(s)) };}
   return out;
 }
 
@@ -19,11 +19,11 @@ export function compare(lock, now) {
   const problems = [];
   for (const [name, old] of Object.entries(lock)) {
     const cur = now[name];
-    if (!cur) problems.push(`${name}: schema was removed (create a new version instead of deleting v${old.version})`);
-    else if (cur.version < old.version) problems.push(`${name}: version went down (${old.version} -> ${cur.version})`);
-    else if (cur.hash !== old.hash && cur.version === old.version) problems.push(`${name}: changed without bumping x-version (${old.version})`);
+    if (!cur) {problems.push(`${name}: schema was removed (create a new version instead of deleting v${old.version})`);}
+    else if (cur.version < old.version) {problems.push(`${name}: version went down (${old.version} -> ${cur.version})`);}
+    else if (cur.hash !== old.hash && cur.version === old.version) {problems.push(`${name}: changed without bumping x-version (${old.version})`);}
   }
-  for (const name of Object.keys(now)) if (!lock[name]) problems.push(`${name}: new schema is not in the lock (run: npm run lock)`);
+  for (const name of Object.keys(now)) {if (!lock[name]) {problems.push(`${name}: new schema is not in the lock (run: npm run lock)`);}}
   return problems;
 }
 

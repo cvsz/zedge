@@ -14,10 +14,9 @@ export const fingerprint = (method, p, body) => crypto.createHash('sha256').upda
  */
 export function riskLabel(method, p, body) {
   const b = body || {};
-  let m;
   if (method === 'POST' && /^\/api\/cf\/zones\/[^/]+\/purge_cache$/.test(p) && b.purge_everything === true) {return 'Purge the entire cache';}
   if (method === 'PATCH' && /^\/api\/cf\/zones\/[^/]+\/dnssec$/.test(p) && b.status === 'disabled') {return 'Disable DNSSEC';}
-  if (method === 'DELETE' && (m = p.match(/^\/api\/cf\/accounts\/[^/]+\/storage\/kv\/namespaces\/[^/]+$/))) {return 'Delete a KV namespace and all its keys';}
+  if (method === 'DELETE' && p.match(/^\/api\/cf\/accounts\/[^/]+\/storage\/kv\/namespaces\/[^/]+$/)) {return 'Delete a KV namespace and all its keys';}
   if (method === 'DELETE' && /^\/api\/cf\/accounts\/[^/]+\/d1\/database\/[^/]+$/.test(p)) {return 'Delete a D1 database';}
   if (method === 'DELETE' && /^\/api\/cf\/accounts\/[^/]+\/queues\/[^/]+$/.test(p)) {return 'Delete a queue';}
   if (method === 'POST' && /^\/api\/d1\/[^/]+\/query$/.test(p) && b.allowWrite === true) {return 'Run a changing SQL statement on D1';}

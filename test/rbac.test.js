@@ -152,6 +152,52 @@ test('no-auth mode acts as a full admin on loopback only', async () => {
   await m.close();
 });
 
+test('audit log verify and export endpoints work for an auditor', async () => {
+  const { body } = await admin.json('GET', '/api/admin/audit/verify');
+  assert.ok(body.ok, 'audit chain should verify');
+  assert.ok(typeof body.entries === 'number');
+  const exp = await admin.call('GET', '/api/admin/audit/export');
+  assert.equal(exp.status, 200);
+  assert.match(exp.headers.get('content-disposition') || '', /audit\.jsonl/);
+  const text = await exp.text();
+  assert.ok(text.length === 0 || text.endsWith('\n'), 'export ends with a newline');
+});
+
+test('two-factor setup, enable and disable for the current user', async () => {
+  const { hotp, stepAt } = await import('../server/totp.js');
+  const t = await userClient('totu', 'operator');
+  // Not enabled yet
+  const s0 = (await t.json('GET', '/api/me/totp')).body;
+  assert.equal(s0.enabled, false);
+  // Setup returns a secret and an otpauth URI
+  const setup = (await t.json('POST', '/api/me/totp/setup')).body;
+  assert.ok(setup.secret && /^[A-Z2-7]+$/.test(setup.secret), 'secret is base32');
+  assert.ok(setup.uri.startsWith('otpauth://totp/'), 'uri is an otpauth link');
+  // A valid current-step code enables 2FA and returns eight single-use recovery codes
+  const code = hotp(setup.secret, stepAt());
+  const en = (await t.json('POST', '/api/me/totp/enable', { code })).body;
+  assert.ok(Array.isArray(en.recoveryCodes) && en.recoveryCodes.length === 8, 'eight recovery codes');
+  const s1 = (await t.json('GET', '/api/me/totp')).body;
+  assert.equal(s1.enabled, true);
+  // Already on: setup again is refused
+  assert.equal((await t.json('POST', '/api/me/totp/setup')).status, 409, 'already set up');
+  // Wrong password is refused
+  assert.equal((await t.json('POST', '/api/me/totp/disable', { current: 'nope', code: en.recoveryCodes[0] })).status, 403, 'bad password');
+  // A recovery code disables 2FA
+  const off = (await t.json('POST', '/api/me/totp/disable', { current: PW2, code: en.recoveryCodes[0] })).body;
+  assert.equal(off.ok, true);
+  const s2 = (await t.json('GET', '/api/me/totp')).body;
+  assert.equal(s2.enabled, false);
+  // Disabling again when already off is refused
+  assert.equal((await t.json('POST', '/api/me/totp/disable', { current: PW2, code: en.recoveryCodes[1] })).status, 409, 'not on');
+  // An old recovery code from before a re-enroll does not work: re-enroll while 2FA is off
+  const setup2 = (await t.json('POST', '/api/me/totp/setup')).body;
+  await t.json('POST', '/api/me/totp/enable', { code: hotp(setup2.secret, stepAt()) });
+  assert.equal((await t.json('POST', '/api/me/totp/disable', { current: PW2, code: en.recoveryCodes[0] })).status, 400, 'old recovery code not accepted');
+  const s3 = (await t.json('GET', '/api/me/totp')).body;
+  assert.equal(s3.enabled, true);
+});
+
 import { loadConfig } from '../server/config.js';
 test('config: CLOUDFLARE_* names are read; legacy CF_* names still work with a warning; new names win', () => {
   const base = { ZEDGE_ADMIN_PASSWORD: 'correct horse battery', SESSION_SECRET: 's'.repeat(32), DATA_DIR: '/tmp/x' };

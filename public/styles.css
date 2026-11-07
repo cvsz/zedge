@@ -111,3 +111,20 @@ a.btn.primary,.btn.primary{color:var(--on-accent)}
 .bar::-webkit-progress-bar{background:var(--line2);border-radius:4px}
 .bar::-webkit-progress-value{background:var(--accent);border-radius:4px}
 .bar::-moz-progress-bar{background:var(--accent);border-radius:4px}
+
+/* Responsive shell - mobile menu below 900px */
+@media (max-width: 899px) {
+  .side { flex: 0 0 260px; }
+  .side .nav { position: fixed; top: 0; left: -260px; width: 260px; height: 100vh; background: var(--side); border-right: 1px solid var(--line2); padding-top: 60px; transition: left 0.2s; z-index: 1000; }
+  .side .nav.open { left: 0; }
+  .mobile-toggle { display: block; background: var(--line2); color: var(--text); border: none; padding: 12px; font-size: 24px; cursor: pointer; border-radius: 8px; }
+  .mobile-toggle[aria-expanded="true"] { background: var(--accent); color: var(--on-accent); }
+  .shell > .main { width: 100%; }
+  .brand { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 8px; }
+}
+
+/* Desktop: hide mobile toggle */
+@media (min-width: 900px) {
+  .mobile-toggle { display: none !important; }
+  .side .nav { position: static; width: auto; height: auto; padding-top: 0; border-right: none; display: flex; flex-direction: column; gap: 4px; }
+}

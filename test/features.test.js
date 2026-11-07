@@ -100,6 +100,22 @@ test('analytics queries GraphQL and returns series with totals', async () => {
   assert.equal((await J('GET', `/api/analytics/${z}?range=1y`)).status, 400);
 });
 
+test('analytics top lists return ranked rows from GraphQL', async () => {
+  const by = 'path';
+  const d = await J('GET', `/api/analytics/${z}/top?by=${by}&range=24h`);
+  assert.equal(d.status, 200);
+  assert.equal(d.body.by, 'path');
+  assert.equal(d.body.range, '24h');
+  assert.ok(Array.isArray(d.body.rows));
+  assert.ok(d.body.rows.length > 0);
+  assert.ok(d.body.rows.every((r) => typeof r.key === 'string' && typeof r.count === 'number'));
+  const last = env.mock.state.graphql.at(-1);
+  assert.match(last.query, /adaptiveGroups/);
+  assert.equal(last.variables.dim, 'clientRequestPath');
+  assert.equal((await J('GET', `/api/analytics/${z}/top?by=nope`)).status, 400);
+  assert.equal((await J('GET', `/api/analytics/${z}/top?range=1y`)).status, 400);
+});
+
 // ------------------------------------------------------------------ workers
 test('Worker deploy uploads a module, keeps bindings and records a version', async () => {
   const code = 'export default { fetch() { return new Response("hi"); } }';

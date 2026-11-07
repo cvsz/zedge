@@ -12,8 +12,8 @@ export function loadSchemas(dir = SCHEMA_DIR) {
   const out = {};
   const walk = (d, prefix) => {
     for (const f of fs.readdirSync(d, { withFileTypes: true })) {
-      if (f.isDirectory()) walk(path.join(d, f.name), `${prefix}${f.name}/`);
-      else if (f.name.endsWith('.json')) out[`${prefix}${f.name.slice(0, -5)}`] = JSON.parse(fs.readFileSync(path.join(d, f.name), 'utf8'));
+      if (f.isDirectory()) {walk(path.join(d, f.name), `${prefix}${f.name}/`);}
+      else if (f.name.endsWith('.json')) {out[`${prefix}${f.name.slice(0, -5)}`] = JSON.parse(fs.readFileSync(path.join(d, f.name), 'utf8'));}
     }
   };
   walk(dir, '');
@@ -28,16 +28,16 @@ export const ENTITIES = ['link', 'click', 'content', 'publication', 'approval-re
 
 /** Validate an entity such as "link" or "content". */
 export function validateEntity(name, value) {
-  if (!ENTITIES.includes(name)) throw new Error(`Unknown entity ${name}`);
+  if (!ENTITIES.includes(name)) {throw new Error(`Unknown entity ${name}`);}
   return validator.validate(name, value);
 }
 
 /** Validate an event envelope and then its payload against the schema for its type and version. */
 export function validateEvent(envelope) {
   const env = validator.validate('event-envelope', envelope);
-  if (!env.valid) return env;
+  if (!env.valid) {return env;}
   const name = `events/${envelope.type}.v${envelope.version}`;
-  if (!validator.has(name)) return { valid: false, errors: [`$: no schema for ${envelope.type} version ${envelope.version}`] };
+  if (!validator.has(name)) {return { valid: false, errors: [`$: no schema for ${envelope.type} version ${envelope.version}`] };}
   const p = validator.validate(name, envelope.payload);
   return { valid: p.valid, errors: p.errors.map((e) => e.replace(/^\$/, '$.payload')) };
 }
@@ -46,7 +46,7 @@ export function validateEvent(envelope) {
 export function makeEvent({ type, organization_id, payload, correlation_id, version = 1, id = crypto.randomUUID(), occurred_at = new Date().toISOString() }) {
   const ev = { id, type, version, organization_id, occurred_at, correlation_id: correlation_id || crypto.randomUUID(), payload };
   const r = validateEvent(ev);
-  if (!r.valid) throw new Error(`Invalid ${type} event: ${r.errors.join('; ')}`);
+  if (!r.valid) {throw new Error(`Invalid ${type} event: ${r.errors.join('; ')}`);}
   return ev;
 }
 

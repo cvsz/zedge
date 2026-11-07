@@ -7,7 +7,7 @@ const PHASE = { http_request_firewall_custom: 'WAF custom', http_ratelimit: 'Rat
 function diffView(d) {
   const dns = d.dns;
   const none = !dns.added.length && !dns.removed.length && !dns.changed.length && !Object.keys(d.rules).length;
-  if (none) return h('div', { class: 'note' }, 'Nothing has changed since this snapshot.');
+  if (none) {return h('div', { class: 'note' }, 'Nothing has changed since this snapshot.');}
   const line = (sign, text, kind) => h('div', { class: 'li' }, badge(sign, kind), h('span', { class: 'mono small' }, text));
   return h('div', { class: 'stack' },
     h('strong', { class: 'small' }, 'DNS'),
@@ -20,7 +20,7 @@ function diffView(d) {
 
 export async function snapshotsView() {
   const z = zone();
-  if (!z) return card('', empty('Add a domain first.'));
+  if (!z) {return card('', empty('Add a domain first.'));}
   const { snapshots } = await api('GET', `zones/${z.id}/snapshots`);
   const out = h('div', { class: 'stack' });
   const note = h('input', { type: 'text', 'aria-label': 'Snapshot note', placeholder: 'Before the migration (optional)' });
@@ -41,7 +41,7 @@ export async function snapshotsView() {
     fill(out, card(`Restore snapshot from ${fmtDate(s.createdAt)}`, h('span', { class: 'small soft' }, 'This is only a preview until you press Apply. Take a fresh snapshot first if you may want to undo it.'),
       h('div', { class: 'row end' }, field('What to restore', scope), h('label', { class: 'row small' }, extra, 'Also delete DNS records added since')), preview,
       h('div', { class: 'row end' }, btn('Apply restore', async () => {
-        if (!confirmAsk('Apply this restore to the live zone?')) return;
+        if (!confirmAsk('Apply this restore to the live zone?')) {return;}
         const r = await api('POST', `zones/${z.id}/snapshots/${s.id}/restore`, { scope: scope.value, deleteExtra: extra.checked, confirm: true });
         toast(r.failed.length ? `Restored with ${r.failed.length} problem(s): ${r.failed[0].error}` : 'Restored', !!r.failed.length);
         fill(out);
@@ -55,13 +55,13 @@ export async function snapshotsView() {
     card('Snapshots', snapshots.length ? snapshots.map((s) => item(fmtDate(s.createdAt), `${s.by} · ${s.dnsCount} DNS records · ${s.ruleCount} rules${s.note ? ` · ${s.note}` : ''}`,
       btn('Compare to live', async () => { const r = await api('GET', `zones/${z.id}/snapshots/${s.id}/diff`); fill(out, card(`Changes since ${fmtDate(s.createdAt)}`, diffView(r.diff))); }),
       can('snapshots.write') && btn('Restore…', () => planRestore(s)),
-      can('snapshots.write') && btn('Delete', async () => { if (!confirmAsk('Delete this snapshot?')) return; await api('DELETE', `zones/${z.id}/snapshots/${s.id}`); toast('Deleted'); reload(); }, 'danger'))) : empty('No snapshots yet.')),
+      can('snapshots.write') && btn('Delete', async () => { if (!confirmAsk('Delete this snapshot?')) {return;} await api('DELETE', `zones/${z.id}/snapshots/${s.id}`); toast('Deleted'); reload(); }, 'danger'))) : empty('No snapshots yet.')),
     out,
     card('Export', h('span', { class: 'small soft' }, 'Download this zone’s configuration. The Terraform JSON file also includes your rule lists; run terraform validate and plan before applying it.'),
       h('div', { class: 'row' }, h('a', { class: 'btn', href: `/api/zones/${z.id}/export?format=json`, download: '' }, 'Download JSON'), h('a', { class: 'btn', href: `/api/zones/${z.id}/export?format=terraform`, download: '' }, 'Download Terraform (DNS)'), h('a', { class: 'btn', href: `/api/zones/${z.id}/export?format=terraform-json`, download: '' }, 'Download Terraform JSON (DNS + rules)'))),
     can('zone.write') && S.zones.length > 1 && card('Clone settings', h('span', { class: 'small soft' }, 'Copies SSL mode, TLS, HTTPS redirect, HTTP/3, Brotli, security level and similar settings from another zone onto this one. DNS and rules are not copied.'),
       h('div', { class: 'row end' }, field('From', clone), btn('Copy settings', async () => {
-        if (!confirmAsk(`Overwrite settings on ${z.name} with those from the chosen zone?`)) return;
+        if (!confirmAsk(`Overwrite settings on ${z.name} with those from the chosen zone?`)) {return;}
         const r = await api('POST', `zones/${z.id}/clone-settings`, { from: clone.value });
         toast(r.applied.length ? `Updated: ${r.applied.join(', ')}` : 'Already identical', !!r.failed.length);
       }, 'primary'))));

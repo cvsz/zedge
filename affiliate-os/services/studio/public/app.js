@@ -1,8 +1,8 @@
 const view = document.getElementById('view');
-const el = (t, a, ...k) => { const n = document.createElement(t); for (const [x, v] of Object.entries(a || {})) { if (x === 'class') n.className = v; else n.setAttribute(x, v); } n.append(...k.filter((c) => c != null && c !== false)); return n; };
+const el = (t, a, ...k) => { const n = document.createElement(t); for (const [x, v] of Object.entries(a || {})) { if (x === 'class') {n.className = v;} else {n.setAttribute(x, v);} } n.append(...k.filter((c) => c !== null && c !== false)); return n; };
 async function api(method, path, body) {
   const r = await fetch(`/api/${path}`, { method, headers: body ? { 'content-type': 'application/json', 'x-studio': '1' } : {}, body: body ? JSON.stringify(body) : undefined });
-  const j = await r.json(); if (!r.ok) throw new Error(j.error || 'Request failed'); return j;
+  const j = await r.json(); if (!r.ok) {throw new Error(j.error || 'Request failed');} return j;
 }
 const fail = (e) => view.replaceChildren(el('p', { class: 'err', role: 'alert' }, e.message));
 async function board() {
@@ -27,7 +27,7 @@ async function approvals(me) {
   try {
     const me = await api('GET', 'me'); document.getElementById('who').textContent = `${me.name} (${me.role})`;
     const tabs = { 'tab-cal': () => board(), 'tab-appr': () => approvals(me) };
-    for (const id of Object.keys(tabs)) document.getElementById(id).onclick = async () => { for (const k of Object.keys(tabs)) document.getElementById(k).setAttribute('aria-pressed', String(k === id)); try { await tabs[id](); } catch (e) { fail(e); } };
+    for (const id of Object.keys(tabs)) {document.getElementById(id).onclick = async () => { for (const k of Object.keys(tabs)) {document.getElementById(k).setAttribute('aria-pressed', String(k === id));} try { await tabs[id](); } catch (e) { fail(e); } };}
     await board();
   } catch (e) { fail(e); }
 })();

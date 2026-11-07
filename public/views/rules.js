@@ -28,7 +28,7 @@ function ruleList(z, kind, describe, reload) {
     h('div', { class: 'row' },
       toggle(r.enabled !== false, `Enable ${r.description || 'rule'}`, async (on) => { await api('PATCH', `zones/${z.id}/rules/${kind}/${r.id}`, { enabled: on }); r.enabled = on; }),
       btn('Delete', async () => {
-        if (!confirmAsk(`Delete "${r.description || 'this rule'}"?`)) return;
+        if (!confirmAsk(`Delete "${r.description || 'this rule'}"?`)) {return;}
         await api('DELETE', `zones/${z.id}/rules/${kind}/${r.id}`);
         rules = rules.filter((x) => x.id !== r.id); draw(); toast('Rule deleted');
       }, 'danger')))) : empty('None yet.'));
@@ -64,12 +64,12 @@ async function managedTab(z) {
       h('div', { class: 'col' }, h('div', { class: 'row' }, h('strong', null, title), r ? badge(r.enabled === false ? 'Deployed, off' : 'On', r.enabled === false ? 'warn' : 'ok') : badge('Not deployed')), h('span', { class: 'xs mute' }, desc)),
       h('div', { class: 'row' },
         toggle(!!r && r.enabled !== false, title, async (on) => {
-          if (r) await api('PATCH', `zones/${z.id}/rules/managed/${r.id}`, { enabled: on });
-          else if (on) await api('POST', `zones/${z.id}/rules/managed`, { ruleset: key });
+          if (r) {await api('PATCH', `zones/${z.id}/rules/managed/${r.id}`, { enabled: on });}
+          else if (on) {await api('POST', `zones/${z.id}/rules/managed`, { ruleset: key });}
           rules = (await api('GET', `zones/${z.id}/rules/managed`)).rules; draw(); toast(`${title} ${on ? 'on' : 'off'}`);
         }),
         r && btn('Remove', async () => {
-          if (!confirmAsk(`Remove ${title} from this zone?`)) return;
+          if (!confirmAsk(`Remove ${title} from this zone?`)) {return;}
           await api('DELETE', `zones/${z.id}/rules/managed/${r.id}`); rules = rules.filter((x) => x.id !== r.id); draw();
         }, 'danger')));
   }));
@@ -121,7 +121,7 @@ async function pageRulesTab(z) {
     h('div', { class: 'col' }, h('strong', { class: 'mono' }, ((r.targets || [])[0] && r.targets[0].constraint.value) || '(pattern)'), h('span', { class: 'xs mute' }, summarise(r))),
     h('div', { class: 'row' },
       toggle(r.status === 'active', 'Page rule active', async (on) => { await cf('PATCH', `/zones/${z.id}/pagerules/${r.id}`, { status: on ? 'active' : 'disabled' }); r.status = on ? 'active' : 'disabled'; }),
-      btn('Delete', async () => { if (!confirmAsk('Delete this page rule?')) return; await cf('DELETE', `/zones/${z.id}/pagerules/${r.id}`); rules = rules.filter((x) => x.id !== r.id); draw(); }, 'danger')))) : empty('No page rules.'));
+      btn('Delete', async () => { if (!confirmAsk('Delete this page rule?')) {return;} await cf('DELETE', `/zones/${z.id}/pagerules/${r.id}`); rules = rules.filter((x) => x.id !== r.id); draw(); }, 'danger')))) : empty('No page rules.'));
   draw();
   const pattern = input({ placeholder: '*example.com/old/*', 'aria-label': 'URL pattern' });
   const kind = selectOf('Action', [['forward', 'Forward to a URL'], ['cache_level', 'Set cache level']], 'forward');
@@ -132,11 +132,11 @@ async function pageRulesTab(z) {
     card('Page rules', h('span', { class: 'small soft' }, 'Page Rules are Cloudflare\'s older system. Prefer redirect and cache rules for new work.'), box),
     card('Add a page rule', h('div', { class: 'row end' }, field('URL pattern', pattern), field('Action', kind)), h('div', { class: 'row end' }, field('Forward to', target), field('Status', code), field('Cache level', level),
       btn('Add page rule', async () => {
-        if (!pattern.value.trim()) throw new Error('Enter a URL pattern');
+        if (!pattern.value.trim()) {throw new Error('Enter a URL pattern');}
         const action = kind.value === 'forward'
           ? { id: 'forwarding_url', value: { url: target.value.trim(), status_code: Number(code.value) } }
           : { id: 'cache_level', value: level.value };
-        if (kind.value === 'forward' && !/^https?:\/\//.test(target.value.trim())) throw new Error('Forward to a full URL starting with https://');
+        if (kind.value === 'forward' && !/^https?:\/\//.test(target.value.trim())) {throw new Error('Forward to a full URL starting with https://');}
         const r = await cf('POST', `/zones/${z.id}/pagerules`, { targets: [{ target: 'url', constraint: { operator: 'matches', value: pattern.value.trim() } }], actions: [action], priority: 1, status: 'active' });
         rules.unshift(r.result); draw(); pattern.value = ''; toast('Page rule added');
       }, 'primary')))
@@ -193,7 +193,7 @@ const BUILDERS = { ratelimit: rateLimitTab, managed: managedTab, redirect: redir
 export async function rulesView() {
   const z = zone();
   let tab = localStorage.getItem('zedge.rulesTab');
-  if (!BUILDERS[tab]) tab = 'ratelimit';
+  if (!BUILDERS[tab]) {tab = 'ratelimit';}
   const body = h('div', { class: 'stack' });
   const show = async (t) => {
     localStorage.setItem('zedge.rulesTab', t);

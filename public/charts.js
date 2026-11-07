@@ -29,7 +29,7 @@ export function barChart(series, { height = 220 } = {}) {
 
 function label(t) {
   const d = new Date(t);
-  if (Number.isNaN(d.getTime())) return String(t);
+  if (Number.isNaN(d.getTime())) {return String(t);}
   return String(t).length > 10 ? d.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : d.toLocaleDateString([], { month: 'short', day: 'numeric' });
 }
 

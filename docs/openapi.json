@@ -48,6 +48,52 @@
         }
       }
     },
+    "/api/admin/audit/export": {
+      "get": {
+        "summary": "GET /api/admin/audit/export",
+        "tags": [
+          "admin"
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/admin/audit/verify": {
+      "get": {
+        "summary": "GET /api/admin/audit/verify",
+        "tags": [
+          "admin"
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
     "/api/admin/permissions": {
       "get": {
         "summary": "GET /api/admin/permissions",
@@ -268,15 +314,15 @@
         }
       }
     },
-    "/api/cf^\\/accounts\\/{id1}\\/access\\/apps$": {
+    "/api/analytics/{zid}/top": {
       "get": {
-        "summary": "Cloudflare GET ^\\/accounts\\/{id1}\\/access\\/apps$",
+        "summary": "GET /api/analytics/{zid}/top",
         "tags": [
-          "cloudflare"
+          "analytics"
         ],
         "parameters": [
           {
-            "name": "id1",
+            "name": "zid",
             "in": "path",
             "required": true,
             "schema": {
@@ -284,27 +330,32 @@
             }
           }
         ],
-        "x-permission": "read",
+        "x-permission": "any signed-in user",
         "responses": {
           "200": {
-            "description": "The Cloudflare API response, passed through"
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
           },
           "403": {
             "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
           }
         }
-      },
+      }
+    },
+    "/api/d1/{db}/query": {
       "post": {
-        "summary": "Cloudflare POST ^\\/accounts\\/{id1}\\/access\\/apps$",
+        "summary": "POST /api/d1/{db}/query",
         "tags": [
-          "cloudflare"
+          "d1"
         ],
         "parameters": [
           {
-            "name": "id1",
+            "name": "db",
             "in": "path",
             "required": true,
             "schema": {
@@ -312,2136 +363,19 @@
             }
           }
         ],
-        "x-permission": "zerotrust.write",
+        "x-permission": "any signed-in user",
         "responses": {
           "200": {
-            "description": "The Cloudflare API response, passed through"
+            "description": "OK"
           },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/accounts\\/{id1}\\/access\\/apps\\/{id2}$": {
-      "delete": {
-        "summary": "Cloudflare DELETE ^\\/accounts\\/{id1}\\/access\\/apps\\/{id2}$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "zerotrust.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "put": {
-        "summary": "Cloudflare PUT ^\\/accounts\\/{id1}\\/access\\/apps\\/{id2}$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "zerotrust.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/accounts\\/{id1}\\/access\\/apps\\/{id2}\\/policies$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/accounts\\/{id1}\\/access\\/apps\\/{id2}\\/policies$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "post": {
-        "summary": "Cloudflare POST ^\\/accounts\\/{id1}\\/access\\/apps\\/{id2}\\/policies$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "zerotrust.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/accounts\\/{id1}\\/access\\/apps\\/{id2}\\/policies\\/{id3}$": {
-      "delete": {
-        "summary": "Cloudflare DELETE ^\\/accounts\\/{id1}\\/access\\/apps\\/{id2}\\/policies\\/{id3}$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id3",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "zerotrust.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "put": {
-        "summary": "Cloudflare PUT ^\\/accounts\\/{id1}\\/access\\/apps\\/{id2}\\/policies\\/{id3}$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id3",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "zerotrust.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/accounts\\/{id1}\\/audit_logs$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/accounts\\/{id1}\\/audit_logs$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "audit.read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/accounts\\/{id1}\\/cfd_tunnel$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/accounts\\/{id1}\\/cfd_tunnel$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/accounts\\/{id1}\\/cfd_tunnel\\/{id2}\\/configurations$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/accounts\\/{id1}\\/cfd_tunnel\\/{id2}\\/configurations$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/accounts\\/{id1}\\/d1\\/database$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/accounts\\/{id1}\\/d1\\/database$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/accounts\\/{id1}\\/devices\\/posture$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/accounts\\/{id1}\\/devices\\/posture$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "post": {
-        "summary": "Cloudflare POST ^\\/accounts\\/{id1}\\/devices\\/posture$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "zerotrust.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/accounts\\/{id1}\\/devices\\/posture\\/{id2}$": {
-      "delete": {
-        "summary": "Cloudflare DELETE ^\\/accounts\\/{id1}\\/devices\\/posture\\/{id2}$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "zerotrust.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "put": {
-        "summary": "Cloudflare PUT ^\\/accounts\\/{id1}\\/devices\\/posture\\/{id2}$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "zerotrust.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/accounts\\/{id1}\\/email\\/routing\\/addresses$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/accounts\\/{id1}\\/email\\/routing\\/addresses$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "post": {
-        "summary": "Cloudflare POST ^\\/accounts\\/{id1}\\/email\\/routing\\/addresses$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "email.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/accounts\\/{id1}\\/email\\/routing\\/addresses\\/{id2}$": {
-      "delete": {
-        "summary": "Cloudflare DELETE ^\\/accounts\\/{id1}\\/email\\/routing\\/addresses\\/{id2}$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "email.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/accounts\\/{id1}\\/gateway\\/categories$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/accounts\\/{id1}\\/gateway\\/categories$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/accounts\\/{id1}\\/gateway\\/rules$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/accounts\\/{id1}\\/gateway\\/rules$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "post": {
-        "summary": "Cloudflare POST ^\\/accounts\\/{id1}\\/gateway\\/rules$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "zerotrust.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/accounts\\/{id1}\\/gateway\\/rules\\/{id2}$": {
-      "delete": {
-        "summary": "Cloudflare DELETE ^\\/accounts\\/{id1}\\/gateway\\/rules\\/{id2}$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "zerotrust.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "put": {
-        "summary": "Cloudflare PUT ^\\/accounts\\/{id1}\\/gateway\\/rules\\/{id2}$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "zerotrust.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/accounts\\/{id1}\\/r2\\/buckets$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/accounts\\/{id1}\\/r2\\/buckets$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "post": {
-        "summary": "Cloudflare POST ^\\/accounts\\/{id1}\\/r2\\/buckets$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "r2.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/accounts\\/{id1}\\/r2\\/buckets\\/{bucket2}\\/cors$": {
-      "delete": {
-        "summary": "Cloudflare DELETE ^\\/accounts\\/{id1}\\/r2\\/buckets\\/{bucket2}\\/cors$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "bucket2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "r2.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "get": {
-        "summary": "Cloudflare GET ^\\/accounts\\/{id1}\\/r2\\/buckets\\/{bucket2}\\/cors$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "bucket2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "put": {
-        "summary": "Cloudflare PUT ^\\/accounts\\/{id1}\\/r2\\/buckets\\/{bucket2}\\/cors$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "bucket2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "r2.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/accounts\\/{id1}\\/r2\\/buckets\\/{bucket2}\\/lifecycle$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/accounts\\/{id1}\\/r2\\/buckets\\/{bucket2}\\/lifecycle$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "bucket2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "put": {
-        "summary": "Cloudflare PUT ^\\/accounts\\/{id1}\\/r2\\/buckets\\/{bucket2}\\/lifecycle$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "bucket2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "r2.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/accounts\\/{id1}\\/storage\\/kv\\/namespaces$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/accounts\\/{id1}\\/storage\\/kv\\/namespaces$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/accounts\\/{id1}\\/workers\\/scripts$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/accounts\\/{id1}\\/workers\\/scripts$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/user\\/tokens$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/user\\/tokens$",
-        "tags": [
-          "cloudflare"
-        ],
-        "x-permission": "tokens.read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/user\\/tokens\\/permission_groups$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/user\\/tokens\\/permission_groups$",
-        "tags": [
-          "cloudflare"
-        ],
-        "x-permission": "tokens.read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/user\\/tokens\\/verify$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/user\\/tokens\\/verify$",
-        "tags": [
-          "cloudflare"
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/user\\/tokens\\/{id1}$": {
-      "delete": {
-        "summary": "Cloudflare DELETE ^\\/user\\/tokens\\/{id1}$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "tokens.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/user\\/tokens\\/{id1}\\/value$": {
-      "put": {
-        "summary": "Cloudflare PUT ^\\/user\\/tokens\\/{id1}\\/value$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "tokens.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/zones$",
-        "tags": [
-          "cloudflare"
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones\\/{id1}$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/zones\\/{id1}$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones\\/{id1}\\/activation_check$": {
-      "put": {
-        "summary": "Cloudflare PUT ^\\/zones\\/{id1}\\/activation_check$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "domains.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones\\/{id1}\\/dns_records$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/zones\\/{id1}\\/dns_records$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "post": {
-        "summary": "Cloudflare POST ^\\/zones\\/{id1}\\/dns_records$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "dns.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones\\/{id1}\\/dns_records\\/{id2}$": {
-      "delete": {
-        "summary": "Cloudflare DELETE ^\\/zones\\/{id1}\\/dns_records\\/{id2}$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "dns.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Cloudflare PATCH ^\\/zones\\/{id1}\\/dns_records\\/{id2}$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "dns.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones\\/{id1}\\/dnssec$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/zones\\/{id1}\\/dnssec$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Cloudflare PATCH ^\\/zones\\/{id1}\\/dnssec$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "zone.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones\\/{id1}\\/email\\/routing$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/zones\\/{id1}\\/email\\/routing$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones\\/{id1}\\/email\\/routing\\/dns$": {
-      "delete": {
-        "summary": "Cloudflare DELETE ^\\/zones\\/{id1}\\/email\\/routing\\/dns$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "email.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "post": {
-        "summary": "Cloudflare POST ^\\/zones\\/{id1}\\/email\\/routing\\/dns$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "email.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones\\/{id1}\\/email\\/routing\\/rules$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/zones\\/{id1}\\/email\\/routing\\/rules$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "post": {
-        "summary": "Cloudflare POST ^\\/zones\\/{id1}\\/email\\/routing\\/rules$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "email.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones\\/{id1}\\/email\\/routing\\/rules\\/catch_all$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/zones\\/{id1}\\/email\\/routing\\/rules\\/catch_all$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "put": {
-        "summary": "Cloudflare PUT ^\\/zones\\/{id1}\\/email\\/routing\\/rules\\/catch_all$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "email.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones\\/{id1}\\/email\\/routing\\/rules\\/{id2}$": {
-      "delete": {
-        "summary": "Cloudflare DELETE ^\\/zones\\/{id1}\\/email\\/routing\\/rules\\/{id2}$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "email.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "put": {
-        "summary": "Cloudflare PUT ^\\/zones\\/{id1}\\/email\\/routing\\/rules\\/{id2}$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "email.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones\\/{id1}\\/firewall\\/access_rules\\/rules$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/zones\\/{id1}\\/firewall\\/access_rules\\/rules$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "post": {
-        "summary": "Cloudflare POST ^\\/zones\\/{id1}\\/firewall\\/access_rules\\/rules$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "security.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones\\/{id1}\\/firewall\\/access_rules\\/rules\\/{id2}$": {
-      "delete": {
-        "summary": "Cloudflare DELETE ^\\/zones\\/{id1}\\/firewall\\/access_rules\\/rules\\/{id2}$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "security.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones\\/{id1}\\/pagerules$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/zones\\/{id1}\\/pagerules$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "post": {
-        "summary": "Cloudflare POST ^\\/zones\\/{id1}\\/pagerules$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "rules.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
+          "400": {
+            "description": "The request was not valid"
           },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones\\/{id1}\\/pagerules\\/{id2}$": {
-      "delete": {
-        "summary": "Cloudflare DELETE ^\\/zones\\/{id1}\\/pagerules\\/{id2}$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "rules.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Cloudflare PATCH ^\\/zones\\/{id1}\\/pagerules\\/{id2}$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "id2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "rules.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones\\/{id1}\\/purge_cache$": {
-      "post": {
-        "summary": "Cloudflare POST ^\\/zones\\/{id1}\\/purge_cache$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "zone.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones\\/{id1}\\/rulesets\\/phases\\/{phase}\\/entrypoint$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/zones\\/{id1}\\/rulesets\\/phases\\/{phase}\\/entrypoint$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "phase",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones\\/{id1}\\/settings$": {
-      "get": {
-        "summary": "Cloudflare GET ^\\/zones\\/{id1}\\/settings$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "read",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones\\/{id1}\\/settings\\/security_level$": {
-      "patch": {
-        "summary": "Cloudflare PATCH ^\\/zones\\/{id1}\\/settings\\/security_level$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "security.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
-          },
-          "403": {
-            "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
-          }
-        }
-      }
-    },
-    "/api/cf^\\/zones\\/{id1}\\/settings\\/{setting2}$": {
-      "patch": {
-        "summary": "Cloudflare PATCH ^\\/zones\\/{id1}\\/settings\\/{setting2}$",
-        "tags": [
-          "cloudflare"
-        ],
-        "parameters": [
-          {
-            "name": "id1",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "setting2",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "x-permission": "zone.write",
-        "responses": {
-          "200": {
-            "description": "The Cloudflare API response, passed through"
+          "401": {
+            "description": "Not signed in"
           },
           "403": {
             "description": "Not permitted"
-          },
-          "404": {
-            "description": "Not found at Cloudflare"
           }
         }
       }
@@ -2451,6 +385,101 @@
         "summary": "POST /api/domains",
         "tags": [
           "domains"
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/kv/{ns}/value": {
+      "delete": {
+        "summary": "DELETE /api/kv/{ns}/value",
+        "tags": [
+          "kv"
+        ],
+        "parameters": [
+          {
+            "name": "ns",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      },
+      "get": {
+        "summary": "GET /api/kv/{ns}/value",
+        "tags": [
+          "kv"
+        ],
+        "parameters": [
+          {
+            "name": "ns",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      },
+      "put": {
+        "summary": "PUT /api/kv/{ns}/value",
+        "tags": [
+          "kv"
+        ],
+        "parameters": [
+          {
+            "name": "ns",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "x-permission": "any signed-in user",
         "responses": {
@@ -2520,6 +549,98 @@
     "/api/me/password": {
       "post": {
         "summary": "POST /api/me/password",
+        "tags": [
+          "me"
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/me/totp": {
+      "get": {
+        "summary": "GET /api/me/totp",
+        "tags": [
+          "me"
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/me/totp/disable": {
+      "post": {
+        "summary": "POST /api/me/totp/disable",
+        "tags": [
+          "me"
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/me/totp/enable": {
+      "post": {
+        "summary": "POST /api/me/totp/enable",
+        "tags": [
+          "me"
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/me/totp/setup": {
+      "post": {
+        "summary": "POST /api/me/totp/setup",
         "tags": [
           "me"
         ],
@@ -3109,6 +1230,39 @@
         }
       }
     },
+    "/api/zones/{zid}/clone-settings": {
+      "post": {
+        "summary": "POST /api/zones/{zid}/clone-settings",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
     "/api/zones/{zid}/dmarc": {
       "post": {
         "summary": "POST /api/zones/{zid}/dmarc",
@@ -3142,9 +1296,108 @@
         }
       }
     },
+    "/api/zones/{zid}/dns/export": {
+      "get": {
+        "summary": "GET /api/zones/{zid}/dns/export",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/zones/{zid}/dns/import": {
+      "post": {
+        "summary": "POST /api/zones/{zid}/dns/import",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
     "/api/zones/{zid}/email-security": {
       "get": {
         "summary": "GET /api/zones/{zid}/email-security",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/zones/{zid}/export": {
+      "get": {
+        "summary": "GET /api/zones/{zid}/export",
         "tags": [
           "zones"
         ],
@@ -3335,6 +1588,306 @@
           }
         ],
         "x-permission": "depends on the rule type: read to view, rules.write (or security.write for custom rules) to change",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/zones/{zid}/snapshots": {
+      "get": {
+        "summary": "GET /api/zones/{zid}/snapshots",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      },
+      "post": {
+        "summary": "POST /api/zones/{zid}/snapshots",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/zones/{zid}/snapshots/{sid}": {
+      "delete": {
+        "summary": "DELETE /api/zones/{zid}/snapshots/{sid}",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/zones/{zid}/snapshots/{sid}/diff": {
+      "get": {
+        "summary": "GET /api/zones/{zid}/snapshots/{sid}/diff",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/zones/{zid}/snapshots/{sid}/restore": {
+      "post": {
+        "summary": "POST /api/zones/{zid}/snapshots/{sid}/restore",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/zones/{zid}/snippet-rules": {
+      "put": {
+        "summary": "PUT /api/zones/{zid}/snippet-rules",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      }
+    },
+    "/api/zones/{zid}/snippets/{name}": {
+      "delete": {
+        "summary": "DELETE /api/zones/{zid}/snippets/{name}",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "The request was not valid"
+          },
+          "401": {
+            "description": "Not signed in"
+          },
+          "403": {
+            "description": "Not permitted"
+          }
+        }
+      },
+      "put": {
+        "summary": "PUT /api/zones/{zid}/snippets/{name}",
+        "tags": [
+          "zones"
+        ],
+        "parameters": [
+          {
+            "name": "zid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-permission": "any signed-in user",
         "responses": {
           "200": {
             "description": "OK"

@@ -6,8 +6,8 @@ import { createAuth } from './auth.js';
 import { createStore } from './store.js';
 import { can } from './rbac.js';
 import { HttpError } from './errors.js';
-import { recordMetric, getMetrics } from './metrics.js';
-import { openApiSpec } from './openapi.js';
+import { createMetrics } from './metrics.js';
+import { build as buildOpenApi } from './openapi.js';
 import { registerCore } from './routes/core.js';
 import { registerRules } from './routes/rules.js';
 import { registerWorkers } from './routes/workers.js';
@@ -15,6 +15,9 @@ import { registerR2 } from './routes/r2.js';
 import { registerAnalytics } from './routes/analytics.js';
 import { registerEmail } from './routes/email.js';
 import { registerAdmin } from './routes/admin.js';
+import { registerEdge } from './routes/edge.js';
+import { registerSnapshots } from './routes/snapshots.js';
+import { registerLimits } from './limits.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 
@@ -27,15 +30,16 @@ export function createApp(config, opts = {}) {
   if (store.isEmpty() && config.password) {
     store.createUser({ name: 'admin', password: config.password, role: 'admin' });
   }
-  const cf = createCF({ token: config.token, apiBase: config.apiBase, fetchImpl });
-  const auth = createAuth(config, store);
+  const metrics = createMetrics(); // X4: per-app metrics state
+  const cf = createCF({ token: config.token, apiBase: config.apiBase, fetchImpl, metrics });
+  const auth = createAuth(config, store, { metrics });
   const app = express();
   app.disable('x-powered-by');
   app.set('trust proxy', false);
   
   app.use((req, res, next) => {
     const start = Date.now();
-    res.on('finish', () => recordMetric(res.statusCode, Date.now() - start));
+    res.on('finish', () => metrics.recordMetric(res.statusCode, Date.now() - start));
     next();
   });
 
@@ -138,12 +142,15 @@ export function createApp(config, opts = {}) {
   });
 
   // ---- authenticated-only endpoints ----
-  app.get('/metrics', auth.require, (req, res) => {
+  // ---- /metrics: Bearer token first (scrapers), else a session with audit.read (X5) ----
+  app.get('/metrics', (req, res) => {
     const token = req.get('authorization') || '';
     const ok = config.metricsToken && token === `Bearer ${config.metricsToken}`;
-    const canReadAudit = can(req.user.permissions, 'audit.read');
-    if (!ok && !canReadAudit) {return res.status(401).json({ error: 'Metrics require Bearer token or audit.read permission' });}
-    res.type('text/plain').send(getMetrics(store));
+    if (ok) { return res.type('text/plain').send(metrics.getMetrics(store)); }
+    const user = auth.resolve(req);
+    if (!user) { return res.status(401).json({ error: 'Not signed in' }); }
+    if (!can(user.permissions, 'audit.read')) { return res.status(403).json({ error: 'Forbidden' }); }
+    res.type('text/plain').send(metrics.getMetrics(store));
   });
   app.get('/openapi.json', auth.require, (req, res) => res.json(openApiSpec));
 
@@ -154,6 +161,10 @@ export function createApp(config, opts = {}) {
   registerAnalytics(app, ctx);
   registerEmail(app, ctx);
   registerAdmin(app, ctx);
+  registerEdge(app, ctx);
+  registerSnapshots(app, ctx);
+  // Param-based resource limits for the dedicated account-level routes (workers, r2, kv, d1, pages).
+  registerLimits(app);
 
   // ---- errors ----
   app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
@@ -170,5 +181,6 @@ export function createApp(config, opts = {}) {
     return res.status(500).json({ error: 'Internal error' });
   });
 
+  const openApiSpec = buildOpenApi(app);
   return app;
 }

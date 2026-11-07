@@ -14,14 +14,14 @@ async function runApproved(a) {
   });
   let json = null;
   try { json = await res.json(); } catch { /* empty */ }
-  if (!res.ok) throw new Error((json && json.error) || `Request failed (${res.status})`);
+  if (!res.ok) {throw new Error((json && json.error) || `Request failed (${res.status})`);}
 }
 
 export async function approvalsView() {
   const r = await api('GET', 'approvals');
   const reload = () => location.reload();
   const decide = (a, approve) => async () => {
-    if (!confirmAsk(`${approve ? 'Approve' : 'Reject'} “${a.label}” requested by ${a.requester}?\n\n${a.method} ${a.path}`)) return;
+    if (!confirmAsk(`${approve ? 'Approve' : 'Reject'} “${a.label}” requested by ${a.requester}?\n\n${a.method} ${a.path}`)) {return;}
     await api('POST', `approvals/${a.id}/decide`, { approve }); toast(approve ? 'Approved. They have 30 minutes to run it.' : 'Rejected'); reload();
   };
   return h('div', { class: 'stack' }, header('Approvals', 'Risky actions that need a second person'),

@@ -38,7 +38,7 @@ cp .env.example .env
 # Edit .env with your values:
 #   CLOUDFLARE_API_TOKEN=cfat_...
 #   CLOUDFLARE_ACCOUNT_ID=...
-#   EDGE_ADMIN_PASSWORD=...  (12+ characters)
+#   ZEDGE_ADMIN_PASSWORD=...  (12+ characters)
 
 # Install dependencies
 npm install
@@ -56,9 +56,9 @@ npm test
 |----------|----------|-------------|
 | `CLOUDFLARE_API_TOKEN` | Yes | Cloudflare API token (never sent to browser) |
 | `CLOUDFLARE_ACCOUNT_ID` | No | Restrict console to specific account(s) |
-| `EDGE_ADMIN_PASSWORD` | Yes | First admin password (12+ characters) |
+| `ZEDGE_ADMIN_PASSWORD` | Yes | First admin password (12+ characters) |
 | `SESSION_SECRET` | No | Session cookie signing secret |
-| `EDGE_ALLOW_NO_AUTH` | No | Allow no-auth mode on loopback only (`1` = enable) |
+| `ZEDGE_ALLOW_NO_AUTH` | No | Allow no-auth mode on loopback only (`1` = enable) |
 | `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | No | R2 object storage access |
 | `R2_ENDPOINT` | No | R2 S3-compatible endpoint |
 | `METRICS_TOKEN` | No | Bearer token for `/metrics` endpoint |
@@ -96,10 +96,10 @@ B4 (studio depth), B5 (manual-adapter workflow), B6 (Postgres hardening), B10 (C
 
 ```
 npm test
-# tests 54, pass 54, fail 0
 ```
+Runs against a mock Cloudflare API (no network). See the TAP output for the current pass/fail count.
 
-All 54 tests pass against the mock Cloudflare API. Tests require `CLOUDFLARE_API_TOKEN` and `EDGE_ADMIN_PASSWORD` environment variables.
+Run `npm test` (mock Cloudflare API, no network). Tests require `CLOUDFLARE_API_TOKEN` and `ZEDGE_ADMIN_PASSWORD` environment variables.
 
 ## Repository Structure
 

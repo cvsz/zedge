@@ -1,0 +1,10 @@
+# Cloudflare Terraform variables for zedge.zeaz.dev
+# Replace the placeholder values with your actual Cloudflare credentials.
+# DO NOT commit real tokens to version control.
+
+cloudflare_api_token = "your_cloudflare_api_token_here"
+cloudflare_account_id = "your_account_id_here"
+cloudflare_zone_id    = "your_zone_id_here"
+zone_name             = "zeaz.dev"
+subdomain             = "zedge"
+tunnel_id             = "your_tunnel_id_here"

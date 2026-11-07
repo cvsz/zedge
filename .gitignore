@@ -11,6 +11,9 @@ infrastructure/edge/zedge/.terraform/
 infrastructure/terraform/
 *.tfstate
 *.tfstate.backup
+terraform.tfvars
+*.tfvars
+credentials.json
 
 # Standalone builds and packaged artifacts (may contain local .env secrets)
 /standalone/

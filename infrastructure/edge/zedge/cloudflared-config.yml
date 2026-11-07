@@ -1,0 +1,9 @@
+# cloudflared tunnel configuration for zedge.zeaz.dev
+# Tunnel id is set in terraform.tfvars (var.tunnel_id) and must match here.
+tunnel: REPLACE_WITH_TUNNEL_ID
+credentials-file: /etc/cloudflared/credentials.json
+
+ingress:
+  - hostname: zedge.zeaz.dev
+    service: http://app:8787
+  - service: http_status:404

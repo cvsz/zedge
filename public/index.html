@@ -1,17 +1,9 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex">
-<title>Zedge</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>Zedge</title>
 <link rel="stylesheet" href="/styles.css">
-</head>
-<body>
-<div id="app"></div>
-<div id="toasts" role="status" aria-live="polite"></div>
-<script type="module" src="/app.js"></script>
-</body>
-</html>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>
+  .skip-link { position: absolute; left: -999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+  .skip-link:focus { left: 0; top: 0; width: auto; height: auto; overflow: visible; }
+</style>
+</head><body><div class="wrapper"><div class="sidebar"><div class="sidebar-brand"><span>Zedge</span></div><ul class="sidebar-nav"></ul><div class="sidebar-footer"><a href="/docs" target="_blank">Documentation</a></div></div>
+<div class="main-content"><div class="topbar"><div class="left"><button class="btn btn-icon" style="position: fixed; top: 1rem; right: 1rem; z-index: 9999;" aria-label="theme toggle"><i class="fa-solid fa-moon"></i></button></div><div class="right"></div></topbar><div class="p-4" id="content"></div></div><script>document.addEventListener('DOMContentLoaded', () => { const savedTheme = localStorage.getItem('zedgeTheme'); const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; document.documentElement.dataset.theme = savedTheme || (prefersDark ? 'dark' : 'light'); const themeToggle = document.createElement('button'); themeToggle.style.cssText = 'position: fixed; top: 1rem; right: 1rem; z-index: 9999;'; themeToggle.innerHTML = savedTheme === 'dark' ? '☀️' : '🌙'; themeToggle.innerHTML = savedTheme === 'dark' ? '☀️' : '🌙'; themeToggle.title = savedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'; themeToggle.onclick = () => { const html = document.documentElement; const newTheme = html.dataset.theme === 'dark' ? 'light' : 'dark'; html.dataset.theme = newTheme; localStorage.setItem('zedgeTheme', newTheme); themeToggle.innerHTML = newTheme === 'dark' ? '☀️' : '🌙'; themeToggle.title = newTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'; }; const toast = (message, isError) => { const toast = document.createElement('div'); toast.style.cssText = `position: fixed; top: 1rem; right: 1rem; padding: 0.75rem 1.25rem; background: ${isError ? 'rgba(220, 38, 38, 0.9)' : 'rgba(5, 150, 105, 0.9)'}; color: white; border-radius: 0.5rem; z-index: 9999;`; toast.innerHTML = `${message} <button style="margin-left: 1rem; border: none; background: none; color: white;">×</button>`; document.body.appendChild(toast); setTimeout(() => toast.remove(), 3000); }; showToast('Zedge v2.0 loaded');; });</script></body></html>

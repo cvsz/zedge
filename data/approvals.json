@@ -1,0 +1,61 @@
+[
+  {
+    "id": "e628d649438e",
+    "requester": "test",
+    "label": "test label",
+    "method": "POST",
+    "path": "/api/test",
+    "body": null,
+    "fingerprint": "e66e9b7336489ede7e608b03dcf2607cfa01890bff51964ebe22044d604924c5",
+    "status": "cancelled",
+    "createdAt": "2026-11-06T11:46:18.118Z",
+    "decidedBy": "admin",
+    "decidedAt": "2026-11-06T11:46:18.120Z",
+    "note": "approved test",
+    "expiresAt": "2026-11-06T12:16:18.120Z"
+  },
+  {
+    "id": "e7cd4eee05d1",
+    "requester": "user1",
+    "label": "Action 1",
+    "method": "POST",
+    "path": "/api/test1",
+    "body": null,
+    "fingerprint": "845ef34953bcff10dbfc595daa457f6bf8d5c82fef398625fbb486dd17c83787",
+    "status": "approved",
+    "createdAt": "2026-11-06T13:53:53.827Z",
+    "decidedBy": "admin",
+    "decidedAt": "2026-11-06T13:53:53.832Z",
+    "note": "Batch",
+    "expiresAt": "2026-11-06T14:23:53.832Z"
+  },
+  {
+    "id": "ee92778bc551",
+    "requester": "user1",
+    "label": "Action 2",
+    "method": "POST",
+    "path": "/api/test2",
+    "body": null,
+    "fingerprint": "e5908b21481eed2941b6ed8c0665cec0bfe9cfd46aff763f845d18a9df65dbdd",
+    "status": "approved",
+    "createdAt": "2026-11-06T13:53:53.829Z",
+    "decidedBy": "admin",
+    "decidedAt": "2026-11-06T13:53:53.832Z",
+    "note": "Batch",
+    "expiresAt": "2026-11-06T14:23:53.833Z"
+  },
+  {
+    "id": "2d5b2471055c",
+    "requester": "user2",
+    "label": "Action 3",
+    "method": "POST",
+    "path": "/api/test3",
+    "body": null,
+    "fingerprint": "532458b4e90dc6b1e4afe3f8d691e09916abe84d67a8b402b02e7a21d4d2402c",
+    "status": "rejected",
+    "createdAt": "2026-11-06T13:53:53.829Z",
+    "decidedBy": "admin",
+    "decidedAt": "2026-11-06T13:53:53.833Z",
+    "note": "Reject"
+  }
+]

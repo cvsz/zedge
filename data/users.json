@@ -1,0 +1,12 @@
+{
+  "users": {
+    "admin": {
+      "name": "admin",
+      "hash": "scrypt$fqnCkFXB/zdJ7nM4RVFbsQ==$9mY8VT8S9Sj0zW5dBTH4RkL5v4Bemg84N2aXyeZbkAR4LfQJt3yVRERL47oF69BSQw0+WJP8zDH27uch2Q9lOQ==",
+      "role": "admin",
+      "disabled": false,
+      "createdAt": "2026-11-05T08:40:10.826Z"
+    }
+  },
+  "roles": {}
+}

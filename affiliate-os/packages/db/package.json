@@ -10,7 +10,7 @@
     "migrate": "node src/cli.js"
   },
   "dependencies": {
-    "@electric-sql/pglite": "^0.5.14"
+    "@electric-sql/pglite": "^0.5.15"
   },
   "engines": {
     "node": ">=22"
